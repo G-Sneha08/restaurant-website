@@ -1,0 +1,46 @@
+// Cart Management System using localStorage
+
+const initCart = () => {
+    if (!localStorage.getItem('restaurant_cart')) {
+        localStorage.setItem('restaurant_cart', JSON.stringify([]));
+    }
+    updateCartCount();
+};
+
+const addToCart = (id, name, price, image) => {
+    let cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+
+    const existingItemIndex = cart.findIndex(item => item.id === id);
+
+    if (existingItemIndex > -1) {
+        cart[existingItemIndex].quantity += 1;
+    } else {
+        cart.push({
+            id: id,
+            name: name,
+            price: price,
+            image: image,
+            quantity: 1
+        });
+    }
+
+    localStorage.setItem('restaurant_cart', JSON.stringify(cart));
+    updateCartCount();
+
+    alert('Item added to cart successfully!');
+};
+
+const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.innerText = `(${count})`;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', initCart);
+
+// Export for use in other scripts
+window.addToCart = addToCart;
+window.updateCartCount = updateCartCount;
