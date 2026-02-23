@@ -48,3 +48,32 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
+// ================= PEXELS IMAGE ROUTE =================
+const axios = require('axios');
+
+app.get('/api/image', async (req, res) => {
+    try {
+        const query = req.query.query;
+
+        const response = await axios.get(
+            `https://api.pexels.com/v1/search?query=${query}&per_page=1`,
+            {
+                headers: {
+                    Authorization: process.env.PEXELS_API_KEY
+                }
+            }
+        );
+
+        if (response.data.photos.length > 0) {
+            res.json({
+                image: response.data.photos[0].src.large
+            });
+        } else {
+            res.json({ image: null });
+        }
+
+    } catch (error) {
+        console.error("Pexels API Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch image" });
+    }
+});
