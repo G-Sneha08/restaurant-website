@@ -29,7 +29,30 @@ function updateNavbar() {
         </ul>
     `;
 }
+async function loadImage(query, elementId) {
+    try {
+        const res = await fetch(`/api/image?query=${query}`);
+        const data = await res.json();
 
+        if (data.image) {
+            document.getElementById(elementId).src = data.image;
+        } else {
+            document.getElementById(elementId).src = "https://via.placeholder.com/300";
+        }
+
+    } catch (err) {
+        console.error("Image Load Error:", err);
+    }
+}
+
+// Load images automatically
+window.onload = function () {
+    loadImage("Paneer Tikka Indian food", "paneerTikkaImg");
+    loadImage("Crispy Corn appetizer", "crispyCornImg");
+    loadImage("Paneer Butter Masala curry", "paneerButterMasalaImg");
+    loadImage("Cold Coffee drink aesthetic", "coldCoffeeImg");
+    loadImage("Rasmalai dessert Indian", "rasmalaiImg");
+};
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
