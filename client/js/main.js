@@ -29,30 +29,28 @@ function updateNavbar() {
         </ul>
     `;
 }
-async function loadImage(query, elementId) {
+// ================= LOAD MENU IMAGES =================
+async function loadMenuImages() {
     try {
-        const res = await fetch(`/api/image?query=${query}`);
-        const data = await res.json();
+        const response = await fetch('/api/images');
+        const data = await response.json();
 
-        if (data.image) {
-            document.getElementById(elementId).src = data.image;
-        } else {
-            document.getElementById(elementId).src = "https://via.placeholder.com/300";
+        if (data.success) {
+            const images = data.images;
+
+            document.getElementById("paneerTikkaImg").src = images["Paneer Tikka"];
+            document.getElementById("crispyCornImg").src = images["Crispy Corn"];
+            document.getElementById("paneerButterMasalaImg").src = images["Paneer Butter Masala"];
+            document.getElementById("coldCoffeeImg").src = images["Cold Coffee"];
+            document.getElementById("rasmalaiImg").src = images["Rasmalai"];
         }
 
-    } catch (err) {
-        console.error("Image Load Error:", err);
+    } catch (error) {
+        console.error("Error loading menu images:", error);
     }
 }
 
-// Load images automatically
-window.onload = function () {
-    loadImage("vegetarian paneer butter masala Indian curry", "paneerButterMasalaImg");
-    loadImage("vegetarian paneer tikka skewers Indian food", "paneerTikkaImg");
-    loadImage("crispy fried sweet corn snack bowl", "crispyCornImg");
-    loadImage("iced cold coffee glass cafe aesthetic", "coldCoffeeImg");
-    loadImage("rasmalai Indian sweet dessert saffron milk", "rasmalaiImg");
-};
+window.onload = loadMenuImages;
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
