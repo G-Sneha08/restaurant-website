@@ -46,11 +46,13 @@ async function loadImage(query, elementId) {
 }
 
 // Load images automatically
-loadImage("Indian paneer tikka skewers grilled", "paneerTikkaImg");
-loadImage("crispy fried corn snack bowl", "crispyCornImg");
-loadImage("paneer butter masala curry in bowl", "paneerButterMasalaImg");
-loadImage("iced coffee glass aesthetic cafe", "coldCoffeeImg");
-loadImage("Indian rasmalai dessert saffron milk", "rasmalaiImg");
+window.onload = function () {
+    loadImage("vegetarian paneer butter masala Indian curry", "paneerButterMasalaImg");
+    loadImage("vegetarian paneer tikka skewers Indian food", "paneerTikkaImg");
+    loadImage("crispy fried sweet corn snack bowl", "crispyCornImg");
+    loadImage("iced cold coffee glass cafe aesthetic", "coldCoffeeImg");
+    loadImage("rasmalai Indian sweet dessert saffron milk", "rasmalaiImg");
+};
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

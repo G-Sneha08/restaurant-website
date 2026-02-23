@@ -48,7 +48,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
-// ================= PEXELS IMAGE ROUTE =================
+// ================= IMPROVED PEXELS IMAGE ROUTE =================
 const axios = require('axios');
 
 app.get('/api/image', async (req, res) => {
@@ -56,7 +56,7 @@ app.get('/api/image', async (req, res) => {
         const query = req.query.query;
 
         const response = await axios.get(
-            `https://api.pexels.com/v1/search?query=${query}&per_page=1`,
+            `https://api.pexels.com/v1/search?query=${query}&per_page=5&orientation=landscape`,
             {
                 headers: {
                     Authorization: process.env.PEXELS_API_KEY
@@ -64,13 +64,26 @@ app.get('/api/image', async (req, res) => {
             }
         );
 
-        if (response.data.photos.length > 0) {
-            res.json({
-                image: response.data.photos[0].src.large
-            });
-        } else {
-            res.json({ image: null });
+        if (response.data.photos.length === 0) {
+            return res.json({ image: null });
         }
+
+        // Filter out non-veg words
+        const filteredPhotos = response.data.photos.filter(photo => {
+            const text = (photo.alt || "").toLowerCase();
+            return !text.includes("chicken") &&
+                   !text.includes("meat") &&
+                   !text.includes("beef") &&
+                   !text.includes("pork");
+        });
+
+        const finalPhoto = filteredPhotos.length > 0
+            ? filteredPhotos[0]
+            : response.data.photos[0];
+
+        res.json({
+            image: finalPhoto.src.large
+        });
 
     } catch (error) {
         console.error("Pexels API Error:", error.message);
