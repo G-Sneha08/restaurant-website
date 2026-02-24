@@ -38,26 +38,20 @@ async function loadMenuImages() {
         if (data.success) {
             const images = data.images;
 
-            document.getElementById("paneerTikkaImg").src = images["Paneer Tikka"];
-            document.getElementById("crispyCornImg").src = images["Crispy Corn"];
-            document.getElementById("paneerButterMasalaImg").src = images["Paneer Butter Masala"];
-            document.getElementById("coldCoffeeImg").src = images["Cold Coffee"];
-            document.getElementById("rasmalaiImg").src = images["Rasmalai"];
+            const paneerTikka = document.getElementById("paneerTikkaImg");
+            const crispyCorn = document.getElementById("crispyCornImg");
+            const paneerButter = document.getElementById("paneerButterMasalaImg");
+            const coldCoffee = document.getElementById("coldCoffeeImg");
+            const rasmalai = document.getElementById("rasmalaiImg");
+
+            if (paneerTikka) paneerTikka.src = images["Paneer Tikka"];
+            if (crispyCorn) crispyCorn.src = images["Crispy Corn"];
+            if (paneerButter) paneerButter.src = images["Paneer Butter Masala"];
+            if (coldCoffee) coldCoffee.src = images["Cold Coffee"];
+            if (rasmalai) rasmalai.src = images["Rasmalai"];
         }
 
     } catch (error) {
         console.error("Error loading menu images:", error);
     }
 }
-
-window.onload = loadMenuImages;
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'index.html';
-}
-
-// Minimal global script for navbar logic across simple pages
-document.addEventListener('DOMContentLoaded', () => {
-    updateNavbar();
-});
