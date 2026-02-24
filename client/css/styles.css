@@ -334,10 +334,11 @@ section {
 }
 
 .card-img {
-    height: 200px;
+    height: 220px;
     width: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
+    border-radius:12px 12px 0 0;
 }
 
 .card:hover .card-img {
@@ -345,18 +346,20 @@ section {
 }
 
 .card-body {
-    padding: 25px;
+    padding: 15px;
 }
 
 .card-title {
-    font-size: 1.4rem;
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
     margin-bottom: 8px;
 }
 
 .card-desc {
     color: var(--text-light);
-    font-size: 0.95rem;
-    margin-bottom: 20px;
+    font-size: 14px;
+    margin-bottom: 12px;
     height: 45px;
     overflow: hidden;
 }
@@ -562,4 +565,10 @@ footer {
     .about-features {
         grid-template-columns: 1fr;
     }
+}
+.menu-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 40px;
 }
