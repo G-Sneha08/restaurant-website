@@ -32,6 +32,7 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 
+
 // Root route
 app.get('/', (req, res) => {
     res.send('Restaurant API is running...');
