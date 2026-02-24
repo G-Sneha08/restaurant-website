@@ -54,18 +54,19 @@ app.listen(PORT, () => {
 app.get('/api/images', (req, res) => {
     try {
 
-        const imageMap = {
-            "Paneer Tikka": "panner-tikka.jpg",
-            "Crispy Corn": "https://images.pexels.com/photos/5639411/pexels-photo-5639411.jpeg",
-            "Paneer Butter Masala": "https://images.pexels.com/photos/9609840/pexels-photo-9609840.jpeg",
-            "Cold Coffee": "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg",
-            "Rasmalai": "https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg"
-        };
+          const imageMap = {
+        "Paneer Tikka": "/images/panner-tikka.jpg",
+        "Paneer Butter Masala": "/images/paneer-butter-masala.jpg",
+        "Cold Coffee": "/images/cold-coffee.jpg",
+        "Crispy Corn": "/images/crispy-corn.jpg",
+        "Rasmalai": "/images/rasmalai.jpg"
+    };
 
-        res.status(200).json({
-            success: true,
-            images: imageMap
-        });
+    res.json({
+        success: true,
+        images: imageMap
+    });
+
 
     } catch (error) {
         console.error("Image API Error:", error);
