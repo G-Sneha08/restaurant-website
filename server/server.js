@@ -55,7 +55,7 @@ app.get('/api/images', (req, res) => {
     try {
 
         const imageMap = {
-            "Paneer Tikka": "https://images.pexels.com/photos/9609838/pexels-photo-9609838.jpeg",
+            "Paneer Tikka": "paneer-tikka.jpg",
             "Crispy Corn": "https://images.pexels.com/photos/5639411/pexels-photo-5639411.jpeg",
             "Paneer Butter Masala": "https://images.pexels.com/photos/9609840/pexels-photo-9609840.jpeg",
             "Cold Coffee": "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg",
