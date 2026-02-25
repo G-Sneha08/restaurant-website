@@ -46,10 +46,16 @@ window.addToCart = addToCart;
 window.updateCartCount = updateCartCount;
 async function checkout() {
     const token = localStorage.getItem("token");
+    const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
 
     if (!token) {
         alert("Please login first!");
         window.location.href = "login.html";
+        return;
+    }
+
+    if (cart.length === 0) {
+        alert("Cart is empty!");
         return;
     }
 
@@ -59,13 +65,15 @@ async function checkout() {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
-            }
+            },
+            body: JSON.stringify({ cartItems: cart })
         });
 
         const data = await response.json();
 
         if (response.ok) {
             alert("🎉 Order placed successfully!");
+            localStorage.setItem('restaurant_cart', JSON.stringify([]));
             window.location.reload();
         } else {
             alert(data.message);
