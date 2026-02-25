@@ -76,7 +76,7 @@
         </div>
     </footer>
 
-    <script src="js/cart.js"></script>
+   
     <script>
         function renderCart() {
             const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
@@ -158,18 +158,11 @@
             }
         }
 
-        function checkout() {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) {
-                alert('Please login to place an order.');
-                window.location.href = 'login.html';
-                return;
-            }
-            alert('Checkout functionality integration with backend would happen here.');
-        }
+        
 
         document.addEventListener('DOMContentLoaded', renderCart);
     </script>
+     <script src="js/cart.js"></script>
 </body>
 
 </html>
