@@ -44,3 +44,35 @@ document.addEventListener('DOMContentLoaded', initCart);
 // Export for use in other scripts
 window.addToCart = addToCart;
 window.updateCartCount = updateCartCount;
+async function checkout() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/orders/checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("🎉 Order placed successfully!");
+            window.location.reload();
+        } else {
+            alert(data.message);
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Checkout failed");
+    }
+}
