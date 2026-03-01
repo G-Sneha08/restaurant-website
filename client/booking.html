@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,19 +17,25 @@
     <main>
         <div class="booking-form-container">
             <div class="grid" style="margin-top:50px;">
+                
+                <!-- LEFT SIDE FORM -->
                 <div class="form-section">
                     <h2>Book a Table</h2>
-                    <p style="color:var(--text-light); margin-bottom: 30px;">Reservations are recommended for weekends.
+                    <p style="color:var(--text-light); margin-bottom: 30px;">
+                        Reservations are recommended for weekends.
                     </p>
+
                     <form id="booking-form" class="card" style="padding: 30px;">
                         <div class="form-group">
                             <label for="date">Date</label>
                             <input type="date" id="date" required>
                         </div>
+
                         <div class="form-group">
                             <label for="time">Time</label>
                             <input type="time" id="time" required>
                         </div>
+
                         <div class="form-group">
                             <label for="guests">Number of Guests</label>
                             <select id="guests" required>
@@ -39,90 +44,30 @@
                                 <option value="3">3 People</option>
                                 <option value="4">4 People</option>
                                 <option value="5">5 People</option>
-                                <option value="6+">6+ People</option>
+                                <option value="6">6 People</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width:100%;">Confirm Reservation</button>
+
+                        <button type="submit" class="btn btn-primary" style="width:100%;">
+                            Confirm Reservation
+                        </button>
                     </form>
-                    <div id="booking-msg" class="text-center mt-20"></div>
                 </div>
 
+                <!-- RIGHT SIDE BOOKINGS -->
                 <div class="status-section">
                     <h2>Your Bookings</h2>
                     <div id="booking-list" style="margin-top:30px;">
-                        <p class="text-center" id="load-msg">Loading your reservations...</p>
+                        <p class="text-center">Loading your reservations...</p>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
-    
-    <script>
-        document.getElementById('booking-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = localStorage.getItem('token');
-            if (!token) { window.location.href = 'login.html'; return; }
 
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            const guests = document.getElementById('guests').value;
-
-            try {
-                const response = await fetch('/api/booking', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ date, time, guests })
-                });
-
-                if (response.ok) {
-                    alert('Table reserved successfully!');
-                    loadBookings();
-                } else {
-                    alert('Booking failed. Please try again.');
-                }
-            } catch (err) { console.error(err); }
-        });
-
-        async function loadBookings() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                document.getElementById('booking-list').innerHTML = '<p class="text-center">Please login to see bookings.</p>';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/booking', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const bookings = await response.json();
-                const list = document.getElementById('booking-list');
-
-                if (bookings.length === 0) {
-                    list.innerHTML = '<p class="text-center">No reservations found.</p>';
-                    return;
-                }
-
-                list.innerHTML = bookings.map(b => `
-                    <div class="card" style="margin-bottom: 15px; padding: 15px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <div>
-                                <p style="font-weight:600;">${new Date(b.date).toLocaleDateString()}</p>
-                                <p style="font-size:0.85rem; color:var(--text-light);">${b.time} | ${b.guests} Guests</p>
-                            </div>
-                            <span class="badge badge-${b.status.toLowerCase()}">${b.status}</span>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (err) { console.error(err); }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadBookings);
-    </script>
+    <!-- Only external scripts -->
     <script src="js/main.js"></script>
     <script src="js/booking.js"></script>
 </body>
-
 </html>

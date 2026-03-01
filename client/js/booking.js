@@ -3,59 +3,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("booking-form");
 
-    if (form) {
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-            if (!token) {
-                alert("Please login first");
-                return;
+        if (!token) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const guests = document.getElementById("guests").value;
+
+        try {
+            const response = await fetch("/api/booking", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ date, time, guests })
+            });
+
+            if (response.ok) {
+                alert("Table reserved successfully!");
+                form.reset();
+                loadBookings();
+            } else {
+                alert("Booking failed. Please try again.");
             }
 
-            const date = document.getElementById("date").value;
-            const time = document.getElementById("time").value;
-            const guests = document.getElementById("guests").value;
-
-            try {
-                const response = await fetch("/api/booking", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ date, time, guests })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert("Table reserved successfully!");
-                    form.reset();
-                    loadBookings(); // reload after booking
-                } else {
-                    alert(data.message);
-                }
-
-            } catch (error) {
-                console.error(error);
-                alert("Error booking table");
-            }
-        });
-    }
+        } catch (error) {
+            console.error("Booking error:", error);
+        }
+    });
 });
 
 
-// ================= LOAD BOOKINGS =================
 async function loadBookings() {
     const token = localStorage.getItem("token");
-    const container = document.getElementById("booking-list");
-
-    if (!container) return;
+    const list = document.getElementById("booking-list");
 
     if (!token) {
-        container.innerHTML = "<p>Please login to view bookings.</p>";
+        list.innerHTML = "<p class='text-center'>Please login to see bookings.</p>";
         return;
     }
 
@@ -68,26 +60,28 @@ async function loadBookings() {
 
         const bookings = await response.json();
 
-        if (bookings.length === 0) {
-            container.innerHTML = "<p>No bookings yet.</p>";
+        if (!bookings || bookings.length === 0) {
+            list.innerHTML = "<p class='text-center'>No reservations found.</p>";
             return;
         }
 
-        container.innerHTML = "";
-
-        bookings.forEach(booking => {
-            container.innerHTML += `
-                <div class="booking-card">
-                    <h3>Reservation</h3>
-                    <p><strong>Date:</strong> ${booking.date.split("T")[0]}</p>
-                    <p><strong>Time:</strong> ${booking.time}</p>
-                    <p><strong>Guests:</strong> ${booking.guests}</p>
+        list.innerHTML = bookings.map(b => `
+            <div class="card" style="margin-bottom: 15px; padding: 15px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <div>
+                        <p style="font-weight:600;">
+                            ${new Date(b.date).toLocaleDateString()}
+                        </p>
+                        <p style="font-size:0.85rem; color:var(--text-light);">
+                            ${b.time} | ${b.guests} Guests
+                        </p>
+                    </div>
                 </div>
-            `;
-        });
+            </div>
+        `).join("");
 
     } catch (error) {
-        console.error(error);
-        container.innerHTML = "<p>Error loading bookings.</p>";
+        console.error("Load bookings error:", error);
+        list.innerHTML = "<p class='text-center'>Error loading bookings.</p>";
     }
 }
