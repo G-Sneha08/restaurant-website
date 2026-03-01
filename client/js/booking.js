@@ -70,7 +70,7 @@ async function loadBookings() {
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <p style="font-weight:600;">
-                            ${new Date(b.date).toLocaleDateString()}
+                            ${new Date(b.date).toLocaleDateString('en-GB')}
                         </p>
                         <p style="font-size:0.85rem; color:var(--text-light);">
                             ${b.time} | ${b.guests} Guests
