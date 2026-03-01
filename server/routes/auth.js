@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
-
+const sendEmail = require("../utils/sendEmail");
 // @route   POST /api/auth/register
 // @desc    Register a user
 router.post('/register', async (req, res) => {
@@ -14,7 +14,11 @@ router.post('/register', async (req, res) => {
         if (existingUser.length > 0) {
             return res.status(400).json({ message: 'User already exists' });
         }
-
+await sendEmail(
+    email,
+    "Welcome to Lumina Dine 🎉",
+    `Hello ${name},\n\nYour account has been successfully created!\n\nThank you for registering with Lumina Dine.`
+);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -47,7 +51,11 @@ router.post('/login', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
         const user = rows[0];
-
+await sendEmail(
+    user.email,
+    "Login Alert - Lumina Dine",
+    `Hello ${user.name},\n\nYou have successfully logged into your account.\n\nIf this wasn't you, please reset your password immediately.`
+);
         if (user && (await bcrypt.compare(password, user.password))) {
             const token = jwt.sign(
                 { id: user.id, role: user.role },
