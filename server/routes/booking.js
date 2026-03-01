@@ -38,5 +38,22 @@ router.post('/', protect, async (req, res) => {
     }
 });
 
+// ================= DELETE BOOKING =================
+router.delete('/:id', protect, async (req, res) => {
+    const bookingId = req.params.id;
 
+    try {
+        // Only allow user to delete their own booking
+        await pool.query(
+            'DELETE FROM bookings WHERE id = ? AND user_id = ?',
+            [bookingId, req.user.id]
+        );
+
+        res.json({ message: 'Booking cancelled successfully' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 module.exports = router;

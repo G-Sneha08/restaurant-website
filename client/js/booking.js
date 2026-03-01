@@ -66,22 +66,52 @@ async function loadBookings() {
         }
 
         list.innerHTML = bookings.map(b => `
-            <div class="card" style="margin-bottom: 15px; padding: 15px;">
-                <div style="display:flex; justify-content:space-between;">
-                    <div>
-                        <p style="font-weight:600;">
-                            ${new Date(b.date).toLocaleDateString()}
-                        </p>
-                        <p style="font-size:0.85rem; color:var(--text-light);">
-                            ${b.time} | ${b.guests} Guests
-                        </p>
-                    </div>
-                </div>
+    <div class="card" style="margin-bottom: 15px; padding: 15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <p style="font-weight:600;">
+                    ${new Date(b.date).toLocaleDateString()}
+                </p>
+                <p style="font-size:0.85rem; color:var(--text-light);">
+                    ${b.time} | ${b.guests} Guests
+                </p>
             </div>
-        `).join("");
+
+            <button 
+                onclick="cancelBooking(${b.id})" 
+                style="background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">
+                Cancel
+            </button>
+        </div>
+    </div>
+`).join("");
 
     } catch (error) {
         console.error("Load bookings error:", error);
         list.innerHTML = "<p class='text-center'>Error loading bookings.</p>";
     }
+    async function cancelBooking(id) {
+    const token = localStorage.getItem("token");
+
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+    try {
+        const response = await fetch(`/api/booking/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            alert("Booking cancelled successfully");
+            loadBookings(); // Refresh list
+        } else {
+            alert("Failed to cancel booking");
+        }
+
+    } catch (error) {
+        console.error("Cancel error:", error);
+    }
+}
 }
