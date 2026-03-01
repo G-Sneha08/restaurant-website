@@ -49,15 +49,14 @@
 
                 <div class="status-section">
                     <h2>Your Bookings</h2>
-                    <div id="booking-list" style="margin-top:30px;">
+                    <div id="booking-container" style="margin-top:30px;">
                         <p class="text-center" id="load-msg">Loading your reservations...</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-    <script src="js/main.js"></script>
-    <script src="js/booking.js"></script>
+    
     <script>
         document.getElementById('booking-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -122,6 +121,8 @@
 
         document.addEventListener('DOMContentLoaded', loadBookings);
     </script>
+    <script src="js/main.js"></script>
+    <script src="js/booking.js"></script>
 </body>
 
 </html>
