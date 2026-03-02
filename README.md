@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 z# Lumina Dine - Restaurant Management System
+=======
+# Lumina Dine - Restaurant Management System
+>>>>>>> 5cc34f09652c928b31cdd89313c065a5f7fd6b40
 
 A full-stack, production-ready Restaurant Management Web Application built with Node.js, Express, MySQL, and Vanilla JavaScript.
 
