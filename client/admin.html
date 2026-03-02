@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Dine | Experience the Taste of Excellence</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .admin-sidebar {
+            background: var(--secondary);
+            color: white;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar a {
+            display: block;
+            padding: 10px 0;
+            color: #ccc;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .admin-main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body style="display:flex;">
+    <aside class="admin-sidebar" style="width:250px;">
+        <h2 style="margin-bottom:40px; color:var(--primary);">Admin Board</h2>
+        <nav>
+            <a href="#" class="active" onclick="showTab('orders')">Manage Orders</a>
+            <a href="#" onclick="showTab('menu')">Manage Menu</a>
+            <a href="#" onclick="showTab('users')">Manage Users</a>
+            <hr style="margin:20px 0; border:0.5px solid #444;">
+            <a href="index.html">Back to Site</a>
+            <a href="#" onclick="logout()" style="color:var(--primary);">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <!-- Orders Tab -->
+        <div id="orders-tab" class="tab-content active">
+            <h2>Orders Management</h2>
+            <table style="margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-orders-list"></tbody>
+            </table>
+        </div>
+
+        <!-- Menu Tab -->
+        <div id="menu-tab" class="tab-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Menu Management</h2>
+                <button class="btn btn-primary" onclick="showAddMenuModal()">+ Add New Item</button>
+            </div>
+            <table style="margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-menu-list"></tbody>
+            </table>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content">
+            <h2>User Management</h2>
+            <table style="margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-users-list"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!token || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.admin-sidebar a').forEach(a => a.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tab === 'orders') loadAdminOrders();
+            if (tab === 'menu') loadAdminMenu();
+            if (tab === 'users') loadAdminUsers();
+        }
+
+        async function loadAdminOrders() {
+            const res = await fetch('/api/admin/orders', { headers: { 'Authorization': `Bearer ${token}` } });
+            const orders = await res.json();
+            const list = document.getElementById('admin-orders-list');
+            list.innerHTML = orders.map(o => `
+                <tr>
+                    <td>#${o.id}</td>
+                    <td>${o.user_name}</td>
+                    <td>$${o.total_amount}</td>
+                    <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
+                    <td>
+                        <select onchange="updateStatus(${o.id}, this.value)">
+                            <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateStatus(id, status) {
+            await fetch(`/api/admin/orders/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ status })
+            });
+            loadAdminOrders();
+        }
+
+        async function loadAdminMenu() {
+            const res = await fetch('/api/menu'); // Public menu API is fine for list
+            const menu = await res.json();
+            const list = document.getElementById('admin-menu-list');
+            list.innerHTML = menu.map(m => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td>${m.category}</td>
+                    <td>$${m.price}</td>
+                    <td>${m.available ? 'Available' : 'Sold Out'}</td>
+                    <td>
+                        <button onclick="deleteMenu(${m.id})" style="color:red; background:none; border:none; cursor:pointer;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function deleteMenu(id) {
+            if (confirm('Delete this item?')) {
+                await fetch(`/api/admin/menu/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadAdminMenu();
+            }
+        }
+
+        async function loadAdminUsers() {
+            const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+            const users = await res.json();
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = users.map(u => `
+                <tr>
+                    <td>#${u.id}</td>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td>${u.role}</td>
+                    <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddMenuModal() {
+            const name = prompt('Item Name:');
+            const price = prompt('Price:');
+            const category = prompt('Category (e.g. Starters, Main, Dessert):');
+            const desc = prompt('Description:');
+
+            if (name && price) {
+                fetch('/api/admin/menu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ name, price, category, description: desc })
+                }).then(() => loadAdminMenu());
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAdminOrders);
+    </script>
+</body>
+
+</html>
