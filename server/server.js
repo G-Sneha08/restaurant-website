@@ -23,7 +23,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.static('client'));
-app.use(express.static(path.join(__dirname, "../client")));
+//app.use(express.static(path.join(__dirname, "../client")));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
