@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS restaurant_db;
-USE restaurant_db;
+USE railway;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
