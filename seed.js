@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 
 // Railway DB connection
 const pool = mysql.createPool({
-    host: process.env.crossover.proxy.rlwy.net,
+    host: process.env.mysql.railway.internal,
     user: process.env.root,
     password: process.env.VgknVczRXKYYnbRoIVWRGwMwjOFgJfko,
     database: process.env.railway,
