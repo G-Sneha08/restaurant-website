@@ -1,4 +1,4 @@
-import { SpeedInsights } from "@vercel/speed-insights/next"
+// import { SpeedInsights } from "@vercel/speed-insights/next"
 function updateNavbar() {
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
