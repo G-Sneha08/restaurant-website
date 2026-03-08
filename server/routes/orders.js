@@ -28,8 +28,8 @@ router.post('/checkout', protect, async (req, res) => {
 
         for (let item of cartItems) {
             await pool.query(
-                "INSERT INTO order_items (order_id, item_name, price, quantity) VALUES (?, ?, ?, ?)",
-                [orderId, item.name, item.price, item.quantity]
+                "INSERT INTO order_items (order_id, menu_id, quantity,price, ) VALUES (?, ?, ?, ?)",
+                [orderId, item.menu_id, item.quantity, item.price]
             );
         }
 
