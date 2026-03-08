@@ -32,13 +32,16 @@ A full-stack, production-ready Restaurant Management Web Application built with 
 ### 2. Environment Variables
 Create a `.env` file in the root directory and add the following:
 ```env
-DB_HOST=localhost
-DB_USER=your_mysql_user
-DB_PASSWORD=your_mysql_password
-DB_NAME=restaurant_db
-JWT_SECRET=your_jwt_secret_key
+DB_HOST=crossover.proxy.rlwy.net
+DB_PORT=12849
+DB_USER=root
+DB_PASSWORD=VgknVczRXKYYnbRoIVWRGwMwjOFgJfko
+DB_NAME=railway
+
+JWT_SECRET=your_super_secret_jwt_key
 PORT=5000
 NODE_ENV=development
+PEXELS_API_KEY=lREKBvDWZIUvJBQjCJpvC46YG9n2XH7M6KPjGhaN2YWiHiKOK0L8lWdk
 ```
 
 ### 3. Installation
