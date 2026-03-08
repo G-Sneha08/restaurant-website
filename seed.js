@@ -7,7 +7,7 @@ const pool = mysql.createPool({
     user: process.env.root,
     password: process.env.VgknVczRXKYYnbRoIVWRGwMwjOFgJfko,
     database: process.env.railway,
-    port: process.env.12849
+    port: process.env.DB_PORT
 });
 
 async function seed() {
