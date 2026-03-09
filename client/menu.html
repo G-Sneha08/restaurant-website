@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -407,6 +407,183 @@
     </footer>
 
     <script src="js/cart.js"></script>
+</body>
+
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exquisite Menu | Lumina Dine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Minimal styles in case not in styles.css */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 10px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav id="navbar">
+                <a href="index.html" class="logo">LUMINA DINE</a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="menu.html">Menu</a></li>
+                    <li><a href="cart.html">Cart <span id="cart-count">0</span></a></li>
+                    <li><a href="#footer">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="margin-top: 50px;">
+            <div class="section-title">
+                <h1>Our Culinary Gallery</h1>
+                <p>Explore the finest selection of dishes at Lumina Dine</p>
+            </div>
+
+            <!-- Dynamic Menu will be injected here -->
+            <div id="menu-sections"></div>
+        </div>
+    </main>
+
+    <footer id="footer" style="margin-top: 50px;">
+        <div class="container">
+            <p>&copy; 2026 Lumina Dine. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/cart.js"></script>
+
+    <!-- Dynamic Menu Script -->
+    <script>
+        // Load cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cart-count').textContent = `(${cart.length})`;
+        }
+
+        updateCartCount();
+
+        // Fetch menu items dynamically
+        async function loadMenu() {
+            try {
+                const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/menu'); // replace with your backend
+                const data = await res.json();
+
+                if (!data.items || data.items.length === 0) {
+                    document.getElementById('menu-sections').innerHTML = "<p>No menu items available.</p>";
+                    return;
+                }
+
+                // Group items by category
+                const categories = {};
+                data.items.forEach(item => {
+                    if (!categories[item.category]) categories[item.category] = [];
+                    categories[item.category].push(item);
+                });
+
+                let html = '';
+                for (const category in categories) {
+                    html += `
+                    <section id="${category.toLowerCase().replace(/\s+/g, '-')}" class="menu-section" style="margin-top:80px;">
+                        <h2 style="margin-bottom:30px; border-bottom:2px solid var(--primary); display:inline-block;">${category}</h2>
+                        <div class="grid">
+                            ${categories[category].map(item => `
+                                <div class="card">
+                                    <img src="${item.image_url}" alt="${item.name}" class="card-img">
+                                    <div class="card-body">
+                                        <h3 class="card-title">${item.name}</h3>
+                                        <p class="card-desc">${item.description || ''}</p>
+                                        <div class="card-footer">
+                                            <span class="card-price">₹${item.price}</span>
+                                            <button onclick="addToCart(${item.id}, '${item.name}', ${item.price}, '${item.image_url}')" class="btn btn-primary btn-sm">Add to Cart</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>`;
+                }
+
+                document.getElementById('menu-sections').innerHTML = html;
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('menu-sections').innerHTML = "<p>Failed to load menu items.</p>";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadMenu);
+    </script>
 </body>
 
 </html>
