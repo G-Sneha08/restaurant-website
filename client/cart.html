@@ -58,11 +58,22 @@
 </main>
 
 <script>
+// ---------- Configuration ----------
+const BACKEND_URL = 'https://restaurant-backend-cli2.onrender.com';
 const token = localStorage.getItem('token');
 
+// ---------- Load Cart ----------
 async function loadCart() {
+    if (!token) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
     try {
-        const res = await fetch('/api/cart', { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${BACKEND_URL}/api/cart`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
 
         const table = document.getElementById('cart-table');
@@ -85,7 +96,8 @@ async function loadCart() {
 
         let total = 0;
         tbody.innerHTML = data.items.map(item => {
-            total += item.price * item.quantity;
+            const subtotal = item.price * item.quantity;
+            total += subtotal;
             return `
                 <tr>
                     <td>
@@ -100,7 +112,7 @@ async function loadCart() {
                         ${item.quantity}
                         <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
                     </td>
-                    <td>₹${item.price * item.quantity}</td>
+                    <td>₹${subtotal}</td>
                     <td>
                         <button onclick="deleteItem(${item.id})" style="background:none; border:none; cursor:pointer; color:var(--primary)">
                             <i class="fas fa-trash"></i>
@@ -111,17 +123,20 @@ async function loadCart() {
         }).join('');
 
         document.getElementById('total-price').innerText = `₹${total}`;
-        cartCountElement.innerText = `(${data.items.length})`;
+        cartCountElement.innerText = `(${data.items.reduce((sum, i) => sum + i.quantity, 0)})`;
+
     } catch (err) {
         console.error(err);
         alert('Failed to load cart');
     }
 }
 
+// ---------- Update Quantity ----------
 async function updateQuantity(cartId, quantity) {
     if (quantity < 1) return;
+
     try {
-        const res = await fetch(`/api/cart/${cartId}`, {
+        const res = await fetch(`${BACKEND_URL}/api/cart/${cartId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ quantity })
@@ -135,9 +150,13 @@ async function updateQuantity(cartId, quantity) {
     }
 }
 
+// ---------- Delete Item ----------
 async function deleteItem(cartId) {
     try {
-        const res = await fetch(`/api/cart/${cartId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${BACKEND_URL}/api/cart/${cartId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
         if (!res.ok) alert(data.message);
         else loadCart();
@@ -147,9 +166,13 @@ async function deleteItem(cartId) {
     }
 }
 
+// ---------- Checkout ----------
 async function checkout() {
     try {
-        const res = await fetch('/api/cart/checkout', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${BACKEND_URL}/api/cart/checkout`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
         if (!res.ok) alert(data.message);
         else {
@@ -162,14 +185,16 @@ async function checkout() {
     }
 }
 
-document.getElementById('checkout-btn').addEventListener('click', checkout);
+// ---------- Clear Cart ----------
 document.getElementById('clear-cart-btn').addEventListener('click', async () => {
     if (confirm('Are you sure you want to clear your cart?')) {
-        await fetch('/api/cart', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        await fetch(`${BACKEND_URL}/api/cart`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         loadCart();
     }
 });
 
+// ---------- Event Listeners ----------
+document.getElementById('checkout-btn').addEventListener('click', checkout);
 window.addEventListener('DOMContentLoaded', loadCart);
 </script>
 
