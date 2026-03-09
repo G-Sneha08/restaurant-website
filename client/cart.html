@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumina Dine | Cart</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumina Dine | Cart</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
 <header>
     <nav>
         <a href="index.html" class="logo">LUMINA DINE</a>
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="index.html#featured">Menu</a></li>
-            <li><a href="cart.html">Cart</a></li>
+            <li><a href="cart.html">Cart <span id="cart-count">(0)</span></a></li>
         </ul>
     </nav>
 </header>
@@ -57,24 +58,24 @@
 </main>
 
 <script>
-const token = localStorage.getItem('token'); // your JWT token
+const token = localStorage.getItem('token');
 
 async function loadCart() {
     try {
-        const res = await fetch('/api/cart', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch('/api/cart', { headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
 
         const table = document.getElementById('cart-table');
         const tbody = document.getElementById('cart-items');
         const emptyMsg = document.getElementById('empty-msg');
         const footerActions = document.getElementById('cart-footer-actions');
+        const cartCountElement = document.getElementById('cart-count');
 
         if (!data.items || data.items.length === 0) {
             table.style.display = 'none';
             footerActions.style.display = 'none';
             emptyMsg.style.display = 'block';
+            cartCountElement.innerText = '(0)';
             return;
         }
 
@@ -110,6 +111,7 @@ async function loadCart() {
         }).join('');
 
         document.getElementById('total-price').innerText = `₹${total}`;
+        cartCountElement.innerText = `(${data.items.length})`;
     } catch (err) {
         console.error(err);
         alert('Failed to load cart');
@@ -121,10 +123,7 @@ async function updateQuantity(cartId, quantity) {
     try {
         const res = await fetch(`/api/cart/${cartId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ quantity })
         });
         const data = await res.json();
@@ -138,10 +137,7 @@ async function updateQuantity(cartId, quantity) {
 
 async function deleteItem(cartId) {
     try {
-        const res = await fetch(`/api/cart/${cartId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch(`/api/cart/${cartId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
         if (!res.ok) alert(data.message);
         else loadCart();
@@ -153,10 +149,7 @@ async function deleteItem(cartId) {
 
 async function checkout() {
     try {
-        const res = await fetch('/api/cart/checkout', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch('/api/cart/checkout', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
         if (!res.ok) alert(data.message);
         else {
@@ -172,18 +165,13 @@ async function checkout() {
 document.getElementById('checkout-btn').addEventListener('click', checkout);
 document.getElementById('clear-cart-btn').addEventListener('click', async () => {
     if (confirm('Are you sure you want to clear your cart?')) {
-        const res = await fetch('/api/cart', {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        for (const item of data.items) {
-            await deleteItem(item.id);
-        }
+        await fetch('/api/cart', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        loadCart();
     }
 });
 
 window.addEventListener('DOMContentLoaded', loadCart);
 </script>
+
 </body>
 </html>

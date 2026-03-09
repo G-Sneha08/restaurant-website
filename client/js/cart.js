@@ -1,17 +1,20 @@
+// ============================
 // Cart Management System using localStorage
+// ============================
 
 const initCart = () => {
     if (!localStorage.getItem('restaurant_cart')) {
         localStorage.setItem('restaurant_cart', JSON.stringify([]));
     }
     updateCartCount();
+    renderCartItems(); // render items on page load
 };
 
+// Add item to cart
 const addToCart = (id, name, price, image) => {
     let cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
 
-    // convert id to number to avoid "s1" type errors
-    id = parseInt(id);
+    id = parseInt(id); // ensure number
 
     const existingItemIndex = cart.findIndex(item => item.menu_id === id);
 
@@ -29,9 +32,12 @@ const addToCart = (id, name, price, image) => {
 
     localStorage.setItem('restaurant_cart', JSON.stringify(cart));
     updateCartCount();
+    renderCartItems();
 
     alert('Item added to cart successfully!');
 };
+
+// Update cart count in header/badge
 const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
     const count = cart.reduce((total, item) => total + item.quantity, 0);
@@ -41,12 +47,57 @@ const updateCartCount = () => {
     }
 };
 
-document.addEventListener('DOMContentLoaded', initCart);
+// Render cart items on the page
+const renderCartItems = () => {
+    const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+    const container = document.getElementById('cart-items-container');
+    if (!container) return;
 
-// Export for use in other scripts
-window.addToCart = addToCart;
-window.updateCartCount = updateCartCount;
-async function checkout() {
+    container.innerHTML = ''; // clear previous
+
+    if (cart.length === 0) {
+        container.innerHTML = '<p>Your cart is empty!</p>';
+        return;
+    }
+
+    let totalPrice = 0;
+
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        totalPrice += subtotal;
+
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" width="80">
+            <div style="margin-left: 10px;">
+                <h3>${item.name}</h3>
+                <p>Price: $${item.price}</p>
+                <p>Quantity: ${item.quantity}</p>
+                <p>Subtotal: $${subtotal}</p>
+                <button onclick="removeFromCart(${item.menu_id})">Remove</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    // Total price
+    const totalDiv = document.createElement('div');
+    totalDiv.innerHTML = `<h3>Total: $${totalPrice}</h3>`;
+    container.appendChild(totalDiv);
+};
+
+// Remove an item from cart
+const removeFromCart = (id) => {
+    let cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+    cart = cart.filter(item => item.menu_id !== id);
+    localStorage.setItem('restaurant_cart', JSON.stringify(cart));
+    updateCartCount();
+    renderCartItems();
+};
+
+// Checkout function
+const checkout = async () => {
     const token = localStorage.getItem("token");
     const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
 
@@ -62,7 +113,7 @@ async function checkout() {
     }
 
     try {
-        const response = await fetch("/api/orders/checkout", {
+        const response = await fetch("/api/cart/checkout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -76,7 +127,8 @@ async function checkout() {
         if (response.ok) {
             alert("🎉 Order placed successfully!");
             localStorage.setItem('restaurant_cart', JSON.stringify([]));
-            window.location.reload();
+            updateCartCount();
+            renderCartItems();
         } else {
             alert(data.message);
         }
@@ -85,4 +137,12 @@ async function checkout() {
         console.error(error);
         alert("Checkout failed");
     }
-}
+};
+
+document.addEventListener('DOMContentLoaded', initCart);
+
+// Export for use in other scripts
+window.addToCart = addToCart;
+window.updateCartCount = updateCartCount;
+window.checkout = checkout;
+window.removeFromCart = removeFromCart;
