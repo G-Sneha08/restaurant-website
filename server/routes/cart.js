@@ -10,13 +10,18 @@ const { protect } = require('../middleware/authMiddleware');
 router.get('/', protect, async (req, res) => {
     try {
         const [rows] = await pool.query(
-            `SELECT cart.*, menu.name, menu.price, menu.image_url
+            `SELECT cart.*, menu.name, menu.price, menu.image_url,
+                    (cart.quantity * menu.price) AS subtotal
              FROM cart
              JOIN menu ON cart.menu_id = menu.id
              WHERE cart.user_id = ?`,
             [req.user.id]
         );
-        res.json(rows);
+
+        // Calculate total price
+        const totalPrice = rows.reduce((sum, item) => sum + item.subtotal, 0);
+
+        res.json({ items: rows, totalPrice });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
@@ -30,16 +35,14 @@ router.get('/', protect, async (req, res) => {
 router.post('/', protect, async (req, res) => {
     const { menu_id, quantity } = req.body;
 
-    if (!menu_id || quantity <= 0) {
-        return res.status(400).json({ message: 'Invalid menu item or quantity' });
-    }
+    if (!menu_id) return res.status(400).json({ message: 'menu_id is required' });
+    if (!quantity || quantity <= 0) return res.status(400).json({ message: 'quantity must be > 0' });
 
     try {
         // Fetch item details from menu
         const [menuItem] = await pool.query('SELECT name, price FROM menu WHERE id = ?', [menu_id]);
-        if (!menuItem.length) {
-            return res.status(404).json({ message: 'Menu item not found' });
-        }
+        if (!menuItem.length) return res.status(404).json({ message: `Menu item with id ${menu_id} not found` });
+
         const { name, price } = menuItem[0];
 
         // Check if item already exists in cart
@@ -50,10 +53,7 @@ router.post('/', protect, async (req, res) => {
 
         if (existing.length > 0) {
             // Update quantity
-            await pool.query(
-                'UPDATE cart SET quantity = quantity + ? WHERE id = ?',
-                [quantity, existing[0].id]
-            );
+            await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [quantity, existing[0].id]);
         } else {
             // Insert new item
             await pool.query(
@@ -75,9 +75,7 @@ router.post('/', protect, async (req, res) => {
 // ============================
 router.put('/:id', protect, async (req, res) => {
     const { quantity } = req.body;
-    if (quantity <= 0) {
-        return res.status(400).json({ message: 'Quantity must be at least 1' });
-    }
+    if (!quantity || quantity <= 0) return res.status(400).json({ message: 'Quantity must be at least 1' });
 
     try {
         const [result] = await pool.query(
@@ -85,9 +83,7 @@ router.put('/:id', protect, async (req, res) => {
             [quantity, req.params.id, req.user.id]
         );
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Cart item not found' });
-        }
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Cart item not found' });
 
         res.json({ message: 'Cart updated' });
     } catch (err) {
@@ -101,15 +97,15 @@ router.put('/:id', protect, async (req, res) => {
 // Remove an item from cart
 // ============================
 router.delete('/:id', protect, async (req, res) => {
+    if (!req.params.id) return res.status(400).json({ message: 'Cart item id required' });
+
     try {
         const [result] = await pool.query(
             'DELETE FROM cart WHERE id = ? AND user_id = ?',
             [req.params.id, req.user.id]
         );
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Cart item not found' });
-        }
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Cart item not found' });
 
         res.json({ message: 'Item removed' });
     } catch (err) {
@@ -124,7 +120,7 @@ router.delete('/:id', protect, async (req, res) => {
 // ============================
 router.post('/checkout', protect, async (req, res) => {
     try {
-        // Get all cart items for this user
+        // Get all cart items
         const [cartItems] = await pool.query(
             `SELECT cart.menu_id, cart.quantity, menu.name, menu.price
              FROM cart
@@ -133,9 +129,7 @@ router.post('/checkout', protect, async (req, res) => {
             [req.user.id]
         );
 
-        if (cartItems.length === 0) {
-            return res.status(400).json({ message: 'Cart is empty' });
-        }
+        if (cartItems.length === 0) return res.status(400).json({ message: 'Cart is empty' });
 
         // Calculate total price
         const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -148,17 +142,8 @@ router.post('/checkout', protect, async (req, res) => {
         const orderId = orderResult.insertId;
 
         // Insert order items
-        const orderItemsValues = cartItems.map(item => [
-            orderId,
-            item.menu_id,
-            item.quantity,
-            item.price
-        ]);
-
-        await pool.query(
-            'INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES ?',
-            [orderItemsValues]
-        );
+        const orderItemsValues = cartItems.map(item => [orderId, item.menu_id, item.quantity, item.price]);
+        await pool.query('INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES ?', [orderItemsValues]);
 
         // Clear cart
         await pool.query('DELETE FROM cart WHERE user_id = ?', [req.user.id]);
