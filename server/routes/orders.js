@@ -39,7 +39,7 @@ router.post('/checkout', protect, async (req, res) => {
                 "INSERT INTO order_items (order_id, menu_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
                 [
                     orderId,
-                    item.menu_id,
+                    item.menu_id || item.id,
                     item.name,
                     item.quantity,
                     item.price
