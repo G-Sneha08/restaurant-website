@@ -4,6 +4,7 @@
 
 const token = localStorage.getItem('token'); // JWT token
 
+// Load cart items from backend
 async function loadCart() {
     if (!token) {
         alert("Please login to view your cart!");
@@ -15,6 +16,8 @@ async function loadCart() {
         const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/cart', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (!res.ok) throw new Error("Failed to fetch cart");
 
         const data = await res.json();
 
@@ -29,6 +32,7 @@ async function loadCart() {
             footerActions.style.display = 'none';
             emptyMsg.style.display = 'block';
             cartCountElement.innerText = '(0)';
+            document.getElementById('total-price').innerText = '₹0';
             return;
         }
 
@@ -73,7 +77,7 @@ async function loadCart() {
     }
 }
 
-// Update quantity
+// Update quantity of a cart item
 async function updateQuantity(cartId, quantity) {
     if (quantity < 1) return;
 
@@ -97,7 +101,7 @@ async function updateQuantity(cartId, quantity) {
     }
 }
 
-// Delete item
+// Delete a cart item
 async function deleteItem(cartId) {
     try {
         const res = await fetch(`https://restaurant-backend-cli2.onrender.com/api/cart/${cartId}`, {
@@ -115,8 +119,10 @@ async function deleteItem(cartId) {
     }
 }
 
-// Checkout
+// Checkout cart
 async function checkout() {
+    if (!confirm("Proceed to checkout?")) return;
+
     try {
         const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/cart/checkout', {
             method: 'POST',
@@ -136,200 +142,27 @@ async function checkout() {
     }
 }
 
-// Clear cart
+// Clear all cart items
 async function clearCart() {
     if (!confirm("Are you sure you want to clear your cart?")) return;
 
     try {
-        const res = await fetch('<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumina Dine | Cart</title>
-<link rel="stylesheet" href="css/styles.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
-<header>
-    <nav>
-        <a href="index.html" class="logo">LUMINA DINE</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#featured">Menu</a></li>
-            <li><a href="cart.html">Cart <span id="cart-count">(0)</span></a></li>
-        </ul>
-    </nav>
-</header>
-
-<main>
-    <div class="container" style="margin-top:50px;">
-        <h2>Your Shopping Cart</h2>
-
-        <table id="cart-table" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="cart-items"></tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3" style="text-align:right; font-weight:700;">Cart Total:</td>
-                    <td id="total-price" style="font-weight:700; color:#27ae60;">₹0</td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <div id="empty-msg" style="text-align:center; padding: 100px 0;">
-            <i class="fas fa-shopping-basket" style="font-size: 4rem; color: #ddd;"></i>
-            <h3>Your cart is empty</h3>
-            <a href="index.html#featured" class="btn btn-primary">Browse Menu</a>
-        </div>
-
-        <div id="cart-footer-actions" style="display:none; text-align:center; margin-top:20px;">
-            <button id="clear-cart-btn" class="btn btn-outline" style="margin-right:10px;">Clear Cart</button>
-            <button id="checkout-btn" class="btn btn-primary">Proceed to Checkout</button>
-        </div>
-    </div>
-</main>
-
-<script>
-const token = localStorage.getItem('token');
-
-async function loadCart() {
-    try {
-        const res = await fetch('/api/cart', { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-
-        const table = document.getElementById('cart-table');
-        const tbody = document.getElementById('cart-items');
-        const emptyMsg = document.getElementById('empty-msg');
-        const footerActions = document.getElementById('cart-footer-actions');
-        const cartCountElement = document.getElementById('cart-count');
-
-        if (!data.items || data.items.length === 0) {
-            table.style.display = 'none';
-            footerActions.style.display = 'none';
-            emptyMsg.style.display = 'block';
-            cartCountElement.innerText = '(0)';
-            return;
-        }
-
-        table.style.display = 'table';
-        emptyMsg.style.display = 'none';
-        footerActions.style.display = 'block';
-
-        let total = 0;
-        tbody.innerHTML = data.items.map(item => {
-            total += item.price * item.quantity;
-            return `
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <img src="${item.image_url}" width="60" height="60" style="border-radius:10px; object-fit:cover;">
-                            <span>${item.name}</span>
-                        </div>
-                    </td>
-                    <td>₹${item.price}</td>
-                    <td>
-                        <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
-                        ${item.quantity}
-                        <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                    </td>
-                    <td>₹${item.price * item.quantity}</td>
-                    <td>
-                        <button onclick="deleteItem(${item.id})" style="background:none; border:none; cursor:pointer; color:var(--primary)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        document.getElementById('total-price').innerText = `₹${total}`;
-        cartCountElement.innerText = `(${data.items.length})`;
-    } catch (err) {
-        console.error(err);
-        alert('Failed to load cart');
-    }
-}
-
-async function updateQuantity(cartId, quantity) {
-    if (quantity < 1) return;
-    try {
-        const res = await fetch(`/api/cart/${cartId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ quantity })
-        });
-        const data = await res.json();
-        if (!res.ok) alert(data.message);
-        else loadCart();
-    } catch (err) {
-        console.error(err);
-        alert('Failed to update quantity');
-    }
-}
-
-async function deleteItem(cartId) {
-    try {
-        const res = await fetch(`/api/cart/${cartId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (!res.ok) alert(data.message);
-        else loadCart();
-    } catch (err) {
-        console.error(err);
-        alert('Failed to delete item');
-    }
-}
-
-async function checkout() {
-    try {
-        const res = await fetch('/api/cart/checkout', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        if (!res.ok) alert(data.message);
-        else {
-            alert(data.message);
-            loadCart();
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Checkout failed');
-    }
-}
-
-document.getElementById('checkout-btn').addEventListener('click', checkout);
-document.getElementById('clear-cart-btn').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to clear your cart?')) {
-        await fetch('/api/cart', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-        loadCart();
-    }
-});
-
-window.addEventListener('DOMContentLoaded', loadCart);
-</script>
-
-</body>
-</html>, {
+        const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/cart', {
+            method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
         const data = await res.json();
-        for (const item of data.items) {
-            await deleteItem(item.id);
-        }
+        if (!res.ok) alert(data.message);
+        else loadCart();
+
     } catch (err) {
         console.error(err);
         alert("Failed to clear cart");
     }
 }
 
+// Event listeners
 document.getElementById('checkout-btn').addEventListener('click', checkout);
 document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
 window.addEventListener('DOMContentLoaded', loadCart);
