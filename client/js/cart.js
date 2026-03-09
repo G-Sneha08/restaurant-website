@@ -10,13 +10,13 @@ const initCart = () => {
 const addToCart = (id, name, price, image) => {
     let cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
 
-    const existingItemIndex = cart.findIndex(item => item.id === id);
+    const existingItemIndex = cart.findIndex(item => item.menu_id === id);
 
     if (existingItemIndex > -1) {
         cart[existingItemIndex].quantity += 1;
     } else {
         cart.push({
-            id: id,
+            menu_id: id,
             name: name,
             price: price,
             image: image,
@@ -29,7 +29,6 @@ const addToCart = (id, name, price, image) => {
 
     alert('Item added to cart successfully!');
 };
-
 const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
     const count = cart.reduce((total, item) => total + item.quantity, 0);

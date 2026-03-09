@@ -33,12 +33,12 @@ router.post('/', protect, async (req, res) => {
         if (existing.length > 0) {
             await pool.query(
                 'UPDATE cart SET quantity = quantity + ? WHERE id = ?',
-                [quantity || 1, existing[0].id]
+                [quantity || 1, existing[0].id] 
             );
         } else {
             await pool.query(
-                'INSERT INTO cart (user_id, menu_id, quantity) VALUES (?, ?, ?)',
-                [req.user.id, menu_id, quantity || 1]
+                'INSERT INTO cart (user_id, menu_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?)',
+                [req.user.id, menu_id, req.body.item_name, quantity || 1, req.body.price]
             );
         }
         res.status(201).json({ message: 'Item added to cart' });
