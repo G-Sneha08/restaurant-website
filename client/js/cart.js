@@ -10,6 +10,9 @@ const initCart = () => {
 const addToCart = (id, name, price, image) => {
     let cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
 
+    // convert id to number to avoid "s1" type errors
+    id = parseInt(id);
+
     const existingItemIndex = cart.findIndex(item => item.menu_id === id);
 
     if (existingItemIndex > -1) {

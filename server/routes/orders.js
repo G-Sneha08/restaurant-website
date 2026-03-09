@@ -33,13 +33,22 @@ router.post('/checkout', protect, async (req, res) => {
 
         const orderId = orderResult.insertId;
 
-        // Insert order items
+        // Insert each item
         for (let item of cartItems) {
+
+            const menuId = parseInt(item.menu_id);
+
+            if (!menuId) {
+                return res.status(400).json({ message: "Invalid menu item" });
+            }
+
             await pool.query(
-                "INSERT INTO order_items (order_id, menu_id, item_name, quantity, price) VALUES (?, ?, ?, ?, ?)",
+                `INSERT INTO order_items 
+                (order_id, menu_id, item_name, quantity, price)
+                VALUES (?, ?, ?, ?, ?)`,
                 [
                     orderId,
-                    item.menu_id || item.id,
+                    menuId,
                     item.name,
                     item.quantity,
                     item.price
