@@ -1,10 +1,13 @@
 // =======================
-// Cart frontend using backend
+// Cart frontend using backend + Menu Add to Cart
 // =======================
 
-const token = localStorage.getItem('token'); // JWT token
+// Get JWT token from localStorage
+const token = localStorage.getItem('token'); 
 
-// Load cart items from backend
+// =======================
+// Load Cart Page Items
+// =======================
 async function loadCart() {
     if (!token) {
         alert("Please login to view your cart!");
@@ -31,7 +34,7 @@ async function loadCart() {
             table.style.display = 'none';
             footerActions.style.display = 'none';
             emptyMsg.style.display = 'block';
-            cartCountElement.innerText = '(0)';
+            if (cartCountElement) cartCountElement.innerText = '(0)';
             document.getElementById('total-price').innerText = '₹0';
             return;
         }
@@ -69,7 +72,10 @@ async function loadCart() {
         }).join('');
 
         document.getElementById('total-price').innerText = `₹${total}`;
-        cartCountElement.innerText = `(${data.items.reduce((sum, i) => sum + i.quantity, 0)})`;
+        if (cartCountElement) {
+            const totalQty = data.items.reduce((sum, i) => sum + i.quantity, 0);
+            cartCountElement.innerText = `(${totalQty})`;
+        }
 
     } catch (err) {
         console.error(err);
@@ -77,7 +83,9 @@ async function loadCart() {
     }
 }
 
-// Update quantity of a cart item
+// =======================
+// Cart Page Actions
+// =======================
 async function updateQuantity(cartId, quantity) {
     if (quantity < 1) return;
 
@@ -101,7 +109,6 @@ async function updateQuantity(cartId, quantity) {
     }
 }
 
-// Delete a cart item
 async function deleteItem(cartId) {
     try {
         const res = await fetch(`https://restaurant-backend-cli2.onrender.com/api/cart/${cartId}`, {
@@ -119,7 +126,6 @@ async function deleteItem(cartId) {
     }
 }
 
-// Checkout cart
 async function checkout() {
     if (!confirm("Proceed to checkout?")) return;
 
@@ -142,7 +148,6 @@ async function checkout() {
     }
 }
 
-// Clear all cart items
 async function clearCart() {
     if (!confirm("Are you sure you want to clear your cart?")) return;
 
@@ -162,7 +167,67 @@ async function clearCart() {
     }
 }
 
+// =======================
+// Add to Cart from Menu Page
+// =======================
+window.addToCart = async function(menu_id, name, price, image_url) {
+    if (!token) {
+        alert("Please login to add items to cart!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ menu_id, name, price, image_url, quantity: 1 })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to add to cart");
+
+        alert(`${name} added to cart!`);
+        updateCartBadge();
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to add item to cart");
+    }
+};
+
+// =======================
+// Update cart badge in navbar
+// =======================
+async function updateCartBadge() {
+    if (!token) return;
+
+    try {
+        const res = await fetch('https://restaurant-backend-cli2.onrender.com/api/cart', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            const totalQty = data.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+            cartCountElement.innerText = `(${totalQty})`;
+        }
+    } catch (err) {
+        console.error("Failed to update cart badge", err);
+    }
+}
+
+// =======================
 // Event listeners
-document.getElementById('checkout-btn').addEventListener('click', checkout);
-document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
-window.addEventListener('DOMContentLoaded', loadCart);
+// =======================
+document.getElementById('checkout-btn')?.addEventListener('click', checkout);
+document.getElementById('clear-cart-btn')?.addEventListener('click', clearCart);
+
+// Run on page load
+window.addEventListener('DOMContentLoaded', () => {
+    loadCart();
+    updateCartBadge();
+});
