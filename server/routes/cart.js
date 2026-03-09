@@ -118,4 +118,56 @@ router.delete('/:id', protect, async (req, res) => {
     }
 });
 
+// ============================
+// POST /api/cart/checkout
+// Place order from the cart
+// ============================
+router.post('/checkout', protect, async (req, res) => {
+    try {
+        // Get all cart items for this user
+        const [cartItems] = await pool.query(
+            `SELECT cart.menu_id, cart.quantity, menu.name, menu.price
+             FROM cart
+             JOIN menu ON cart.menu_id = menu.id
+             WHERE cart.user_id = ?`,
+            [req.user.id]
+        );
+
+        if (cartItems.length === 0) {
+            return res.status(400).json({ message: 'Cart is empty' });
+        }
+
+        // Calculate total price
+        const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+        // Create a new order
+        const [orderResult] = await pool.query(
+            'INSERT INTO orders (user_id, total_price) VALUES (?, ?)',
+            [req.user.id, totalPrice]
+        );
+        const orderId = orderResult.insertId;
+
+        // Insert order items
+        const orderItemsValues = cartItems.map(item => [
+            orderId,
+            item.menu_id,
+            item.quantity,
+            item.price
+        ]);
+
+        await pool.query(
+            'INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES ?',
+            [orderItemsValues]
+        );
+
+        // Clear cart
+        await pool.query('DELETE FROM cart WHERE user_id = ?', [req.user.id]);
+
+        res.status(201).json({ message: 'Order placed successfully', orderId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;
