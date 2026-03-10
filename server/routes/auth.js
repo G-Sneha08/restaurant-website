@@ -1,9 +1,10 @@
 const express = require("express");
+const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 
-const router = express.Router();
+
 
 // FIX 1️⃣ correct import
 const { sendWelcomeEmail } = require("../utils/sendEmail");

@@ -23,10 +23,12 @@ app.use(cors({
     origin: "https://restaurant-website-204ng5f0k-g-sneha08s-projects.vercel.app",
     credentials: true
 }));
-app.use(express.json());
 app.use(morgan('dev'));
+app.use(express.json());
 app.use(express.static('client'));
 //app.use(express.static(path.join(__dirname, "../client")));
+
+
 // Routes
 console.log(authRoutes);
 app.use('/api/auth', authRoutes);
