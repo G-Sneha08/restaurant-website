@@ -19,7 +19,10 @@ const app = express();
 app.use(helmet({
     contentSecurityPolicy: false, // For local development flexibility
 }));
-app.use(cors());
+app.use(cors({
+    origin: "https://restaurant-website-204ng5f0k-g-sneha08s-projects.vercel.app",
+    credentials: true
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.static('client'));
