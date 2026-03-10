@@ -29,7 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/booking', bookingRoutes);
+app.use('/api/bookings', bookingRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
 
@@ -48,7 +48,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT,'0.0.0.0', () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 // ================= IMPROVED PEXELS IMAGE ROUTE =================
 //const axios = require('axios');

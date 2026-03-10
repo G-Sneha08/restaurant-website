@@ -9,97 +9,159 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// ================= WELCOME EMAIL =================
+// ================================
+// EMAIL TEMPLATE WRAPPER
+// ================================
+const emailTemplate = (title, content) => {
+
+    return `
+    <div style="font-family: Arial, sans-serif; background:#f4f4f4; padding:30px;">
+        
+        <div style="max-width:600px; margin:auto; background:white; border-radius:10px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,0.1);">
+
+            <div style="background:#ff5a5f; color:white; padding:20px; text-align:center;">
+                <h1 style="margin:0;">Lumina Dine 🍽️</h1>
+                <p style="margin:5px 0;">Premium Restaurant Experience</p>
+            </div>
+
+            <div style="padding:30px;">
+                <h2 style="color:#333;">${title}</h2>
+                ${content}
+            </div>
+
+            <div style="background:#fafafa; padding:15px; text-align:center; font-size:12px; color:#777;">
+                <p>© 2026 Lumina Dine</p>
+                <p>Thank you for choosing our restaurant!</p>
+            </div>
+
+        </div>
+
+    </div>
+    `;
+};
+
+
+
+// ================================
+// WELCOME EMAIL
+// ================================
 const sendWelcomeEmail = async (email, name) => {
 
-    try {
+    const content = `
+        <p>Hello <b>${name}</b>,</p>
 
-        const mailOptions = {
-            from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Welcome to Lumina Dine 🍽️",
-            html: `
-                <h2>Welcome to Lumina Dine</h2>
+        <p>Welcome to <b>Lumina Dine</b>! 🎉</p>
 
-                <p>Hello <b>${name}</b>,</p>
+        <p>Your account has been successfully created.</p>
 
-                <p>Your account has been successfully created.</p>
+        <ul>
+            <li>🍽️ Book restaurant tables</li>
+            <li>🍔 Order delicious food</li>
+            <li>⭐ Enjoy premium dining</li>
+        </ul>
 
-                <p>You can now:</p>
+        <p>We are excited to serve you!</p>
+    `;
 
-                <ul>
-                    <li>Book restaurant tables</li>
-                    <li>Order delicious food</li>
-                    <li>Track your bookings</li>
-                </ul>
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Welcome to Lumina Dine 🍽️",
+        html: emailTemplate("Welcome to Lumina Dine!", content)
+    };
 
-                <p>Thank you for joining us!</p>
-
-                <br>
-
-                <p>Team Lumina Dine</p>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        console.log("Welcome email sent");
-
-    } catch (error) {
-
-        console.error("Email error:", error);
-
-    }
-
+    await transporter.sendMail(mailOptions);
 };
 
 
 
-// ================= BOOKING EMAIL =================
+// ================================
+// BOOKING CONFIRMATION
+// ================================
 const sendBookingEmail = async (email, name, date, time, guests) => {
 
-    try {
+    const content = `
+        <p>Hello <b>${name}</b>,</p>
 
-        const mailOptions = {
-            from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "Table Booking Confirmation 🍽️",
-            html: `
-                <h2>Reservation Confirmed</h2>
+        <p>Your table booking has been <b>confirmed</b> ✅</p>
 
-                <p>Hello <b>${name}</b>,</p>
+        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">📅 Date</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><b>${date}</b></td>
+            </tr>
 
-                <p>Your table has been successfully reserved.</p>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">⏰ Time</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><b>${time}</b></td>
+            </tr>
 
-                <h3>Booking Details</h3>
+            <tr>
+                <td style="padding:10px;">👥 Guests</td>
+                <td style="padding:10px;"><b>${guests}</b></td>
+            </tr>
+        </table>
 
-                <ul>
-                    <li><b>Date:</b> ${date}</li>
-                    <li><b>Time:</b> ${time}</li>
-                    <li><b>Guests:</b> ${guests}</li>
-                </ul>
+        <p style="margin-top:20px;">
+        We look forward to serving you at <b>Lumina Dine</b>.
+        </p>
+    `;
 
-                <p>We look forward to serving you.</p>
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Your Table Booking is Confirmed 🍽️",
+        html: emailTemplate("Booking Confirmation", content)
+    };
 
-                <br>
-
-                <p>Team Lumina Dine</p>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        console.log("Booking confirmation email sent");
-
-    } catch (error) {
-
-        console.error("Email error:", error);
-
-    }
-
+    await transporter.sendMail(mailOptions);
 };
+
+
+
+// ================================
+// ORDER CONFIRMATION
+// ================================
+const sendOrderEmail = async (email, name, orderId, totalPrice) => {
+
+    const content = `
+        <p>Hello <b>${name}</b>,</p>
+
+        <p>Your food order has been placed successfully. 🎉</p>
+
+        <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">Order ID</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><b>#${orderId}</b></td>
+            </tr>
+
+            <tr>
+                <td style="padding:10px;">Total Amount</td>
+                <td style="padding:10px;"><b>₹${totalPrice}</b></td>
+            </tr>
+
+        </table>
+
+        <p style="margin-top:20px;">
+        Our chefs are preparing your delicious meal 👨‍🍳
+        </p>
+    `;
+
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Order Confirmation 🍔",
+        html: emailTemplate("Order Confirmed", content)
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+
 
 module.exports = {
     sendWelcomeEmail,
-    sendBookingEmail
+    sendBookingEmail,
+    sendOrderEmail
 };
