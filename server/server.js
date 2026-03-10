@@ -28,6 +28,7 @@ app.use(morgan('dev'));
 app.use(express.static('client'));
 //app.use(express.static(path.join(__dirname, "../client")));
 // Routes
+console.log(authRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
