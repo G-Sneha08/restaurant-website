@@ -5,13 +5,13 @@ const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
 
-const authRoutes = require('../routes/auth');
-const menuRoutes = require('../routes/menu');
-const cartRoutes = require('../routes/cart');
-const orderRoutes = require('../routes/orders');
-const bookingRoutes = require('../routes/booking');
-const feedbackRoutes = require('../routes/feedback');
-const adminRoutes = require('../routes/admin');
+const authRoutes = require('./routes/auth');
+const menuRoutes = require('./routes/menu');
+const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/orders');
+const bookingRoutes = require('./routes/booking');
+const feedbackRoutes = require('./routes/feedback');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
