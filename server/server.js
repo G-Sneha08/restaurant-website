@@ -30,7 +30,7 @@ app.use(express.static('client'));
 
 
 // Routes
-console.log(authRoutes);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
@@ -38,7 +38,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
-
+console.log(authRoutes);
+console.log(typeof authRoutes); 
 
 // Root route
 app.get('/', (req, res) => {
@@ -84,3 +85,6 @@ app.get('/api/images', (req, res) => {
         });
     }
 });
+console.log('PORT:', process.env.PORT);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL:', process.env.DATABASE_URL);
