@@ -1,59 +1,106 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../config/db');
-const { protect } = require('../middleware/authMiddleware');
+const nodemailer = require("nodemailer");
 
-
-// ================= GET USER BOOKINGS =================
-router.get('/', protect, async (req, res) => {
-    try {
-        const [rows] = await pool.query(
-            'SELECT * FROM bookings WHERE user_id = ? ORDER BY date DESC, time DESC',
-            [req.user.id]
-        );
-
-        res.json(rows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
 
-// ================= CREATE BOOKING =================
-router.post('/', protect, async (req, res) => {
-    const { date, time, guests } = req.body;
+// =========================
+// WELCOME EMAIL
+// =========================
+const sendWelcomeEmail = async (email, name) => {
 
-    try {
-        await pool.query(
-            'INSERT INTO bookings (user_id, date, time, guests) VALUES (?, ?, ?, ?)',
-            [req.user.id, date, time, guests]
-        );
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Welcome to Lumina Dine 🍽️",
+        html: `
+        <h2>Hello ${name}!</h2>
+        <p>Your account has been successfully created.</p>
+        <p>You can now:</p>
+        <ul>
+            <li>Book restaurant tables</li>
+            <li>Order food online</li>
+        </ul>
+        <p>Thank you for joining us!</p>
+        `
+    };
 
-        res.status(201).json({ message: 'Table booked successfully' });
+    await transporter.sendMail(mailOptions);
+};
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
 
-// ================= DELETE BOOKING =================
-router.delete('/:id', protect, async (req, res) => {
-    const bookingId = req.params.id;
 
-    try {
-        // Only allow user to delete their own booking
-        await pool.query(
-            'DELETE FROM bookings WHERE id = ? AND user_id = ?',
-            [bookingId, req.user.id]
-        );
+// =========================
+// BOOKING CONFIRMATION
+// =========================
+const sendBookingEmail = async (email, name, date, time, guests) => {
 
-        res.json({ message: 'Booking cancelled successfully' });
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Table Booking Confirmation 🍽️",
+        html: `
+        <h2>Reservation Confirmed</h2>
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-module.exports = router;
+        <p>Hello ${name},</p>
+
+        <p>Your table booking is confirmed.</p>
+
+        <h3>Booking Details</h3>
+
+        <ul>
+            <li><b>Date:</b> ${date}</li>
+            <li><b>Time:</b> ${time}</li>
+            <li><b>Guests:</b> ${guests}</li>
+        </ul>
+
+        <p>We look forward to serving you!</p>
+        `
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+
+
+// =========================
+// ORDER CONFIRMATION
+// =========================
+const sendOrderEmail = async (email, name, orderId, totalPrice) => {
+
+    const mailOptions = {
+        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "Order Confirmation 🍔",
+        html: `
+        <h2>Order Confirmed</h2>
+
+        <p>Hello ${name},</p>
+
+        <p>Your order has been placed successfully.</p>
+
+        <ul>
+            <li><b>Order ID:</b> ${orderId}</li>
+            <li><b>Total Price:</b> ₹${totalPrice}</li>
+        </ul>
+
+        <p>Your food will be prepared shortly.</p>
+
+        <p>Thank you for ordering from Lumina Dine!</p>
+        `
+    };
+
+    await transporter.sendMail(mailOptions);
+};
+
+
+module.exports = {
+    sendWelcomeEmail,
+    sendBookingEmail,
+    sendOrderEmail
+};

@@ -2,18 +2,24 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Backend API
+    const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+
     // ================= LOGIN =================
     const loginForm = document.getElementById("loginForm");
 
     if (loginForm) {
+
         loginForm.addEventListener("submit", async (e) => {
+
             e.preventDefault();
 
             const email = document.querySelector("input[name='email']").value;
             const password = document.querySelector("input[name='password']").value;
 
             try {
-                const response = await fetch("/api/auth/login", {
+
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -24,25 +30,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (response.ok) {
+
                     // Save token
                     localStorage.setItem("token", data.token);
 
-                    // Save user if returned
                     if (data.user) {
                         localStorage.setItem("user", JSON.stringify(data.user));
                     }
 
                     alert("Login Successful!");
+
                     window.location.href = "index.html";
+
                 } else {
+
                     alert(data.message || "Login failed");
+
                 }
 
             } catch (error) {
+
                 console.error("Login Error:", error);
                 alert("Server error during login");
+
             }
+
         });
+
     }
 
 
@@ -50,7 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const registerForm = document.getElementById("registerForm");
 
     if (registerForm) {
+
         registerForm.addEventListener("submit", async (e) => {
+
             e.preventDefault();
 
             const name = document.querySelector("input[name='name']").value;
@@ -58,7 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const password = document.querySelector("input[name='password']").value;
 
             try {
-                const response = await fetch("/api/auth/register", {
+
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -69,17 +86,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (response.ok) {
+
                     alert("Registration Successful! Please login.");
                     window.location.href = "login.html";
+
                 } else {
+
                     alert(data.message || "Registration failed");
+
                 }
 
             } catch (error) {
+
                 console.error("Register Error:", error);
                 alert("Server error during registration");
+
             }
+
         });
+
     }
 
 });

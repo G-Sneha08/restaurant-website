@@ -1,9 +1,18 @@
+// =======================
+// Backend API URL
+// =======================
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+
 document.addEventListener("DOMContentLoaded", () => {
+
     loadBookings();
 
     const form = document.getElementById("booking-form");
 
+    if (!form) return;
+
     form.addEventListener("submit", async (e) => {
+
         e.preventDefault();
 
         const token = localStorage.getItem("token");
@@ -18,7 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const guests = document.getElementById("guests").value;
 
         try {
-            const response = await fetch("/api/booking", {
+
+            const response = await fetch(`${API_BASE_URL}/booking`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -28,31 +38,48 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (response.ok) {
+
                 alert("Table reserved successfully!");
                 form.reset();
                 loadBookings();
+
             } else {
+
                 alert("Booking failed. Please try again.");
+
             }
 
         } catch (error) {
+
             console.error("Booking error:", error);
+
         }
+
     });
+
 });
 
 
+// =======================
+// Load Bookings
+// =======================
 async function loadBookings() {
+
     const token = localStorage.getItem("token");
     const list = document.getElementById("booking-list");
 
+    if (!list) return;
+
     if (!token) {
+
         list.innerHTML = "<p class='text-center'>Please login to see bookings.</p>";
         return;
+
     }
 
     try {
-        const response = await fetch("/api/booking", {
+
+        const response = await fetch(`${API_BASE_URL}/booking`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -61,8 +88,10 @@ async function loadBookings() {
         const bookings = await response.json();
 
         if (!bookings || bookings.length === 0) {
+
             list.innerHTML = "<p class='text-center'>No reservations found.</p>";
             return;
+
         }
 
         list.innerHTML = bookings.map(b => `
@@ -78,7 +107,7 @@ async function loadBookings() {
                     </div>
 
                     <button 
-                        onclick="cancelBooking(${b.id})" 
+                        onclick="cancelBooking(${b.id})"
                         style="background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">
                         Cancel
                     </button>
@@ -87,20 +116,28 @@ async function loadBookings() {
         `).join("");
 
     } catch (error) {
+
         console.error("Load bookings error:", error);
+
         list.innerHTML = "<p class='text-center'>Error loading bookings.</p>";
+
     }
+
 }
 
 
-// ✅ KEEP THIS OUTSIDE
+// =======================
+// Cancel Booking
+// =======================
 window.cancelBooking = async function(id) {
+
     const token = localStorage.getItem("token");
 
     if (!confirm("Are you sure you want to cancel this booking?")) return;
 
     try {
-        const response = await fetch(`/api/booking/${id}`, {
+
+        const response = await fetch(`${API_BASE_URL}/booking/${id}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -108,13 +145,20 @@ window.cancelBooking = async function(id) {
         });
 
         if (response.ok) {
+
             alert("Booking cancelled successfully");
             loadBookings();
+
         } else {
+
             alert("Failed to cancel booking");
+
         }
 
     } catch (error) {
+
         console.error("Cancel error:", error);
+
     }
+
 };
