@@ -2,35 +2,31 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const path = require("path");
+const path = require('path');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth');
-const menuRoutes = require('./routes/menu');
-const cartRoutes = require('./routes/cart');
-const orderRoutes = require('./routes/orders');
-const bookingRoutes = require('./routes/booking');
-const feedbackRoutes = require('./routes/feedback');
-const adminRoutes = require('./routes/admin');
+const authRoutes = require('../routes/auth');
+const menuRoutes = require('../routes/menu');
+const cartRoutes = require('../routes/cart');
+const orderRoutes = require('../routes/orders');
+const bookingRoutes = require('../routes/booking');
+const feedbackRoutes = require('../routes/feedback');
+const adminRoutes = require('../routes/admin');
 
 const app = express();
 
-// Middleware
-app.use(helmet({
-    contentSecurityPolicy: false, // For local development flexibility
-}));
+// ===================== Middleware =====================
+app.use(helmet({ contentSecurityPolicy: false })); // Disable CSP for local/dev
 app.use(cors({
-    origin: "https://restaurant-website-204ng5f0k-g-sneha08s-projects.vercel.app",
-    credentials: true
+  origin: process.env.CLIENT_URL || "*",
+  credentials: true
 }));
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(express.static('client'));
-//app.use(express.static(path.join(__dirname, "../client")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../client')));
 
-
-// Routes
-
+// ===================== Routes =====================
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
@@ -38,53 +34,44 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/admin', adminRoutes);
-console.log(authRoutes);
-console.log(typeof authRoutes); 
 
 // Root route
 app.get('/', (req, res) => {
-    res.send('Restaurant API is running...');
+  res.send('Restaurant API is running...');
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong!' });
-});
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT,'0.0.0.0', () => {
-    console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
-// ================= IMPROVED PEXELS IMAGE ROUTE =================
-//const axios = require('axios');
-// ================== MENU IMAGE API ==================
+// ===================== Image API =====================
 app.get('/api/images', (req, res) => {
-    try {
-
-          const imageMap = {
-        "Paneer Tikka": "/images/panner-tikka.jpg",
-        "Paneer Butter Masala": "/images/paneer-butter-masala.jpg",
-        "Cold Coffee": "/images/cold-coffee.jpg",
-        "Crispy Corn": "/images/crispy-corn.jpg",
-        "Rasmalai": "/images/rasmalai.jpg"
+  try {
+    const imageMap = {
+      "Paneer Tikka": "/images/panner-tikka.jpg",
+      "Paneer Butter Masala": "/images/paneer-butter-masala.jpg",
+      "Cold Coffee": "/images/cold-coffee.jpg",
+      "Crispy Corn": "/images/crispy-corn.jpg",
+      "Rasmalai": "/images/rasmalai.jpg"
     };
 
     res.json({
-        success: true,
-        images: imageMap
+      success: true,
+      images: imageMap
     });
-
-
-    } catch (error) {
-        console.error("Image API Error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch images"
-        });
-    }
+  } catch (error) {
+    console.error("Image API Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch images"
+    });
+  }
 });
-console.log('PORT:', process.env.PORT);
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
+
+// ===================== Error handling middleware =====================
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
+// ===================== Start server =====================
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
