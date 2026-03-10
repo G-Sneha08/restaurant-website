@@ -51,27 +51,35 @@ document.getElementById("loginform").addEventListener("submit", async function(e
     const email = document.querySelector("input[name='email']").value;
     const password = document.querySelector("input[name='password']").value;
 
-    const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email, password })
-    });
+    // ✅ Use full backend URL
+    const API_BASE = "https://restaurant-backend-cli2.onrender.com/api";
 
-    const data = await res.json();
+    try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
 
-    if (res.ok) {
+        let data;
+        if (res.headers.get("content-type")?.includes("application/json")) {
+            data = await res.json();
+        } else {
+            const text = await res.text();
+            throw new Error(text);
+        }
 
-        // ⭐ THIS LINE SAVES THE TOKEN
-        localStorage.setItem("token", data.token);
+        if (res.ok) {
+            localStorage.setItem("token", data.token);
+            alert("Login Successful");
+            window.location.href = "/menu.html";
+        } else {
+            alert(data.message || "Login failed");
+        }
 
-        alert("Login Successful");
-
-        window.location.href = "/menu.html";
-
-    } else {
-        alert(data.message || "Login failed");
+    } catch (err) {
+        console.error("Login failed:", err);
+        alert("Login failed: " + err.message);
     }
 });
 </script>
