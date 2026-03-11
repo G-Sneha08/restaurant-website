@@ -1,329 +1,158 @@
 // =======================
-// Cart frontend using backend
+// Cart frontend using session_id based backend
 // =======================
 
-const token = localStorage.getItem('token');
+// Dependencies: API_BASE_URL, getSessionId(), updateNavbar() from main.js
 
-// Backend URL
-// Backend URL - defined in config.js
-// const API_BASE_URL = ...
-
-
-// =======================
-// Load Cart Page Items
-// =======================
 async function loadCart() {
+    const tbody = document.getElementById('cart-items');
+    if (!tbody) return;
 
-    if (!token) {
-        alert("Please login to view your cart!");
-        window.location.href = "login.html";
-        return;
-    }
+    const table = document.getElementById('cart-table');
+    const emptyMsg = document.getElementById('empty-msg');
+    const footerActions = document.getElementById('cart-footer-actions');
+    const totalPriceEl = document.getElementById('total-price');
 
     try {
-
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error(`Failed to fetch cart`);
-
+        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
         const data = await res.json();
 
-        const table = document.getElementById('cart-table');
-        const tbody = document.getElementById('cart-items');
-        const emptyMsg = document.getElementById('empty-msg');
-        const footerActions = document.getElementById('cart-footer-actions');
-        const cartCountElement = document.getElementById('cart-count');
-
-        if (!data.items || data.items.length === 0) {
-
-            table.style.display = 'none';
-            footerActions.style.display = 'none';
-            emptyMsg.style.display = 'block';
-
-            if (cartCountElement) cartCountElement.innerText = '(0)';
-            document.getElementById('total-price').innerText = '₹0';
-
+        if (!data.success || !data.items || data.items.length === 0) {
+            if (table) table.style.display = 'none';
+            if (footerActions) footerActions.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'block';
+            if (totalPriceEl) totalPriceEl.innerText = '₹0';
             return;
         }
 
-        table.style.display = 'table';
-        emptyMsg.style.display = 'none';
-        footerActions.style.display = 'block';
+        if (table) table.style.display = 'table';
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        if (footerActions) footerActions.style.display = 'block';
 
-        let total = 0;
+        tbody.innerHTML = data.items.map(item => `
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="${item.image_url}" width="60" height="60" style="border-radius:10px; object-fit:cover;">
+                        <span>${item.name}</span>
+                    </div>
+                </td>
+                <td>₹${item.price}</td>
+                <td>
+                    <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                    ${item.quantity}
+                    <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                </td>
+                <td>₹${item.subtotal}</td>
+                <td>
+                    <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--primary)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
 
-        tbody.innerHTML = data.items.map(item => {
-
-            const subtotal = item.price * item.quantity;
-            total += subtotal;
-
-            return `
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <img src="${item.image_url}" width="60" height="60" style="border-radius:10px; object-fit:cover;">
-                            <span>${item.name}</span>
-                        </div>
-                    </td>
-                    <td>₹${item.price}</td>
-                    <td>
-                        <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
-                        ${item.quantity}
-                        <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                    </td>
-                    <td>₹${subtotal}</td>
-                    <td>
-                        <button onclick="deleteItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--primary)">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-
-        }).join('');
-
-        document.getElementById('total-price').innerText = `₹${total}`;
-
-        if (cartCountElement) {
-            const totalQty = data.items.reduce((sum, i) => sum + i.quantity, 0);
-            cartCountElement.innerText = `(${totalQty})`;
-        }
+        if (totalPriceEl) totalPriceEl.innerText = `₹${data.totalPrice}`;
 
     } catch (err) {
-
-        console.error(err);
-        alert("Failed to load cart");
-
+        console.error("Load cart error:", err);
     }
 }
 
-
-// =======================
-// Update Quantity
-// =======================
-async function updateQuantity(cartId, quantity) {
-
+async function updateCartQuantity(cartId, quantity) {
     if (quantity < 1) return;
-
     try {
-
         const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ quantity })
         });
-
         const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message);
-
-        loadCart();
-
-    } catch (err) {
-
-        console.error(err);
-        alert(err.message);
-
-    }
+        if (data.success) {
+            loadCart();
+            if (typeof updateNavbar === 'function') updateNavbar();
+        }
+    } catch (err) { console.error("Update quantity error:", err); }
 }
 
-
-// =======================
-// Delete Item
-// =======================
-async function deleteItem(cartId) {
-
+async function deleteCartItem(cartId) {
+    if (!confirm("Remove item?")) return;
     try {
-
         const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            method: 'DELETE'
         });
-
         const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message);
-
-        loadCart();
-
-    } catch (err) {
-
-        console.error(err);
-        alert(err.message);
-
-    }
+        if (data.success) {
+            loadCart();
+            if (typeof updateNavbar === 'function') updateNavbar();
+        }
+    } catch (err) { console.error("Delete item error:", err); }
 }
 
-
-// =======================
-// Checkout Cart
-// =======================
-async function checkout() {
+async function checkoutCart() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Please login to checkout!");
+        window.location.href = "login.html";
+        return;
+    }
 
     if (!confirm("Proceed to checkout?")) return;
 
     try {
+        // Get items for checkout
+        const cartRes = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
+        const cartData = await cartRes.json();
 
-        const res = await fetch(`${API_BASE_URL}/cart/checkout`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        if (!cartData.success || cartData.items.length === 0) {
+            alert("Cart is empty");
+            return;
+        }
 
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message);
-
-        alert(data.message);
-        loadCart();
-
-    } catch (err) {
-
-        console.error(err);
-        alert(err.message);
-
-    }
-}
-
-
-// =======================
-// Clear Cart
-// =======================
-async function clearCart() {
-
-    if (!confirm("Are you sure you want to clear your cart?")) return;
-
-    try {
-
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message);
-
-        loadCart();
-
-    } catch (err) {
-
-        console.error(err);
-        alert(err.message);
-
-    }
-}
-
-
-// =======================
-// Add to Cart from Menu
-// =======================
-window.addToCart = async function (menu_id, name, price, image_url) {
-
-    if (!token) {
-        alert("Please login to add items to cart!");
-        window.location.href = "login.html";
-        return;
-    }
-
-    try {
-
-        const res = await fetch(`${API_BASE_URL}/cart`, {
+        const res = await fetch(`${API_BASE_URL}/orders/checkout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({
-                menu_id,
-                name,
-                price,
-                image_url,
-                quantity: 1
-            })
+            body: JSON.stringify({ cartItems: cartData.items })
         });
-
         const data = await res.json();
 
-        if (!res.ok) throw new Error(data.message);
-
-        alert(`${name} added to cart!`);
-
-        updateCartBadge();
-
-    } catch (err) {
-
-        console.error(err);
-        alert(err.message);
-
-    }
-
-};
-
-
-// =======================
-// Update Cart Badge
-// =======================
-async function updateCartBadge() {
-
-    if (!token) {
-        const cartCountElement = document.getElementById('cart-count');
-        if (cartCountElement) cartCountElement.innerText = '(0)';
-        return;
-    }
-
-    try {
-
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        const cartCountElement = document.getElementById('cart-count');
-
-        if (cartCountElement) {
-
-            const items = data.items || [];
-            const totalQty = items.reduce((sum, i) => sum + (i.quantity || 0), 0) || 0;
-
-            cartCountElement.innerText = `(${totalQty})`;
-            
-            // Sync with localStorage so main.js sees it too
-            localStorage.setItem('cart', JSON.stringify(items));
-
+        if (data.success) {
+            alert(data.message);
+            // Clear cart for this session
+            await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`, { method: 'DELETE' });
+            window.location.href = "orders.html";
+        } else {
+            alert(data.message || "Checkout failed");
         }
-
     } catch (err) {
-
-        console.error("Failed to update cart badge", err);
-
+        console.error("Checkout error:", err);
+        alert("Checkout failed. Please try again.");
     }
-
 }
 
+async function clearFullCart() {
+    if (!confirm("Clear your cart?")) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`, {
+            method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+            loadCart();
+            if (typeof updateNavbar === 'function') updateNavbar();
+        }
+    } catch (err) { console.error("Clear cart error:", err); }
+}
 
-// =======================
-// Event Listeners
-// =======================
-window.addEventListener('DOMContentLoaded', () => {
-    const isCartPage = document.getElementById('cart-items');
-    if (isCartPage) {
-        loadCart();
-    }
-    updateCartBadge();
+// Global exposure
+window.updateCartQuantity = updateCartQuantity;
+window.deleteCartItem = deleteCartItem;
+window.checkoutCart = checkoutCart;
+window.clearFullCart = clearFullCart;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadCart();
 });
-
-const checkoutBtn = document.getElementById('checkout-btn');
-if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', checkout);
-}
-
-const clearCartBtn = document.getElementById('clear-cart-btn');
-if (clearCartBtn) {
-    clearCartBtn.addEventListener('click', clearCart);
-}

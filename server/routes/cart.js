@@ -6,41 +6,44 @@ const { protect } = require('../middleware/authMiddleware');
 // ============================
 // GET /api/cart - fetch all cart items
 // ============================
-router.get('/', protect, async (req, res) => {
+router.get('/', async (req, res) => {
+    const sessionId = req.query.session_id;
+    if (!sessionId) return res.status(400).json({ success: false, message: 'session_id is required' });
+
     try {
         const [rows] = await pool.query(
-            `SELECT cart.id, cart.quantity, menu.id AS menu_id, menu.name, menu.price, menu.image_url,
-                    (cart.quantity * menu.price) AS subtotal
+            `SELECT cart.id, cart.quantity, cart.price, menu.id AS menu_item_id, menu.name, menu.image_url,
+                    (cart.quantity * cart.price) AS subtotal
              FROM cart
-             JOIN menu ON cart.menu_id = menu.id
-             WHERE cart.user_id = ?`,
-            [req.user.id]
+             JOIN menu ON cart.menu_item_id = menu.id
+             WHERE cart.session_id = ?`,
+            [sessionId]
         );
 
-        const totalPrice = rows.reduce((sum, item) => sum + item.subtotal, 0);
+        const totalPrice = rows.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
 
-        res.json({ items: rows, totalPrice });
+        res.json({ success: true, items: rows, totalPrice });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
 // ============================
 // POST /api/cart - add item to cart
 // ============================
-router.post('/', protect, async (req, res) => {
-    const { menu_id, quantity } = req.body;
+router.post('/', async (req, res) => {
+    const { session_id, menu_item_id, quantity } = req.body;
 
-    if (!menu_id || !quantity || quantity <= 0) {
-        return res.status(400).json({ message: 'Invalid menu_id or quantity' });
+    if (!session_id || !menu_item_id || !quantity || quantity <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid session_id, menu_item_id or quantity' });
     }
 
     try {
-        // Check if item exists in cart
+        // Check if item exists in cart for this session
         const [existing] = await pool.query(
-            'SELECT * FROM cart WHERE user_id = ? AND menu_id = ?',
-            [req.user.id, menu_id]
+            'SELECT * FROM cart WHERE session_id = ? AND menu_item_id = ?',
+            [session_id, menu_item_id]
         );
 
         if (existing.length > 0) {
@@ -48,19 +51,19 @@ router.post('/', protect, async (req, res) => {
             await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [quantity, existing[0].id]);
         } else {
             // insert new
-            const [menuItem] = await pool.query('SELECT name, price FROM menu WHERE id = ?', [menu_id]);
-            if (!menuItem.length) return res.status(404).json({ message: 'Menu item not found' });
+            const [menuItem] = await pool.query('SELECT price FROM menu WHERE id = ?', [menu_item_id]);
+            if (!menuItem.length) return res.status(404).json({ success: false, message: 'Menu item not found' });
 
             await pool.query(
-                'INSERT INTO cart (user_id, menu_id, quantity) VALUES (?, ?, ?)',
-                [req.user.id, menu_id, quantity]
+                'INSERT INTO cart (session_id, menu_item_id, quantity, price) VALUES (?, ?, ?, ?)',
+                [session_id, menu_item_id, quantity, menuItem[0].price]
             );
         }
 
-        res.status(201).json({ message: 'Item added to cart' });
+        res.status(201).json({ success: true, message: 'Item added to cart' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
@@ -88,18 +91,15 @@ router.put('/:id', protect, async (req, res) => {
 // ============================
 // DELETE /api/cart/:id - delete cart item
 // ============================
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        const [result] = await pool.query('DELETE FROM cart WHERE id = ? AND user_id = ?', [
-            req.params.id,
-            req.user.id
-        ]);
+        const [result] = await pool.query('DELETE FROM cart WHERE id = ?', [req.params.id]);
 
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Cart item not found' });
-        res.json({ message: 'Item removed' });
+        if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
+        res.json({ success: true, message: 'Item removed' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 

@@ -66,11 +66,11 @@ router.delete("/:id", protect, async (req, res) => {
             "UPDATE bookings SET status='Cancelled' WHERE id = ? AND user_id = ?",
             [id, userId]
         );
-        res.json({ message: "Booking cancelled" });
+        res.json({ success: true, message: "Booking cancelled" });
 
     } catch (err) {
         console.error("Cancel booking error:", err);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 

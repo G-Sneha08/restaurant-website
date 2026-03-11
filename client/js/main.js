@@ -1,8 +1,15 @@
-// ================= BACKEND API =================
-// API_BASE_URL is defined in config.js
+// ================= SESSION MANAGEMENT =================
+function getSessionId() {
+    let sessionId = localStorage.getItem('session_id');
+    if (!sessionId) {
+        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        localStorage.setItem('session_id', sessionId);
+    }
+    return sessionId;
+}
 
 // ================= NAVBAR =================
-function updateNavbar() {
+async function updateNavbar() {
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
     if (!nav) return;
@@ -10,16 +17,19 @@ function updateNavbar() {
     const isDashboard = window.location.pathname.includes('admin.html');
     if (isDashboard) return;
 
-    // Initialize cart if not exists
-    if (!localStorage.getItem('cart')) {
-        localStorage.setItem('cart', JSON.stringify([]));
-    }
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const count = Array.isArray(cart) ? cart.length : 0;
+    // Fetch cart count from server using session_id
+    let count = 0;
+    try {
+        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
+        const data = await res.json();
+        if (data.success) {
+            count = data.items.reduce((sum, item) => sum + item.quantity, 0);
+        }
+    } catch (err) { console.error("Error fetching cart count:", err); }
 
     const authLinks = user ? `
         <li><a href="orders.html">Orders</a></li>
-        ${user.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
+        ${user.role === 'admin' ? '<li><a href="#" onclick="openAdminModal(); return false;">Admin Panel</a></li>' : ''}
         <li>
             <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">Logout</button>
         </li>
@@ -74,14 +84,16 @@ async function loadMenuImages() {
 
 // ================= ADD TO CART =================
 function addToCart(itemId, quantity = 1) {
-    const token = localStorage.getItem('token');
-    fetch(`${API_BASE_URL}/cart/add`, {
+    fetch(`${API_BASE_URL}/cart`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : ''
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify({ itemId, quantity })
+        body: JSON.stringify({ 
+            session_id: getSessionId(),
+            menu_item_id: itemId, 
+            quantity 
+        })
     })
     .then(res => res.json())
     .then(data => {
@@ -105,6 +117,25 @@ function logout() {
     alert("You have been logged out.");
     window.location.href = "login.html";
 }
+
+// ================= ADMIN MODAL =================
+function openAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) {
+        modal.style.display = 'block';
+        if (typeof loadAdminBookings === 'function') {
+            loadAdminBookings();
+        }
+    }
+}
+
+function closeAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) modal.style.display = 'none';
+}
+
+window.openAdminModal = openAdminModal;
+window.closeAdminModal = closeAdminModal;
 
 // ================= PAGE LOAD =================
 document.addEventListener("DOMContentLoaded", () => {

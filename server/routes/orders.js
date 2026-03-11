@@ -12,7 +12,7 @@ router.post('/checkout', protect, async (req, res) => {
         const { cartItems } = req.body;
 
         if (!cartItems || cartItems.length === 0) {
-            return res.status(400).json({ message: "Cart is empty" });
+            return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
         let total = 0;
@@ -36,20 +36,19 @@ router.post('/checkout', protect, async (req, res) => {
         // Insert each item
         for (let item of cartItems) {
 
-            const menuId = parseInt(item.menu_id);
+            const menuId = parseInt(item.menu_item_id || item.menu_id);
 
             if (!menuId) {
-                return res.status(400).json({ message: "Invalid menu item" });
+                return res.status(400).json({ success: false, message: "Invalid menu item" });
             }
 
             await pool.query(
                 `INSERT INTO order_items 
-                (order_id, menu_id, item_name, quantity, price)
-                VALUES (?, ?, ?, ?, ?)`,
+                (order_id, menu_item_id, quantity, price)
+                VALUES (?, ?, ?, ?)`,
                 [
                     orderId,
                     menuId,
-                    item.name,
                     item.quantity,
                     item.price
                 ]
@@ -57,12 +56,13 @@ router.post('/checkout', protect, async (req, res) => {
         }
 
         res.status(201).json({
+            success: true,
             message: "🎉 Order placed successfully! Thank you for ordering."
         });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Checkout failed" });
+        res.status(500).json({ success: false, message: "Checkout failed" });
     }
 });
 

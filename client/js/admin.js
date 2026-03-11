@@ -1,6 +1,84 @@
-// ================= ADMIN DASHBOARD LOGIC =================
+// ================= MODAL ADMIN LOGIC =================
+async function loadAdminBookings() {
+    const tbody = document.getElementById('adminBookingsTable');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">Loading bookings...</td></tr>';
 
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/admin/bookings`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            if (data.bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">No bookings found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.bookings.map(b => `
+                <tr style="border-bottom: 1px solid #333;">
+                    <td style="padding:12px;">#${b.id}</td>
+                    <td style="padding:12px;">${b.customer_name || 'N/A'}</td>
+                    <td style="padding:12px;">${b.customer_email || 'N/A'}</td>
+                    <td style="padding:12px;">${b.customer_phone || 'N/A'}</td>
+                    <td style="padding:12px;">${new Date(b.date).toLocaleDateString()}</td>
+                    <td style="padding:12px;">${b.time}</td>
+                    <td style="padding:12px; text-align:center;">${b.guests}</td>
+                    <td style="padding:12px;">
+                        <span class="badge badge-${b.status.toLowerCase()}">${b.status}</span>
+                    </td>
+                    <td style="padding:12px;">
+                        <select onchange="updateBookingStatus(${b.id}, this.value)" style="background:#333; color:white; border:1px solid #444; padding:5px; border-radius:4px;">
+                            <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="Completed" ${b.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+             tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px; color:red;">${data.message || 'Error loading bookings'}</td></tr>`;
+        }
+    } catch (err) {
+        console.error("Error loading bookings:", err);
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:red;">Connection error</td></tr>';
+    }
+}
+
+async function updateBookingStatus(id, status) {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/admin/bookings/${id}/status`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ status })
+        });
+        const data = await res.json();
+        if (data.success) {
+            loadAdminBookings(); // Refresh UI
+        } else {
+            alert(data.message || "Failed to update status");
+        }
+    } catch (err) {
+        alert("Server error updating status");
+    }
+}
+
+window.loadAdminBookings = loadAdminBookings;
+window.updateBookingStatus = updateBookingStatus;
+
+// Original admin page logic (keeping for backward compatibility or if dedicated page is still used)
 document.addEventListener("DOMContentLoaded", () => {
+    // Only run if on admin.html
+    if (!window.location.pathname.includes('admin.html')) return;
+    
     // Auth Check
     const user = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token');

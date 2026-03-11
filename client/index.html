@@ -205,9 +205,40 @@
         </div>
     </footer>
 
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.8);">
+        <div class="modal-content" style="background-color:#1a1a1a; margin:5% auto; padding:20px; border:1px solid #333; width:90%; max-width:1200px; border-radius:12px; color:white;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="color:var(--primary-color);">Admin Panel - Manage Bookings</h2>
+                <span onclick="closeAdminModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+            </div>
+            <div class="table-container" style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; background: #222; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr style="background:var(--primary-color); color:white; text-align:left;">
+                            <th style="padding:15px;">Booking ID</th>
+                            <th style="padding:15px;">Customer Name</th>
+                            <th style="padding:15px;">Email</th>
+                            <th style="padding:15px;">Phone</th>
+                            <th style="padding:15px;">Date</th>
+                            <th style="padding:15px;">Time</th>
+                            <th style="padding:15px;">Guests</th>
+                            <th style="padding:15px;">Status</th>
+                            <th style="padding:15px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminBookingsTable">
+                        <!-- Bookings will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/cart.js"></script>
     <script>
