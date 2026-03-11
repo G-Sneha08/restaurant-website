@@ -32,10 +32,14 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the "client" directory
-app.use(express.static(path.join(__dirname, '../client')));
+// ===================== Frontend Serving =====================
+const clientPath = path.join(__dirname, '../client');
+console.log(`[SERVER] Serving static files from: ${clientPath}`);
 
-// ===================== Routes =====================
+// Serve static files (css, js, images, etc.)
+app.use(express.static(clientPath));
+
+// ===================== API Routes =====================
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
@@ -56,9 +60,11 @@ app.get('/api/images', (req, res) => {
   res.json({ success: true, images: imageMap });
 });
 
-// Root route - serve frontend instead of just JSON
+// Root route - explicitly serve index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/index.html'));
+  const indexPath = path.join(clientPath, 'index.html');
+  console.log(`[SERVER] Sending homepage: ${indexPath}`);
+  res.sendFile(indexPath);
 });
 
 // Health check endpoint
