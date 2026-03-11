@@ -23,37 +23,51 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        const name = document.getElementById("name")?.value;
+        const email = document.getElementById("email")?.value;
+        const phone = document.getElementById("phone")?.value;
         const date = document.getElementById("date").value;
         const time = document.getElementById("time").value;
         const guests = document.getElementById("guests").value;
 
+        const submitBtn = form.querySelector("button[type='submit']");
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Booking...";
+
         try {
 
-            const response = await fetch(`${API_BASE_URL}/booking`, {
+            const response = await fetch(`${API_BASE_URL}/bookings`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
-                body: JSON.stringify({ date, time, guests })
+                body: JSON.stringify({ name, email, phone, date, time, guests })
             });
 
-            if (response.ok) {
+            const data = await response.json();
 
-                alert("Table reserved successfully!");
+            if (response.ok && data.success) {
+
+                alert(data.message || "Table reserved successfully!");
                 form.reset();
                 loadBookings();
 
             } else {
 
-                alert("Booking failed. Please try again.");
+                alert(data.message || "Booking failed. Please try again.");
 
             }
 
         } catch (error) {
 
             console.error("Booking error:", error);
+            alert("An error occurred. Please try again later.");
 
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
         }
 
     });
@@ -80,38 +94,37 @@ async function loadBookings() {
 
     try {
 
-        const response = await fetch(`${API_BASE_URL}/booking`, {
+        const response = await fetch(`${API_BASE_URL}/bookings`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
         });
 
-        const bookings = await response.json();
+        const data = await response.json();
+        const bookings = data.bookings || [];
 
-        if (!bookings || bookings.length === 0) {
-
+        if (!data.success || bookings.length === 0) {
             list.innerHTML = "<p class='text-center'>No reservations found.</p>";
             return;
-
         }
 
         list.innerHTML = bookings.map(b => `
             <div class="card" style="margin-bottom: 15px; padding: 15px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <p style="font-weight:600;">
-                            ${new Date(b.date).toLocaleDateString('en-GB')}
+                        <p style="font-weight:600; margin-bottom:5px;">
+                            ${new Date(b.date).toLocaleDateString('en-GB')} at ${b.time}
                         </p>
                         <p style="font-size:0.85rem; color:var(--text-light);">
-                            ${b.time} | ${b.guests} Guests
+                            ${b.guests} Guests | Status: <span style="color:${getStatusColor(b.status)}">${b.status}</span>
                         </p>
                     </div>
-
+                    ${b.status === 'Pending' ? `
                     <button 
                         onclick="cancelBooking(${b.id})"
                         style="background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">
                         Cancel
-                    </button>
+                    </button>` : ''}
                 </div>
             </div>
         `).join("");
@@ -138,7 +151,7 @@ window.cancelBooking = async function (id) {
 
     try {
 
-        const response = await fetch(`${API_BASE_URL}/booking/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/bookings/${id}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -163,3 +176,12 @@ window.cancelBooking = async function (id) {
     }
 
 };
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'Confirmed': return '#2ecc71';
+        case 'Cancelled': return '#e74c3c';
+        case 'Completed': return '#3498db';
+        default: return '#f1c40f';
+    }
+}

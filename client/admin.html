@@ -1,120 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumina Dine | Experience the Taste of Excellence</title>
+    <title>Admin Dashboard | Lumina Dine</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .admin-sidebar {
-            background: var(--secondary);
-            color: white;
-            padding: 30px;
-            min-height: 100vh;
-        }
-
-        .admin-sidebar a {
-            display: block;
-            padding: 10px 0;
-            color: #ccc;
-        }
-
-        .admin-sidebar a:hover,
-        .admin-sidebar a.active {
-            color: white;
-            font-weight: 600;
-        }
-
-        .admin-main {
-            flex: 1;
-            padding: 40px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 </head>
-
-<body style="display:flex;">
-    <aside class="admin-sidebar" style="width:250px;">
-        <h2 style="margin-bottom:40px; color:var(--primary);">Admin Board</h2>
-        <nav>
-            <a href="#" class="active" onclick="showTab('orders')">Manage Orders</a>
-            <a href="#" onclick="showTab('menu')">Manage Menu</a>
-            <a href="#" onclick="showTab('users')">Manage Users</a>
-            <hr style="margin:20px 0; border:0.5px solid #444;">
-            <a href="index.html">Back to Site</a>
-            <a href="#" onclick="logout()" style="color:var(--primary);">Logout</a>
-        </nav>
-    </aside>
-
-    <main class="admin-main">
-        <!-- Orders Tab -->
-        <div id="orders-tab" class="tab-content active">
-            <h2>Orders Management</h2>
-            <table style="margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-orders-list"></tbody>
-            </table>
-        </div>
-
-        <!-- Menu Tab -->
-        <div id="menu-tab" class="tab-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>Menu Management</h2>
-                <button class="btn btn-primary" onclick="showAddMenuModal()">+ Add New Item</button>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>LUMINA DINE</h2>
+                <p>Admin Portal</p>
             </div>
-            <table style="margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-menu-list"></tbody>
-            </table>
-        </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-section="dashboard">
+                        <a href="#"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    </li>
+                    <li data-section="orders">
+                        <a href="#"><i class="fas fa-shopping-bag"></i> Orders</a>
+                    </li>
+                    <li data-section="bookings">
+                        <a href="#"><i class="fas fa-calendar-alt"></i> Bookings</a>
+                    </li>
+                    <li>
+                        <a href="menu.html"><i class="fas fa-utensils"></i> Menu</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-        <!-- Users Tab -->
-        <div id="users-tab" class="tab-content">
-            <h2>User Management</h2>
-            <table style="margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Joined</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-users-list"></tbody>
-            </table>
-        </div>
-    </main>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="section-title">Dashboard</h1>
+                <div class="user-info">
+                    <span id="admin-name">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
 
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard-section" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-bookings">0</h3>
+                            <p>Total Bookings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(241, 196, 15, 0.1); color: #f1c40f;">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-revenue">₹0</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1); color: #9b59b2;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-today-orders">0</h3>
+                            <p>Today's Orders</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-grid">
+                    <div class="card recent-list">
+                        <div class="card-header">
+                            <h3>Recent Orders</h3>
+                            <button class="btn btn-sm btn-outline" data-target="orders">View All</button>
+                        </div>
+                        <div class="table-container">
+                            <table id="recent-orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ORDERS SECTION -->
+            <section id="orders-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>All Orders</h3>
+                        <button class="btn btn-sm btn-outline" onclick="loadOrders()">Refresh</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="all-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="text-center">Loading orders...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOOKINGS SECTION -->
+            <section id="bookings-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Reservations Management</h3>
+                        <button class="btn btn-sm btn-outline" onclick="loadBookings()">Refresh</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="all-bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Contact</th>
+                                    <th>Date & Time</th>
+                                    <th>Guests</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="7" class="text-center">Loading bookings...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/admin.js"></script>
 </body>
-</body>
-
 </html>

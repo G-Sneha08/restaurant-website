@@ -18,37 +18,82 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// @route   GET /api/admin/orders
-// @desc    Get all orders with optional pagination
-router.get('/orders', async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
+// @route   GET /api/admin/stats
+// @desc    Get dashboard statistics
+router.get('/stats', async (req, res) => {
+    try {
+        const [orders] = await pool.query('SELECT COUNT(*) as totalOrders, SUM(total_amount) as totalRevenue FROM orders');
+        const [bookings] = await pool.query('SELECT COUNT(*) as totalBookings FROM bookings');
+        const [todayOrders] = await pool.query('SELECT COUNT(*) as todayCount FROM orders WHERE DATE(created_at) = CURDATE()');
 
+        res.json({
+            success: true,
+            totalOrders: orders[0].totalOrders || 0,
+            totalBookings: bookings[0].totalBookings || 0,
+            totalRevenue: orders[0].totalRevenue || 0,
+            todayOrders: todayOrders[0].todayCount || 0
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   GET /api/admin/orders
+// @desc    Get all orders
+router.get('/orders', async (req, res) => {
     try {
         const [rows] = await pool.query(
             `SELECT orders.*, users.name as user_name FROM orders 
              JOIN users ON orders.user_id = users.id 
-             ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-            [limit, offset]
+             ORDER BY created_at DESC`
         );
-        res.json(rows);
+        res.json({ success: true, orders: rows });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
-// @route   PUT /api/admin/orders/:id
+// @route   PUT /api/admin/orders/:id/status
 // @desc    Update order status
-router.put('/orders/:id', async (req, res) => {
+router.put('/orders/:id/status', async (req, res) => {
     const { status } = req.body;
     try {
         await pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
-        res.json({ message: 'Order status updated' });
+        res.json({ success: true, message: 'Order status updated' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   GET /api/admin/bookings
+// @desc    Get all bookings
+router.get('/bookings', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            `SELECT bookings.*, users.name as user_account_name FROM bookings 
+             JOIN users ON bookings.user_id = users.id 
+             ORDER BY date DESC, time DESC`
+        );
+        res.json({ success: true, bookings: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/bookings/:id/status
+// @desc    Update booking status
+router.put('/bookings/:id/status', async (req, res) => {
+    const { status } = req.body;
+    try {
+        await pool.query('UPDATE bookings SET status = ? WHERE id = ?', [status, req.params.id]);
+        res.json({ success: true, message: 'Booking status updated' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 

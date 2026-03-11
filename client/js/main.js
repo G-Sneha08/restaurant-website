@@ -34,6 +34,7 @@ function updateNavbar() {
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="menu.html">Menu</a></li>
+            <li><a href="booking.html">Book Table</a></li>
             <li>
                 <a href="cart.html" id="cart-link">
                     Cart <span id="cart-count">(${count})</span>

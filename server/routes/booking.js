@@ -7,27 +7,28 @@ const { protect } = require("../middleware/authMiddleware");
    CREATE BOOKING
 ============================== */
 router.post("/", protect, async (req, res) => {
-    const { date, time, guests } = req.body;
+    const { name, email, phone, date, time, guests } = req.body;
     const userId = req.user.id;
 
     if (!date || !time || !guests) {
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(400).json({ success: false, message: "Date, time, and guests are required" });
     }
 
     try {
         const [result] = await pool.query(
-            "INSERT INTO bookings (user_id, date, time, guests, status) VALUES (?, ?, ?, ?, ?)",
-            [userId, date, time, guests, "Pending"]
+            "INSERT INTO bookings (user_id, customer_name, customer_email, customer_phone, date, time, guests, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [userId, name || null, email || null, phone || null, date, time, guests, "Pending"]
         );
 
         res.status(201).json({
-            message: "Booking created successfully",
+            success: true,
+            message: "Table booked successfully",
             bookingId: result.insertId
         });
 
     } catch (err) {
         console.error("Booking error:", err);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 
@@ -42,11 +43,14 @@ router.get("/", protect, async (req, res) => {
             "SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC",
             [userId]
         );
-        res.json(rows);
+        res.json({
+            success: true,
+            bookings: rows
+        });
 
     } catch (err) {
         console.error("Get bookings error:", err);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 
