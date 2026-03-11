@@ -133,14 +133,15 @@ router.post('/checkout', protect, async (req, res) => {
 
         const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-        const [orderResult] = await pool.query('INSERT INTO orders (user_id, total_price) VALUES (?, ?)', [
+        const [orderResult] = await pool.query('INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)', [
             req.user.id,
-            totalPrice
+            totalPrice,
+            cartItems.map(i => i.name).join(', ')
         ]);
         const orderId = orderResult.insertId;
 
-        const orderValues = cartItems.map(item => [orderId, item.menu_id, item.quantity, item.price]);
-        await pool.query('INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES ?', [orderValues]);
+        const orderValues = cartItems.map(item => [orderId, item.menu_id, item.name, item.quantity, item.price]);
+        await pool.query('INSERT INTO order_items (order_id, menu_id, item_name, quantity, price) VALUES ?', [orderValues]);
 
         await pool.query('DELETE FROM cart WHERE user_id = ?', [req.user.id]);
 

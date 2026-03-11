@@ -18,15 +18,12 @@ const app = express();
 // ===================== Middleware =====================
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: [
-    "https://restaurant-website-umber-three.vercel.app",
-    "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "http://localhost:3000",
-    "http://localhost:5000",
-    "http://127.0.0.1:5000"
-  ],
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        "https://restaurant-website-umber-three.vercel.app",
+        "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app"
+      ]
+    : true, // true reflects the request origin, useful for local/codespaces
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
