@@ -18,7 +18,7 @@ const app = express();
 // ===================== Middleware =====================
 app.use(helmet({ contentSecurityPolicy: false })); // Disable CSP for local/dev
 app.use(cors({
-  origin: process.env.CLIENT_URL || "*",
+  origin: ["https://restaurant-website-umber-three.vercel.app", "http://localhost:5500", "http://127.0.0.1:5500"],
   credentials: true
 }));
 app.use(morgan('dev'));

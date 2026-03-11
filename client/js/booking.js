@@ -1,7 +1,7 @@
 // =======================
 // Backend API URL
 // =======================
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+const API_BASE_URL = "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -129,7 +129,7 @@ async function loadBookings() {
 // =======================
 // Cancel Booking
 // =======================
-window.cancelBooking = async function(id) {
+window.cancelBooking = async function (id) {
 
     const token = localStorage.getItem("token");
 

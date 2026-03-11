@@ -24,7 +24,7 @@
         </div>
     </main>
 
-    
+
     <script>
         async function loadOrders() {
             const token = localStorage.getItem('token');
@@ -34,7 +34,7 @@
             }
 
             try {
-                const response = await fetch('/api/orders', {
+                const response = await fetch('https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api/orders', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const orders = await response.json();
@@ -70,7 +70,7 @@
         async function viewOrderDetails(id) {
             // Simplified for now, just show items in alert or expand the card
             const token = localStorage.getItem('token');
-            const res = await fetch(`/api/orders/${id}`, {
+            const res = await fetch(`https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api/orders/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -83,7 +83,7 @@
     </script>
     <script src="js/config.js"></script>
     <script src="js/orders.js"></script>
-    <script src="js/main.js"></script>  
+    <script src="js/main.js"></script>
 </body>
 
 </html>

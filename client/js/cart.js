@@ -5,7 +5,7 @@
 const token = localStorage.getItem('token');
 
 // Backend URL
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+const API_BASE_URL = "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api";
 
 // =======================
 // Load Cart Page Items
@@ -220,7 +220,7 @@ async function clearCart() {
 // =======================
 // Add to Cart from Menu
 // =======================
-window.addToCart = async function(menu_id, name, price, image_url) {
+window.addToCart = async function (menu_id, name, price, image_url) {
 
     if (!token) {
         alert("Please login to add items to cart!");

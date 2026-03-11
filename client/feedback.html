@@ -49,7 +49,7 @@
         </div>
     </main>
 
-    
+
     <script>
         document.getElementById('feedback-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -60,7 +60,7 @@
             const message = document.getElementById('message').value;
 
             try {
-                const response = await fetch('/api/feedback', {
+                const response = await fetch('https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api/feedback', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -79,7 +79,7 @@
 
         async function loadFeedback() {
             try {
-                const response = await fetch('/api/feedback');
+                const response = await fetch('https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api/feedback');
                 const feedback = await response.json();
                 const list = document.getElementById('feedback-list');
 
@@ -100,8 +100,8 @@
 
         document.addEventListener('DOMContentLoaded', loadFeedback);
     </script>
-        <script src="js/config.js"></script>
-        
+    <script src="js/config.js"></script>
+
 </body>
 
 </html>
