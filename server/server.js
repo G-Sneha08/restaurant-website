@@ -23,16 +23,20 @@ app.use(cors({
     "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors()); // Enable pre-flight for all routes
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the "client" directory
+app.use(express.static(path.join(__dirname, '../client')));
 
 // ===================== Routes =====================
 app.use('/api/auth', authRoutes);
@@ -55,8 +59,13 @@ app.get('/api/images', (req, res) => {
   res.json({ success: true, images: imageMap });
 });
 
-// Root health check
+// Root route - serve frontend instead of just JSON
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Restaurant API is running' });
 });
 
