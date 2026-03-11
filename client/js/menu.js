@@ -3,9 +3,6 @@
 // =======================
 
 async function loadMenu() {
-    const menuGrid = document.querySelector('.grid'); // Target the grid where menu items go
-    if (!menuGrid) return;
-
     try {
         const response = await fetch(`${API_BASE_URL}/menu`);
         const menuItems = await response.json();

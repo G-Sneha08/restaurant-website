@@ -5,3 +5,23 @@ const API_BASE_URL = isLocal
 
 console.log(`[CONFIG] Running in ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'} mode`);
 console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
+
+window.apiRequest = async function(endpoint, options = {}) {
+    const token = localStorage.getItem("token");
+    const headers = {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(options.headers || {})
+    };
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || "API error");
+    }
+    return data;
+};
