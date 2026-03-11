@@ -270,7 +270,11 @@ window.addToCart = async function (menu_id, name, price, image_url) {
 // =======================
 async function updateCartBadge() {
 
-    if (!token) return;
+    if (!token) {
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) cartCountElement.innerText = '(0)';
+        return;
+    }
 
     try {
 
@@ -284,9 +288,13 @@ async function updateCartBadge() {
 
         if (cartCountElement) {
 
-            const totalQty = data.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+            const items = data.items || [];
+            const totalQty = items.reduce((sum, i) => sum + (i.quantity || 0), 0) || 0;
 
             cartCountElement.innerText = `(${totalQty})`;
+            
+            // Sync with localStorage so main.js sees it too
+            localStorage.setItem('cart', JSON.stringify(items));
 
         }
 

@@ -10,8 +10,12 @@ function updateNavbar() {
     const isDashboard = window.location.pathname.includes('admin.html');
     if (isDashboard) return;
 
-    const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
-    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    // Initialize cart if not exists
+    if (!localStorage.getItem('cart')) {
+        localStorage.setItem('cart', JSON.stringify([]));
+    }
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const count = Array.isArray(cart) ? cart.length : 0;
 
     const authLinks = user ? `
         <li><a href="orders.html">Orders</a></li>
