@@ -1,7 +1,8 @@
 // =======================
 // Backend API URL
 // =======================
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+// API_BASE_URL is defined in config.js
+
 
 document.addEventListener("DOMContentLoaded", () => {
 

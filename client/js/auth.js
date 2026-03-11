@@ -3,7 +3,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // Backend API
-    const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+    // API_BASE_URL is defined in config.js
+
 
     // ================= LOGIN =================
     const loginForm = document.getElementById("loginForm");

@@ -50,57 +50,10 @@
     </main>
 
 
-    <script>
-        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const token = localStorage.getItem('token');
-            if (!token) { alert('Please login to submit feedback'); return; }
-
-            const rating = document.getElementById('rating').value;
-            const message = document.getElementById('message').value;
-
-            try {
-                const response = await fetch('/api/feedback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ message, rating })
-                });
-
-                if (response.ok) {
-                    alert('Thank you for your feedback!');
-                    document.getElementById('feedback-form').reset();
-                    loadFeedback();
-                }
-            } catch (err) { console.error(err); }
-        });
-
-        async function loadFeedback() {
-            try {
-                const response = await fetch('/api/feedback');
-                const feedback = await response.json();
-                const list = document.getElementById('feedback-list');
-
-                if (feedback.length === 0) {
-                    list.innerHTML = '<p class="text-center">No feedback yet. Be the first!</p>';
-                    return;
-                }
-
-                list.innerHTML = feedback.map(f => `
-                    <div class="card" style="margin-bottom: 20px; padding: 20px;">
-                        <div style="color: gold; margin-bottom: 10px;">${'⭐'.repeat(f.rating)}</div>
-                        <p style="font-style: italic; color: var(--text-dark);">"${f.message}"</p>
-                        <p style="margin-top: 15px; font-size: 0.85rem; font-weight: 600;">- ${f.name}</p>
-                    </div>
-                `).join('');
-            } catch (err) { console.error(err); }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadFeedback);
-    </script>
     <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/feedback.js"></script>
+</body>
 
 </body>
 

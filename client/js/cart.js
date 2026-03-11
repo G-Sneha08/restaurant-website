@@ -5,7 +5,9 @@
 const token = localStorage.getItem('token');
 
 // Backend URL
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+// Backend URL - defined in config.js
+// const API_BASE_URL = ...
+
 
 // =======================
 // Load Cart Page Items

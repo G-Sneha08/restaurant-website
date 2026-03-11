@@ -1,5 +1,7 @@
 // ================= BACKEND API =================
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+// ================= BACKEND API =================
+// API_BASE_URL is defined in config.js
+
 
 
 // ================= NAVBAR =================

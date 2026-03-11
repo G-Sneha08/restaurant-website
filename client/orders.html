@@ -25,65 +25,10 @@
     </main>
 
 
-    <script>
-        async function loadOrders() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/orders', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const orders = await response.json();
-
-                const list = document.getElementById('orders-list');
-                document.getElementById('loading').style.display = 'none';
-
-                if (orders.length === 0) {
-                    list.innerHTML = '<p class="text-center">No orders found.</p>';
-                    return;
-                }
-
-                list.innerHTML = orders.map(order => `
-                    <div class="card" style="margin-bottom: 20px; padding: 20px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <h4 style="margin-bottom:5px;">Order #${order.id}</h4>
-                                <p style="font-size:0.85rem; color:var(--text-light);">${new Date(order.created_at).toLocaleString()}</p>
-                            </div>
-                            <span class="badge badge-${order.status.toLowerCase()}">${order.status}</span>
-                        </div>
-                        <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:flex-end;">
-                            <p style="font-weight:600;">Total: $${order.total_amount}</p>
-                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-outline" style="padding: 5px 15px; font-size:0.8rem;">View Details</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        async function viewOrderDetails(id) {
-            // Simplified for now, just show items in alert or expand the card
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/orders/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-
-            const items = data.items.map(i => `${i.name} (x${i.quantity}) - $${i.price}`).join('\n');
-            alert(`Order #${id} Items:\n\n${items}\n\nTotal: $${data.total_amount}`);
-        }
-
-        document.addEventListener('DOMContentLoaded', loadOrders);
-    </script>
     <script src="js/config.js"></script>
-    <script src="js/orders.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/orders.js"></script>
+</body>
 </body>
 
 </html>
