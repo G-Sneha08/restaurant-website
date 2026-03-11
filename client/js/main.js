@@ -83,7 +83,12 @@ async function loadMenuImages() {
 }
 
 // ================= ADD TO CART =================
-function addToCart(itemId, quantity = 1) {
+function addToCart(itemId, name, price, image, quantity = 1) {
+    // If called with only two args and 2nd is numeric, it's (id, qty)
+    // If called with more args, the 2nd is name (string), so qty might be the 5th or default to 1
+    let finalQty = (typeof name === 'number') ? name : quantity;
+    if (typeof name === 'string' && arguments.length < 5) finalQty = 1;
+
     fetch(`${API_BASE_URL}/cart`, {
         method: "POST",
         headers: {
@@ -92,7 +97,7 @@ function addToCart(itemId, quantity = 1) {
         body: JSON.stringify({ 
             session_id: getSessionId(),
             menu_item_id: itemId, 
-            quantity 
+            quantity: finalQty 
         })
     })
     .then(res => res.json())
