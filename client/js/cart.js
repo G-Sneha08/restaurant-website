@@ -303,11 +303,19 @@ async function updateCartBadge() {
 // Event Listeners
 // =======================
 window.addEventListener('DOMContentLoaded', () => {
-
-    loadCart();
+    const isCartPage = document.getElementById('cart-items');
+    if (isCartPage) {
+        loadCart();
+    }
     updateCartBadge();
-
 });
 
-document.getElementById('checkout-btn')?.addEventListener('click', checkout);
-document.getElementById('clear-cart-btn')?.addEventListener('click', clearCart);
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', checkout);
+}
+
+const clearCartBtn = document.getElementById('clear-cart-btn');
+if (clearCartBtn) {
+    clearCartBtn.addEventListener('click', clearCart);
+}
