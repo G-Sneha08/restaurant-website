@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Lumina Dine</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+        }
+        body {
+            display: flex;
+            background: #f4f7f9;
+            color: #333;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #1a1a2e;
+            color: #fff;
+            position: fixed;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: var(--primary);
+            text-align: center;
+        }
+        .sidebar-nav a {
+            display: block;
+            color: #adb5bd;
+            padding: 12px 15px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .sidebar-nav i {
+            margin-right: 10px;
+        }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 40px;
+        }
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        select.status-dropdown {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a href="#" onclick="showSection('bookings')" id="nav-bookings" class="active"><i class="fas fa-calendar-alt"></i> Bookings</a>
+            <a href="#" onclick="showSection('orders')" id="nav-orders"><i class="fas fa-shopping-bag"></i> Orders</a>
+            <a href="/" style="margin-top: 50px;"><i class="fas fa-home"></i> View Site</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1 id="section-title">Booking Management</h1>
+            <div id="admin-info" style="font-weight: 500;">Admin User</div>
+        </header>
+
+        <!-- BOOKING SECTION -->
+        <section id="bookings-section" class="card">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Email/Phone</th>
+                            <th>Date/Time</th>
+                            <th>Guests</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-table-body">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ORDER SECTION -->
+        <section id="orders-section" class="card" style="display: none;">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // Check protection
+        if (!localStorage.getItem("adminLoggedIn")) {
+            window.location.href = "admin-login.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("adminLoggedIn");
+            localStorage.removeItem("adminToken");
+            window.location.href = "admin-login.html";
+        }
+
+        function showSection(section) {
+            document.getElementById('bookings-section').style.display = section === 'bookings' ? 'block' : 'none';
+            document.getElementById('orders-section').style.display = section === 'orders' ? 'block' : 'none';
+            document.getElementById('section-title').innerText = section === 'bookings' ? 'Booking Management' : 'Order Management';
+            
+            document.getElementById('nav-bookings').classList.toggle('active', section === 'bookings');
+            document.getElementById('nav-orders').classList.toggle('active', section === 'orders');
+
+            if (section === 'bookings') loadBookings();
+            else loadOrders();
+        }
+
+        async function loadBookings() {
+            const token = localStorage.getItem("adminToken");
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/bookings`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('bookings-table-body');
+                    tbody.innerHTML = data.bookings.map(b => `
+                        <tr>
+                            <td>#${b.id}</td>
+                            <td>${b.customer_name}</td>
+                            <td>${b.customer_email}<br>${b.customer_phone}</td>
+                            <td>${new Date(b.date).toLocaleDateString()} ${b.time}</td>
+                            <td>${b.guests}</td>
+                            <td><span class="status-badge" style="background:${getStatusColor(b.status)}20; color:${getStatusColor(b.status)}">${b.status}</span></td>
+                            <td>
+                                <select class="status-dropdown" onchange="updateBookingStatus(${b.id}, this.value)">
+                                    <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                    <option value="Completed" ${b.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadOrders() {
+            const token = localStorage.getItem("adminToken");
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const tbody = document.getElementById('orders-table-body');
+                    tbody.innerHTML = data.orders.map(o => `
+                        <tr>
+                            <td>#${o.id}</td>
+                            <td>${o.user_name || 'Guest'}</td>
+                            <td>${o.item_name}</td>
+                            <td>₹${o.total_amount}</td>
+                            <td><span class="status-badge" style="background:${getOrderStatusColor(o.status)}20; color:${getOrderStatusColor(o.status)}">${o.status}</span></td>
+                            <td>
+                                <select class="status-dropdown" onchange="updateOrderStatus(${o.id}, this.value)">
+                                    <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Preparing" ${o.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                                    <option value="Out for Delivery" ${o.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                                    <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function updateBookingStatus(id, status) {
+            const token = localStorage.getItem("adminToken");
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status })
+                });
+                if ((await res.json()).success) loadBookings();
+            } catch (err) { console.error(err); }
+        }
+
+        async function updateOrderStatus(id, status) {
+            const token = localStorage.getItem("adminToken");
+            try {
+                const res = await fetch(`${API_BASE_URL}/admin/orders/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status })
+                });
+                if ((await res.json()).success) loadOrders();
+            } catch (err) { console.error(err); }
+        }
+
+        function getStatusColor(s) {
+            const colors = { 'Pending': '#f39c12', 'Confirmed': '#2ecc71', 'Completed': '#3498db', 'Cancelled': '#e74c3c' };
+            return colors[s] || '#333';
+        }
+        function getOrderStatusColor(s) {
+            const colors = { 'Pending': '#f39c12', 'Preparing': '#3498db', 'Out for Delivery': '#9b59b6', 'Delivered': '#2ecc71' };
+            return colors[s] || '#333';
+        }
+
+        // Initial load
+        loadBookings();
+    </script>
+</body>
+</html>

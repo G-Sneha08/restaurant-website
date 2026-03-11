@@ -2,8 +2,23 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { protect, admin } = require('../middleware/authMiddleware');
+const jwt = require('jsonwebtoken');
 
-// All routes here should be protected and admin-only
+// @route   POST /api/admin/login
+// @desc    Admin login
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    // Example admin credentials (temporary)
+    if (email === 'admin@restaurant.com' && password === 'password123') {
+        const token = jwt.sign({ id: 'admin', role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
+        return res.json({ success: true, token, message: 'Login successful' });
+    }
+    
+    res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+});
+
+// All subsequent routes here should be protected and admin-only
 router.use(protect, admin);
 
 // @route   GET /api/admin/users

@@ -1,8 +1,4 @@
-// =======================
-// Cart frontend using session_id based backend
-// =======================
-
-// Dependencies: API_BASE_URL, getSessionId(), updateNavbar() from main.js
+// Dependencies: API_BASE_URL, updateNavbar() from main.js
 
 async function loadCart() {
     const tbody = document.getElementById('cart-items');
@@ -14,10 +10,10 @@ async function loadCart() {
     const totalPriceEl = document.getElementById('total-price');
 
     try {
-        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
+        const res = await fetch(`${API_BASE_URL}/cart`);
         const data = await res.json();
 
-        if (!data.success || !data.items || data.items.length === 0) {
+        if (!data.success || !data.cart || data.cart.length === 0) {
             if (table) table.style.display = 'none';
             if (footerActions) footerActions.style.display = 'none';
             if (emptyMsg) emptyMsg.style.display = 'block';
@@ -29,12 +25,11 @@ async function loadCart() {
         if (emptyMsg) emptyMsg.style.display = 'none';
         if (footerActions) footerActions.style.display = 'block';
 
-        tbody.innerHTML = data.items.map(item => `
+        tbody.innerHTML = data.cart.map(item => `
             <tr>
                 <td>
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <img src="${item.image_url}" width="60" height="60" style="border-radius:10px; object-fit:cover;">
-                        <span>${item.name}</span>
+                        <span>${item.item_name}</span>
                     </div>
                 </td>
                 <td>₹${item.price}</td>
@@ -43,7 +38,7 @@ async function loadCart() {
                     ${item.quantity}
                     <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})">+</button>
                 </td>
-                <td>₹${item.subtotal}</td>
+                <td>₹${(item.price * item.quantity).toFixed(2)}</td>
                 <td>
                     <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--primary)">
                         <i class="fas fa-trash"></i>
@@ -101,28 +96,25 @@ async function checkoutCart() {
 
     try {
         // Get items for checkout
-        const cartRes = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
+        const cartRes = await fetch(`${API_BASE_URL}/cart`);
         const cartData = await cartRes.json();
 
-        if (!cartData.success || cartData.items.length === 0) {
+        if (!cartData.success || cartData.cart.length === 0) {
             alert("Cart is empty");
             return;
         }
 
-        const res = await fetch(`${API_BASE_URL}/orders/checkout`, {
+        const res = await fetch(`${API_BASE_URL}/cart/checkout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ cartItems: cartData.items })
+            }
         });
         const data = await res.json();
 
         if (data.success) {
             alert(data.message);
-            // Clear cart for this session
-            await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`, { method: 'DELETE' });
             window.location.href = "orders.html";
         } else {
             alert(data.message || "Checkout failed");
@@ -136,7 +128,7 @@ async function checkoutCart() {
 async function clearFullCart() {
     if (!confirm("Clear your cart?")) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`, {
+        const res = await fetch(`${API_BASE_URL}/cart`, {
             method: 'DELETE'
         });
         const data = await res.json();

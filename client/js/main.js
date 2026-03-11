@@ -1,29 +1,19 @@
-// ================= SESSION MANAGEMENT =================
-function getSessionId() {
-    let sessionId = localStorage.getItem('session_id');
-    if (!sessionId) {
-        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        localStorage.setItem('session_id', sessionId);
-    }
-    return sessionId;
-}
-
 // ================= NAVBAR =================
 async function updateNavbar() {
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
     if (!nav) return;
 
-    const isDashboard = window.location.pathname.includes('admin.html');
+    const isDashboard = window.location.pathname.includes('admin-dashboard.html');
     if (isDashboard) return;
 
-    // Fetch cart count from server using session_id
+    // Fetch cart count from server
     let count = 0;
     try {
-        const res = await fetch(`${API_BASE_URL}/cart?session_id=${getSessionId()}`);
+        const res = await fetch(`${API_BASE_URL}/cart`);
         const data = await res.json();
         if (data.success) {
-            count = data.items.reduce((sum, item) => sum + item.quantity, 0);
+            count = data.cart.reduce((sum, item) => sum + item.quantity, 0);
         }
     } catch (err) { console.error("Error fetching cart count:", err); }
 
@@ -84,8 +74,6 @@ async function loadMenuImages() {
 
 // ================= ADD TO CART =================
 function addToCart(itemId, name, price, image, quantity = 1) {
-    // If called with only two args and 2nd is numeric, it's (id, qty)
-    // If called with more args, the 2nd is name (string), so qty might be the 5th or default to 1
     let finalQty = (typeof name === 'number') ? name : quantity;
     if (typeof name === 'string' && arguments.length < 5) finalQty = 1;
 
@@ -95,7 +83,6 @@ function addToCart(itemId, name, price, image, quantity = 1) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
-            session_id: getSessionId(),
             menu_item_id: itemId, 
             quantity: finalQty 
         })
