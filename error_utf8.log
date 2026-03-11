@@ -1,0 +1,84 @@
+﻿[dotenv@17.3.1] injecting env (8) from .env -- tip: ≡ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ≡ƒñû agentic secret storage: https://dotenvx.com/as2
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ≡ƒ¢á∩╕Å  run anywhere with `dotenvx run -- yourcommand`
+node : C:\Users\Sneha\O
+neDrive\Documents\resta
+urant-website\restauran
+t-website\node_modules\
+express\lib\router\inde
+x.js:469
+At line:1 char:1
++ node 
+server/server.js 2>&1 
+| Out-File -Encoding 
+utf8 error_utf8.log
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo     
+         : 
+NotSpecified    : 
+(C:\Users\Sneha\.    
+..er\index.js:469:S    
+tring) [], RemoteEx    
+ception
+    + 
+FullyQualifiedErr    
+orId : NativeComman    
+dError
+ 
+      throw new TypeErr
+or('Router.use() 
+requires a middleware 
+function but got a ' + 
+gettype(fn))
+      ^
+
+TypeError: 
+Router.use() requires 
+a middleware function 
+but got a Object
+    at router.use (C:\U
+sers\Sneha\OneDrive\Doc
+uments\restaurant-websi
+te\restaurant-website\n
+ode_modules\express\lib
+\router\index.js:469:13
+)
+    at app.<anonymous> 
+(C:\Users\Sneha\OneDriv
+e\Documents\restaurant-
+website\restaurant-webs
+ite\node_modules\expres
+s\lib\application.js:22
+7:21)
+    at Array.forEach 
+(<anonymous>)
+    at app.use (C:\User
+s\Sneha\OneDrive\Docume
+nts\restaurant-website\
+restaurant-website\node
+_modules\express\lib\ap
+plication.js:224:7)
+    at 
+Object.<anonymous> (C:\
+Users\Sneha\OneDrive\Do
+cuments\restaurant-webs
+ite\restaurant-website\
+server\server.js:34:5)
+    at Module._compile 
+(node:internal/modules/
+cjs/loader:1804:14)
+    at Object..js (node
+:internal/modules/cjs/l
+oader:1936:10)
+    at Module.load (nod
+e:internal/modules/cjs/
+loader:1525:32)
+    at Module._load (no
+de:internal/modules/cjs
+/loader:1327:12)
+    at TracingChannel.t
+raceSync (node:diagnost
+ics_channel:328:14)
+
+Node.js v24.13.1

@@ -1,7 +1,7 @@
 // =======================
 // Backend API URL
 // =======================
-const API_BASE_URL = "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app/api";
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 
 document.addEventListener("DOMContentLoaded", () => {
 
