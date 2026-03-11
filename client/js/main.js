@@ -1,13 +1,11 @@
 // ================= BACKEND API =================
+// Use global API_BASE_URL from config.js
 const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
-
 
 // ================= NAVBAR =================
 function updateNavbar() {
-
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
-
     if (!nav) return;
 
     const isDashboard = window.location.pathname.includes('admin.html');
@@ -20,25 +18,16 @@ function updateNavbar() {
         <li><a href="orders.html">Orders</a></li>
         ${user.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
         <li>
-            <button onclick="logout()" 
-            class="btn btn-outline" 
-            style="padding:5px 15px;margin-left:10px;">
-            Logout
-            </button>
+            <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">Logout</button>
         </li>
     ` : `
         <li>
-            <a href="login.html" 
-            class="btn btn-outline" 
-            style="padding:8px 16px;">
-            Login
-            </a>
+            <a href="login.html" class="btn btn-outline" style="padding:8px 16px;">Login</a>
         </li>
     `;
 
     nav.innerHTML = `
         <a href="index.html" class="logo">LUMINA DINE</a>
-
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="menu.html">Menu</a></li>
@@ -48,52 +37,65 @@ function updateNavbar() {
                 </a>
             </li>
             <li><a href="index.html#footer">Contact</a></li>
-
             ${authLinks}
         </ul>
     `;
 }
 
-
 // ================= LOAD MENU IMAGES =================
 async function loadMenuImages() {
-
     try {
-
         const response = await fetch(`${API_BASE_URL}/images`);
         const data = await response.json();
 
         if (data.success) {
-
             const images = data.images;
+            const ids = {
+                "Paneer Tikka": "paneerTikkaImg",
+                "Crispy Corn": "crispyCornImg",
+                "Paneer Butter Masala": "paneerButterMasalaImg",
+                "Cold Coffee": "coldCoffeeImg",
+                "Rasmalai": "rasmalaiImg"
+            };
 
-            const paneerTikka = document.getElementById("paneerTikkaImg");
-            const crispyCorn = document.getElementById("crispyCornImg");
-            const paneerButter = document.getElementById("paneerButterMasalaImg");
-            const coldCoffee = document.getElementById("coldCoffeeImg");
-            const rasmalai = document.getElementById("rasmalaiImg");
-
-            if (paneerTikka) paneerTikka.src = images["Paneer Tikka"];
-            if (crispyCorn) crispyCorn.src = images["Crispy Corn"];
-            if (paneerButter) paneerButter.src = images["Paneer Butter Masala"];
-            if (coldCoffee) coldCoffee.src = images["Cold Coffee"];
-            if (rasmalai) rasmalai.src = images["Rasmalai"];
-
+            for (const [name, id] of Object.entries(ids)) {
+                const el = document.getElementById(id);
+                if (el) el.src = images[name];
+            }
         }
-
     } catch (error) {
-
         console.error("Error loading menu images:", error);
-
     }
-
 }
 
+// ================= ADD TO CART =================
+function addToCart(itemId, quantity = 1) {
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/cart/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({ itemId, quantity })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Item added to cart!");
+            updateNavbar(); // update cart count
+        } else {
+            alert(data.message || "Failed to add item.");
+        }
+    })
+    .catch(err => console.error(err));
+}
+
+// Expose globally
+window.addToCart = addToCart;
 
 // ================= PAGE LOAD =================
 document.addEventListener("DOMContentLoaded", () => {
-
     updateNavbar();
     loadMenuImages();
-
 });
