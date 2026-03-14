@@ -20,10 +20,10 @@ const app = express();
 // ===================== Middleware =====================
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-    origin: true, // Allow all origins in Codespaces
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: process.env.NODE_ENV === 'production'
+        ? ["https://restaurant-website.vercel.app"]
+        : true,
+    credentials: true
 }));
 app.use(morgan('dev'));
 app.use(express.json());
