@@ -388,5 +388,54 @@
 </footer>
 <!-- Footer End -->
     <script src="js/cart.js"></script>
+    <!-- Add this near the end of <body> before </body> -->
+<script>
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api"; // your backend API
+
+async function addToCart(menu_item_id, quantity = 1) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ menu_item_id, quantity })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Item added to cart!");
+            if (typeof updateNavbar === 'function') updateNavbar();
+        } else {
+            alert(data.message || "Failed to add item");
+        }
+    } catch (err) {
+        console.error("Add to cart fetch error:", err);
+        alert("Failed to add item to cart");
+    }
+}
+
+document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = parseInt(btn.getAttribute('data-id'));
+        addToCart(id);
+    });
+});
+</script>
+
+<style>
+/* Add to Cart Button Red Styling */
+.add-to-cart {
+    background-color: #e53935; /* red button */
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px; /* slightly curved corners */
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: #b71c1c; /* darker red on hover */
+}
+</style>
 </body>
 </html>

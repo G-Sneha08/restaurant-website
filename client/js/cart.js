@@ -6,12 +6,12 @@ const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 // ============================
 // Add to Cart Function
 // ============================
-async function addToCart(menuItemId, quantity = 1) {
+async function addToCart(menu_item_id, quantity = 1) {
     try {
         const res = await fetch(`${API_BASE_URL}/cart`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ menu_item_id: menuItemId, quantity })
+            body: JSON.stringify({ menu_item_id, quantity })
         });
         const data = await res.json();
         if (data.success) {
@@ -56,11 +56,7 @@ async function loadCart() {
 
         tbody.innerHTML = data.cart.map(item => `
             <tr>
-                <td>
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <span>${item.item_name}</span>
-                    </div>
-                </td>
+                <td>${item.item_name}</td>
                 <td>₹${item.price}</td>
                 <td>
                     <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
@@ -69,7 +65,7 @@ async function loadCart() {
                 </td>
                 <td>₹${(item.price * item.quantity).toFixed(2)}</td>
                 <td>
-                    <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--primary)">
+                    <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:red">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -133,7 +129,6 @@ async function checkoutCart() {
     if (!confirm("Proceed to checkout?")) return;
 
     try {
-        // Get items for checkout
         const cartRes = await fetch(`${API_BASE_URL}/cart`);
         const cartData = await cartRes.json();
 
@@ -197,6 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Attach add-to-cart buttons
     document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => addToCart(btn.dataset.id));
+        btn.addEventListener('click', () => addToCart(parseInt(btn.dataset.id)));
     });
 });
