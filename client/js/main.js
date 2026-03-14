@@ -73,29 +73,23 @@ async function loadMenuImages() {
 }
 
 // ================= ADD TO CART =================
-function addToCart(itemId, name, price, image, quantity = 1) {
-    let finalQty = (typeof name === 'number') ? name : quantity;
-    if (typeof name === 'string' && arguments.length < 5) finalQty = 1;
-
-    fetch(`${API_BASE_URL}/cart`, {
+function addToCart(itemId, quantity = 1) {
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/cart/add`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ 
-            menu_item_id: itemId, 
-            quantity: finalQty 
-        })
+        body: JSON.stringify({ itemId, quantity })
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) {
-            alert("Item added to cart!");
+       
+            alert(data.message || "Item added to cart!");
             updateNavbar(); // update cart count
-        } else {
-            alert(data.message || "Failed to add item.");
-        }
-    })
+     })
+        
+    
     .catch(err => console.error(err));
 }
 
