@@ -118,19 +118,21 @@ nav {
     color: var(--white);
 }
 /* Add this to css/styles.css */
+
 .add-to-cart {
-    background-color: #d93523; /* bright red */
+    background-color: #e53935; /* Red */
     color: #fff;
     border: none;
-    padding: 10px 16px;
-    border-radius: 5px;
+    padding: 8px 16px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .add-to-cart:hover {
-    background-color: #c0392b; /* darker red on hover */
+    background-color: #b71c1c; /* Darker Red on hover */
+    transform: scale(1.05);
 }
 /* Hero Section - Improved with Blur Overlay */
 .hero-new {

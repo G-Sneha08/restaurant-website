@@ -1,5 +1,34 @@
-// Dependencies: API_BASE_URL, updateNavbar() from main.js
+// ============================
+// Backend API URL
+// ============================
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 
+// ============================
+// Add to Cart Function
+// ============================
+async function addToCart(menuItemId, quantity = 1) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ menu_item_id: menuItemId, quantity })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(data.message || 'Item added to cart');
+            if (typeof updateNavbar === 'function') updateNavbar();
+        } else {
+            alert(data.message || 'Add to cart failed');
+        }
+    } catch (err) {
+        console.error("Add to cart fetch error:", err);
+        alert("Failed to add item. Try again!");
+    }
+}
+
+// ============================
+// Load Cart
+// ============================
 async function loadCart() {
     const tbody = document.getElementById('cart-items');
     if (!tbody) return;
@@ -54,14 +83,16 @@ async function loadCart() {
     }
 }
 
-// Update cart quantity
+// ============================
+// Update Cart Quantity
+// ============================
 async function updateCartQuantity(cartId, quantity) {
     if (quantity < 1) return;
     try {
         const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity: Number(quantity) })
+            body: JSON.stringify({ quantity })
         });
         const data = await res.json();
         if (data.success) {
@@ -71,7 +102,9 @@ async function updateCartQuantity(cartId, quantity) {
     } catch (err) { console.error("Update quantity error:", err); }
 }
 
-// Delete single cart item
+// ============================
+// Delete Cart Item
+// ============================
 async function deleteCartItem(cartId) {
     if (!confirm("Remove item?")) return;
     try {
@@ -86,7 +119,9 @@ async function deleteCartItem(cartId) {
     } catch (err) { console.error("Delete item error:", err); }
 }
 
-// Checkout cart
+// ============================
+// Checkout Cart
+// ============================
 async function checkoutCart() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -98,6 +133,7 @@ async function checkoutCart() {
     if (!confirm("Proceed to checkout?")) return;
 
     try {
+        // Get items for checkout
         const cartRes = await fetch(`${API_BASE_URL}/cart`);
         const cartData = await cartRes.json();
 
@@ -111,8 +147,7 @@ async function checkoutCart() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({}) // backend expects a JSON body
+            }
         });
         const data = await res.json();
 
@@ -128,7 +163,9 @@ async function checkoutCart() {
     }
 }
 
-// Clear entire cart
+// ============================
+// Clear Full Cart
+// ============================
 async function clearFullCart() {
     if (!confirm("Clear your cart?")) return;
     try {
@@ -143,47 +180,23 @@ async function clearFullCart() {
     } catch (err) { console.error("Clear cart error:", err); }
 }
 
-// Add item to cart (fixes 400 Bad Request)
-async function addToCart(menuItemId) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                menu_item_id: Number(menuItemId),
-                quantity: 1
-            })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert("Item added to cart!");
-            loadCart();
-            if (typeof updateNavbar === 'function') updateNavbar();
-        } else {
-            console.error("Add to cart error:", data.message);
-            alert("Failed to add item. Check console.");
-        }
-    } catch (err) {
-        console.error("Add to cart fetch error:", err);
-        alert("Error adding item to cart. Check console.");
-    }
-}
-
-// Expose functions globally
+// ============================
+// Expose Functions Globally
+// ============================
+window.addToCart = addToCart;
 window.updateCartQuantity = updateCartQuantity;
 window.deleteCartItem = deleteCartItem;
 window.checkoutCart = checkoutCart;
 window.clearFullCart = clearFullCart;
-window.addToCart = addToCart;
 
+// ============================
+// Initialize
+// ============================
 document.addEventListener('DOMContentLoaded', () => {
     loadCart();
 
-    // Bind add-to-cart buttons dynamically
-    const buttons = document.querySelectorAll('.add-to-cart');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            addToCart(btn.dataset.id);
-        });
+    // Attach add-to-cart buttons
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', () => addToCart(btn.dataset.id));
     });
 });
