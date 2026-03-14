@@ -12,26 +12,21 @@ const orderRoutes = require('./routes/orders');
 const bookingRoutes = require('./routes/booking');
 const feedbackRoutes = require('./routes/feedback');
 const adminRoutes = require('./routes/admin');
-
+// DB
+const pool = require('./db');
 const app = express();
 
 // ===================== Middleware =====================
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        "https://restaurant-website-umber-three.vercel.app",
-        "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app"
-      ]
-    : true, // true reflects the request origin, useful for local/codespaces
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: true, // Allow all origins in Codespaces
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 // ===================== Frontend Serving =====================
 const clientPath = path.join(__dirname, '../client');
 console.log(`[SERVER] Serving static files from: ${clientPath}`);
