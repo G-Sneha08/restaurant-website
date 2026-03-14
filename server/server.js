@@ -13,7 +13,7 @@ const bookingRoutes = require('./routes/booking');
 const feedbackRoutes = require('./routes/feedback');
 const adminRoutes = require('./routes/admin');
 // DB
-const pool = require('./db');
+const pool = require('../db');
 const app = express();
 
 // ===================== Middleware =====================
