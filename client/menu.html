@@ -387,47 +387,6 @@
     </p>
 </footer>
 <!-- Footer End -->
-  <!-- ================= ADD TO CART JS ================= -->
-    <script>
-        const addCartButtons = document.querySelectorAll(".add-to-cart");
-        const cartCount = document.getElementById("cart-count");
-
-        addCartButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const menuItemId = button.dataset.id;
-                addToCart(menuItemId);
-            });
-        });
-
-        function addToCart(menuItemId) {
-            const cardFooter = document.querySelector(`button[data-id='${menuItemId}']`).closest(".card-footer");
-            const itemName = cardFooter.previousElementSibling.textContent;
-            const itemPrice = cardFooter.querySelector(".card-price").textContent;
-
-            fetch("https://restaurant-backend-cli2.onrender.com/api/cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    menu_item_id: menuItemId,
-                    item_name: itemName,
-                    price: parseFloat(itemPrice.replace(/₹/g, '')),
-                    quantity: 1
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    alert(`${itemName} added to cart!`);
-                    cartCount.textContent = parseInt(cartCount.textContent) + 1;
-                } else {
-                    alert("Failed to add to cart.");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Error adding to cart. Check console for details.");
-            });
-        }
-    </script>
+    <script src="js/cart.js"></script>
 </body>
 </html>
