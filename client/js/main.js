@@ -1,25 +1,39 @@
+// ================= BACKEND API =================
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+
 // ================= NAVBAR =================
 async function updateNavbar() {
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
     if (!nav) return;
 
-    const isDashboard = window.location.pathname.includes('admin-dashboard.html');
+    const isDashboard = window.location.pathname.includes('admin.html');
     if (isDashboard) return;
 
-    // Fetch cart count from server
+    // Fetch cart from backend if user is logged in
     let count = 0;
-    try {
-        const res = await fetch(`${API_BASE_URL}/cart`);
-        const data = await res.json();
-        if (data.success) {
-            count = data.cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (user) {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_BASE_URL}/cart`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.cart)) {
+                count = data.cart.reduce((sum, item) => sum + item.quantity, 0);
+            }
+        } catch (err) {
+            console.error("Failed to fetch cart:", err);
         }
-    } catch (err) { console.error("Error fetching cart count:", err); }
+    } else {
+        // Use localStorage fallback for guests
+        const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+        count = cart.reduce((total, item) => total + item.quantity, 0);
+    }
 
     const authLinks = user ? `
         <li><a href="orders.html">Orders</a></li>
-        ${user.role === 'admin' ? '<li><a href="#" onclick="openAdminModal(); return false;">Admin Panel</a></li>' : ''}
+        ${user.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
         <li>
             <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">Logout</button>
         </li>
@@ -34,7 +48,6 @@ async function updateNavbar() {
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="menu.html">Menu</a></li>
-            <li><a href="booking.html">Book Table</a></li>
             <li>
                 <a href="cart.html" id="cart-link">
                     Cart <span id="cart-count">(${count})</span>
@@ -73,55 +86,41 @@ async function loadMenuImages() {
 }
 
 // ================= ADD TO CART =================
-function addToCart(itemId, quantity = 1) {
+function addToCart(menu_item_id, quantity = 1) {
     const token = localStorage.getItem('token');
-    fetch(`${API_BASE_URL}/cart/add`, {
+
+    fetch(`${API_BASE_URL}/cart`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : ''
         },
-        body: JSON.stringify({ itemId, quantity })
+        body: JSON.stringify({ menu_item_id, quantity }) // matches backend
     })
     .then(res => res.json())
     .then(data => {
-       
+        if(data.success){
             alert(data.message || "Item added to cart!");
-            updateNavbar(); // update cart count
-     })
-        
-    
+            updateNavbar(); // refresh cart count
+        } else {
+            alert(data.message || "Failed to add item to cart.");
+        }
+    })
     .catch(err => console.error(err));
 }
 
-// Expose globally
-window.addToCart = addToCart;
-
+window.addToCart = addToCart; // expose globally
 // ================= LOGOUT =================
 function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    alert("You have been logged out.");
-    window.location.href = "login.html";
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    updateNavbar();
+    window.location.href = "index.html";
 }
 
-// ================= ADMIN MODAL =================
-function openAdminModal() {
-    const modal = document.getElementById('adminModal');
-    if (modal) {
-        modal.style.display = 'block';
-        if (typeof loadAdminBookings === 'function') {
-            loadAdminBookings();
-        }
-    }
-}
-
-function closeAdminModal() {
-    const modal = document.getElementById('adminModal');
-    if (modal) modal.style.display = 'none';
-}
-
-window.openAdminModal = openAdminModal;
-window.closeAdminModal = closeAdminModal;
+// Expose addToCart globally for onclick
+window.addToCart = addToCart;
+window.logout = logout;
 
 // ================= PAGE LOAD =================
 document.addEventListener("DOMContentLoaded", () => {
