@@ -1,14 +1,17 @@
+// server/routes/cart.js
+
+const express = require('express');
+const router = express.Router();
+const pool = require('../config/db'); // adjust path if your db pool is elsewhere
+const { protect } = require('../middleware/auth'); // if you use auth middleware
+
 // ============================
 // GET /api/cart - fetch all cart items
 // ============================
 router.get('/', async (req, res) => {
     try {
-        const [rows] = await pool.query(
-            `SELECT * FROM cart ORDER BY created_at DESC`
-        );
-
+        const [rows] = await pool.query(`SELECT * FROM cart ORDER BY created_at DESC`);
         const totalPrice = rows.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-
         res.json({ success: true, cart: rows, totalPrice });
     } catch (err) {
         console.error(err);
@@ -24,22 +27,16 @@ router.post('/', async (req, res) => {
     const qty = quantity || 1;
 
     if (!menu_item_id) {
-        return res.status(400).json({ success: false, message: 'Invalid menu_item_id' });
+        return res.status(400).json({ success: false, message: 'menu_item_id is required' });
     }
 
     try {
-        // Check if item exists in cart
-        const [existing] = await pool.query(
-            'SELECT * FROM cart WHERE menu_item_id = ?',
-            [menu_item_id]
-        );
+        const [existing] = await pool.query('SELECT * FROM cart WHERE menu_item_id = ?', [menu_item_id]);
 
         if (existing.length > 0) {
-            // update quantity
             await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [qty, existing[0].id]);
-            res.status(200).json({ success: true, message: 'Cart updated' });
+            return res.status(200).json({ success: true, message: 'Cart updated' });
         } else {
-            // insert new using SELECT to get name and price from menu
             await pool.query(
                 `INSERT INTO cart (menu_item_id, item_name, price, quantity)
                  SELECT id, name, price, ?
@@ -47,7 +44,7 @@ router.post('/', async (req, res) => {
                  WHERE id = ?`,
                 [qty, menu_item_id]
             );
-            res.status(201).json({ success: true, message: 'Item added to cart' });
+            return res.status(201).json({ success: true, message: 'Item added to cart' });
         }
     } catch (err) {
         console.error(err);
@@ -63,11 +60,7 @@ router.put('/:id', async (req, res) => {
     if (!quantity || quantity < 1) return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
 
     try {
-        const [result] = await pool.query(
-            'UPDATE cart SET quantity = ? WHERE id = ?',
-            [quantity, req.params.id]
-        );
-
+        const [result] = await pool.query('UPDATE cart SET quantity = ? WHERE id = ?', [quantity, req.params.id]);
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
         res.json({ success: true, message: 'Quantity updated' });
     } catch (err) {
@@ -82,7 +75,6 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const [result] = await pool.query('DELETE FROM cart WHERE id = ?', [req.params.id]);
-
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
         res.json({ success: true, message: 'Item removed' });
     } catch (err) {
@@ -109,19 +101,15 @@ router.delete('/', async (req, res) => {
 // ============================
 router.post('/checkout', protect, async (req, res) => {
     try {
-        const [cartItems] = await pool.query(
-            `SELECT * FROM cart`
-        );
-
+        const [cartItems] = await pool.query(`SELECT * FROM cart`);
         if (cartItems.length === 0) return res.status(400).json({ success: false, message: 'Cart is empty' });
 
         const totalPrice = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
 
-        const [orderResult] = await pool.query('INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)', [
-            req.user.id,
-            totalPrice,
-            cartItems.map(i => i.item_name).join(', ')
-        ]);
+        const [orderResult] = await pool.query(
+            'INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)',
+            [req.user.id, totalPrice, cartItems.map(i => i.item_name).join(', ')]
+        );
         const orderId = orderResult.insertId;
 
         const orderValues = cartItems.map(item => [orderId, item.menu_item_id, item.quantity, item.price]);
