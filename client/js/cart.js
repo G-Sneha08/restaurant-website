@@ -17,6 +17,7 @@ async function addToCart(menu_item_id, quantity = 1) {
         if (data.success) {
             alert(data.message || 'Item added to cart');
             if (typeof updateNavbar === 'function') updateNavbar();
+            loadCart(); // refresh cart immediately
         } else {
             alert(data.message || 'Add to cart failed');
         }
@@ -56,7 +57,11 @@ async function loadCart() {
 
         tbody.innerHTML = data.cart.map(item => `
             <tr>
-                <td>${item.item_name}</td>
+                <td>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <span>${item.item_name}</span>
+                    </div>
+                </td>
                 <td>₹${item.price}</td>
                 <td>
                     <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})">-</button>
@@ -65,7 +70,7 @@ async function loadCart() {
                 </td>
                 <td>₹${(item.price * item.quantity).toFixed(2)}</td>
                 <td>
-                    <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:red">
+                    <button onclick="deleteCartItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--primary)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -104,9 +109,7 @@ async function updateCartQuantity(cartId, quantity) {
 async function deleteCartItem(cartId) {
     if (!confirm("Remove item?")) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
-            method: 'DELETE'
-        });
+        const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
             loadCart();
@@ -129,14 +132,6 @@ async function checkoutCart() {
     if (!confirm("Proceed to checkout?")) return;
 
     try {
-        const cartRes = await fetch(`${API_BASE_URL}/cart`);
-        const cartData = await cartRes.json();
-
-        if (!cartData.success || cartData.cart.length === 0) {
-            alert("Cart is empty");
-            return;
-        }
-
         const res = await fetch(`${API_BASE_URL}/cart/checkout`, {
             method: 'POST',
             headers: {
@@ -145,7 +140,6 @@ async function checkoutCart() {
             }
         });
         const data = await res.json();
-
         if (data.success) {
             alert(data.message);
             window.location.href = "orders.html";
@@ -164,9 +158,7 @@ async function checkoutCart() {
 async function clearFullCart() {
     if (!confirm("Clear your cart?")) return;
     try {
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            method: 'DELETE'
-        });
+        const res = await fetch(`${API_BASE_URL}/cart`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
             loadCart();
@@ -176,7 +168,7 @@ async function clearFullCart() {
 }
 
 // ============================
-// Expose Functions Globally
+// Global Exposure
 // ============================
 window.addToCart = addToCart;
 window.updateCartQuantity = updateCartQuantity;
@@ -191,7 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCart();
 
     // Attach add-to-cart buttons
+    const buttons = document.querySelectorAll('.add-to-cart');
+    buttons.forEach(btn => {
+        // Remove existing listener to prevent double alerts
+        btn.replaceWith(btn.cloneNode(true));
+    });
+
     document.querySelectorAll('.add-to-cart').forEach(btn => {
-        btn.addEventListener('click', () => addToCart(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => addToCart(btn.dataset.id));
+        // Style the button with slight rounded corners
+        btn.style.borderRadius = '6px';
     });
 });
