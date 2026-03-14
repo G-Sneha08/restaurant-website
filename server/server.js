@@ -13,7 +13,8 @@ const bookingRoutes = require('./routes/booking');
 const feedbackRoutes = require('./routes/feedback');
 const adminRoutes = require('./routes/admin');
 // DB
-const pool = require('../db');
+// server/server.js
+const pool = require('./config/db');  // <-- Correct path
 const app = express();
 
 // ===================== Middleware =====================
