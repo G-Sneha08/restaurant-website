@@ -2,8 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db'); // adjust path if your db pool is elsewhere
-const { protect } = require('../middleware/auth'); // if you use auth middleware
+const pool = require('../config/db'); // your MySQL pool
 
 // ============================
 // GET /api/cart - fetch all cart items
@@ -97,9 +96,9 @@ router.delete('/', async (req, res) => {
 });
 
 // ============================
-// POST /api/cart/checkout - place order
+// POST /api/cart/checkout - place order (no auth required for now)
 // ============================
-router.post('/checkout', protect, async (req, res) => {
+router.post('/checkout', async (req, res) => {
     try {
         const [cartItems] = await pool.query(`SELECT * FROM cart`);
         if (cartItems.length === 0) return res.status(400).json({ success: false, message: 'Cart is empty' });
@@ -108,7 +107,7 @@ router.post('/checkout', protect, async (req, res) => {
 
         const [orderResult] = await pool.query(
             'INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)',
-            [req.user.id, totalPrice, cartItems.map(i => i.item_name).join(', ')]
+            [null, totalPrice, cartItems.map(i => i.item_name).join(', ')]
         );
         const orderId = orderResult.insertId;
 
