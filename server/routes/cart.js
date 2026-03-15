@@ -4,23 +4,27 @@ const pool = require("../config/db");
 
 
 // ================= GET CART =================
+// ================= GET CART =================
 router.get("/:user_id", async (req, res) => {
+
   try {
 
     const userId = req.params.user_id;
 
-    const [rows] = await pool.query(
-      `SELECT 
-        id,
-        menu_item_id,
-        quantity,
-        price,
-        item_name
-      FROM cart
-      WHERE user_id = ?
-      ORDER BY id DESC`,
-      [userId]
-    );
+    const [rows] = await pool.query(`
+      SELECT 
+        c.id,
+        c.menu_item_id,
+        c.quantity,
+        m.name AS item_name,
+        m.price,
+        m.image_url
+      FROM cart c
+      JOIN menu m
+      ON c.menu_item_id = m.id
+      WHERE c.user_id = ?
+      ORDER BY c.id DESC
+    `, [userId]);
 
     let totalPrice = 0;
 
@@ -44,8 +48,8 @@ router.get("/:user_id", async (req, res) => {
     });
 
   }
-});
 
+});
 
 // ================= ADD TO CART =================
 router.post("/", async (req, res) => {
@@ -79,9 +83,9 @@ router.post("/", async (req, res) => {
 
       await pool.query(
         `INSERT INTO cart
-        (user_id, menu_item_id, quantity, price, item_name)
-        VALUES (?,?,?,?,?)`,
-        [user_id, menu_item_id, qty, price, item_name]
+        (user_id, menu_item_id, quantity)
+        VALUES (?,?,?)`,
+        [user_id, menu_item_id, qty]
       );
 
     }

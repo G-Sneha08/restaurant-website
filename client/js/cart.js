@@ -1,89 +1,65 @@
-async function addToCart(menu_item_id, quantity = 1) {
-  try {
+async function addToCart(id) {
 
-    const res = await fetch(`${window.API_BASE_URL}/cart/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        user_id: window.USER_ID,
-        menu_item_id,
-        quantity
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert(data.message || "Item added to cart");
-
-      if (typeof updateNavbar === "function") {
-        updateNavbar();
-      }
-
-    } else {
-      alert(data.message || "Failed to add item");
-    }
-
-  } catch (err) {
-    console.error("Add to cart error:", err);
-    alert("Error adding item to cart");
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const buttons = document.querySelectorAll(".add-to-cart");
-
-  buttons.forEach(btn => {
-
-    btn.addEventListener("click", () => {
-
-      const menu_item_id = parseInt(btn.dataset.id);
-
-      addToCart(menu_item_id);
-
-    });
-
+  await fetch(`${window.API_BASE_URL}/cart`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user_id: window.USER_ID,
+      menu_item_id: id,
+      quantity: 1
+    })
   });
 
-});
+  updateNavbar();
+}
 
 // LOAD CART
 async function loadCart() {
 
-    try {
+  try {
 
-        const res = await fetch(`${API_BASE_URL}/cart/1`);
+    const res = await fetch(`${window.API_BASE_URL}/cart/${window.USER_ID}`);
+    const data = await res.json();
 
-        const data = await res.json();
+    const cartContainer = document.getElementById("cart-items");
+    cartContainer.innerHTML = "";
 
-        const table = document.getElementById("cart-items");
-
-        if (!data.success) return;
-
-        table.innerHTML = data.cart.map(item => `
-
-        <tr>
-
-            <td>${item.name}</td>
-            <td>₹${item.price}</td>
-            <td>${item.quantity}</td>
-            <td>₹${item.price * item.quantity}</td>
-
-        </tr>
-
-        `).join("");
-
-    } catch (err) {
-
-        console.error("Load cart error:", err);
-
+    if (!data.success || data.cart.length === 0) {
+      cartContainer.innerHTML = "<p>Your cart is empty</p>";
+      return;
     }
+
+    data.cart.forEach(item => {
+
+      const cartItem = document.createElement("div");
+
+      cartItem.className = "cart-item";
+
+      cartItem.innerHTML = `
+        <h3>${item.item_name}</h3>
+        <p>Price: ₹${item.price}</p>
+        <p>Quantity: ${item.quantity}</p>
+        <p>Total: ₹${item.price * item.quantity}</p>
+      `;
+
+      cartContainer.appendChild(cartItem);
+
+    });
+
+    document.getElementById("total-price").innerText =
+      "Total: ₹" + data.totalPrice;
+
+  } catch (err) {
+
+    console.error("Cart load error:", err);
+
+  }
 
 }
 
+loadCart();
 
 // REMOVE ITEM
 async function removeItem(id){
