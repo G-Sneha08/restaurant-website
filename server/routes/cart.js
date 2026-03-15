@@ -2,18 +2,28 @@
 
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db'); // your MySQL pool
+const pool = require('../config/db'); // MySQL pool from /config/db.js
 
 // ============================
 // GET /api/cart - fetch all cart items
 // ============================
 router.get('/', async (req, res) => {
     try {
-        const [rows] = await pool.query(`SELECT * FROM cart ORDER BY created_at DESC`);
-        const totalPrice = rows.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+        const [rows] = await pool.query(
+            `SELECT c.id, c.menu_item_id, c.quantity, m.name AS item_name, m.price, c.created_at
+             FROM cart c
+             JOIN menu m ON c.menu_item_id = m.id
+             ORDER BY c.created_at DESC`
+        );
+
+        const totalPrice = rows.reduce(
+            (sum, item) => sum + parseFloat(item.price) * item.quantity,
+            0
+        );
+
         res.json({ success: true, cart: rows, totalPrice });
     } catch (err) {
-        console.error(err);
+        console.error("Fetch cart error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -30,31 +40,29 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Check if item already in cart
+        // Check if item already exists in cart
         const [existing] = await pool.query('SELECT * FROM cart WHERE menu_item_id = ?', [menu_item_id]);
 
         if (existing.length > 0) {
-            // Update quantity
+            // Update quantity if exists
             await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [qty, existing[0].id]);
             return res.status(200).json({ success: true, message: 'Cart updated' });
         } else {
             // Insert new item
-            const [inserted] = await pool.query(
-                `INSERT INTO cart (menu_item_id, item_name, price, quantity)
-                 SELECT id, name, price, ?
-                 FROM menu
-                 WHERE id = ?`,
-                [qty, menu_item_id]
-            );
-
-            if (inserted.affectedRows === 0) {
+            const [menuItem] = await pool.query('SELECT name, price FROM menu WHERE id = ?', [menu_item_id]);
+            if (menuItem.length === 0) {
                 return res.status(404).json({ success: false, message: 'Menu item not found' });
             }
+
+            await pool.query(
+                'INSERT INTO cart (menu_item_id, quantity, item_name, price) VALUES (?, ?, ?, ?)',
+                [menu_item_id, qty, menuItem[0].name, menuItem[0].price]
+            );
 
             return res.status(201).json({ success: true, message: 'Item added to cart' });
         }
     } catch (err) {
-        console.error(err);
+        console.error("Add to cart error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -75,7 +83,7 @@ router.put('/:id', async (req, res) => {
         }
         res.json({ success: true, message: 'Quantity updated' });
     } catch (err) {
-        console.error(err);
+        console.error("Update cart quantity error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -89,9 +97,9 @@ router.delete('/:id', async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Cart item not found' });
         }
-        res.json({ success: true, message: 'Item removed' });
+        res.json({ success: true, message: 'Item removed from cart' });
     } catch (err) {
-        console.error(err);
+        console.error("Delete cart item error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -104,7 +112,7 @@ router.delete('/', async (req, res) => {
         await pool.query('DELETE FROM cart');
         res.json({ success: true, message: 'Cart cleared' });
     } catch (err) {
-        console.error(err);
+        console.error("Clear cart error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -119,20 +127,29 @@ router.post('/checkout', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
         }
 
-        const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
-
-        // Insert order
-        const [orderResult] = await pool.query(
-            'INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)',
-            [null, totalPrice, cartItems.map(i => i.item_name).join(', ')]
+        const totalAmount = cartItems.reduce(
+            (sum, item) => sum + parseFloat(item.price) * item.quantity,
+            0
         );
 
+        const itemNames = cartItems.map(item => item.item_name).join(', ');
+
+        const [orderResult] = await pool.query(
+            'INSERT INTO orders (user_id, item_name, total_amount) VALUES (?, ?, ?)',
+            [null, itemNames, totalAmount]
+        );
         const orderId = orderResult.insertId;
 
-        // Insert order items
-        const orderValues = cartItems.map(item => [orderId, item.menu_item_id, item.quantity, item.price]);
+        // Insert into order_items
+        const orderValues = cartItems.map(item => [
+            orderId,
+            item.menu_item_id,
+            item.item_name,
+            item.quantity,
+            item.price
+        ]);
         await pool.query(
-            'INSERT INTO order_items (order_id, menu_item_id, quantity, price) VALUES ?',
+            'INSERT INTO order_items (order_id, menu_id, item_name, quantity, price) VALUES ?',
             [orderValues]
         );
 
@@ -141,7 +158,7 @@ router.post('/checkout', async (req, res) => {
 
         res.json({ success: true, message: 'Order placed successfully', orderId });
     } catch (err) {
-        console.error(err);
+        console.error("Checkout error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
