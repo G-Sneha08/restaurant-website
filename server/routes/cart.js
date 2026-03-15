@@ -36,51 +36,68 @@ router.delete("/clear/:user_id", async (req,res)=>{
 
 // ================= GET CART =================
 router.get("/:user_id", async (req, res) => {
-
   try {
 
     const userId = req.params.user_id;
 
-    const [rows] = await pool.query(`
-      SELECT 
-        c.id,
-        c.menu_item_id,
-        c.quantity,
-        m.name,
-        m.price,
-        m.image_url
-      FROM cart c
-      LEFT JOIN menu m
-      ON c.menu_item_id = m.id
-      WHERE c.user_id = ?
-      ORDER BY c.id DESC
-    `, [userId]);
-
-    const totalPrice = rows.reduce(
-      (sum,item)=> sum + item.price * item.quantity,
-      0
+    // fetch cart items first
+    const [cartItems] = await pool.query(
+      "SELECT * FROM cart WHERE user_id = ?",
+      [userId]
     );
 
+    if (cartItems.length === 0) {
+      return res.json({
+        success: true,
+        cart: [],
+        totalPrice: 0
+      });
+    }
+
+    let cart = [];
+    let totalPrice = 0;
+
+    for (let item of cartItems) {
+
+      const [menu] = await pool.query(
+        "SELECT name, price, image_url FROM menu WHERE id = ?",
+        [item.menu_item_id]
+      );
+
+      if (menu.length > 0) {
+
+        cart.push({
+          id: item.id,
+          menu_item_id: item.menu_item_id,
+          quantity: item.quantity,
+          name: menu[0].name,
+          price: menu[0].price,
+          image_url: menu[0].image_url
+        });
+
+        totalPrice += menu[0].price * item.quantity;
+
+      }
+
+    }
+
     res.json({
-      success:true,
-      cart:rows,
+      success: true,
+      cart,
       totalPrice
     });
 
   } catch (err) {
 
-    console.error("Fetch cart error:", err);
+    console.error("Cart API error:", err);
 
     res.status(500).json({
-      success:false,
-      message:"Server error"
+      success: false,
+      message: "Server error"
     });
 
   }
-
 });
-
-
 // ================= ADD TO CART =================
 router.post("/", async (req, res) => {
 
