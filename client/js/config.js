@@ -10,7 +10,6 @@ const API_BASE_URL = isLocal
     ? "http://localhost:5000/api"
     : "https://restaurant-backend-cli2.onrender.com/api";
 
-console.log("[CONFIG] API_BASE_URL:", API_BASE_URL);
 
 
 // Global API helper
@@ -33,3 +32,4 @@ async function apiRequest(endpoint, options = {}) {
 // expose globally
 window.API_BASE_URL = API_BASE_URL;
 window.USER_ID = 1;
+console.log("[CONFIG] API_BASE_URL:", API_BASE_URL);
