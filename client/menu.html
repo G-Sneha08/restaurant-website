@@ -422,7 +422,7 @@ document.querySelectorAll('.add-to-cart').forEach(btn => {
 });
 async function updateNavbar() {
     try {
-        const res = await fetch(`${window.API_BASE_URL}/cart/${window.USER_ID}`);
+        const res = await fetch(`${API_BASE_URL}/cart/${USER_ID}`);
         const data = await res.json();
 
         if (data.success) {
