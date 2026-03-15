@@ -40,42 +40,37 @@ router.get("/:user_id", async (req, res) => {
 
     const userId = req.params.user_id;
 
-    // fetch cart items first
-    const [cartItems] = await pool.query(
+    // Step 1: Get cart items
+    const [cartRows] = await pool.query(
       "SELECT * FROM cart WHERE user_id = ?",
       [userId]
     );
 
-    if (cartItems.length === 0) {
-      return res.json({
-        success: true,
-        cart: [],
-        totalPrice: 0
-      });
-    }
-
     let cart = [];
     let totalPrice = 0;
 
-    for (let item of cartItems) {
+    // Step 2: Get menu details for each cart item
+    for (const item of cartRows) {
 
-      const [menu] = await pool.query(
+      const [menuRows] = await pool.query(
         "SELECT name, price, image_url FROM menu WHERE id = ?",
         [item.menu_item_id]
       );
 
-      if (menu.length > 0) {
+      if (menuRows.length > 0) {
+
+        const menuItem = menuRows[0];
 
         cart.push({
           id: item.id,
           menu_item_id: item.menu_item_id,
           quantity: item.quantity,
-          name: menu[0].name,
-          price: menu[0].price,
-          image_url: menu[0].image_url
+          name: menuItem.name,
+          price: menuItem.price,
+          image_url: menuItem.image_url
         });
 
-        totalPrice += menu[0].price * item.quantity;
+        totalPrice += menuItem.price * item.quantity;
 
       }
 
