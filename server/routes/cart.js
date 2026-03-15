@@ -1,21 +1,16 @@
 // server/routes/cart.js
+
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db');
+const pool = require('../config/db'); // your MySQL pool
 
 // ============================
-// GET /api/cart - fetch all cart items for a user
+// GET /api/cart - fetch all cart items
 // ============================
-router.get('/:user_id', async (req, res) => {
-    const userId = req.params.user_id;
+router.get('/', async (req, res) => {
     try {
-        const [rows] = await pool.query(
-            `SELECT c.id, c.menu_id, c.quantity, m.name AS item_name, m.price
-             FROM cart c
-             JOIN menu m ON c.menu_id = m.id
-             WHERE c.user_id = ?`, [userId]
-        );
-        const totalPrice = rows.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const [rows] = await pool.query(`SELECT * FROM cart ORDER BY created_at DESC`);
+        const totalPrice = rows.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
         res.json({ success: true, cart: rows, totalPrice });
     } catch (err) {
         console.error(err);
@@ -27,27 +22,36 @@ router.get('/:user_id', async (req, res) => {
 // POST /api/cart - add item to cart
 // ============================
 router.post('/', async (req, res) => {
-    const { user_id, menu_id, quantity } = req.body;
-    if (!user_id || !menu_id) return res.status(400).json({ success: false, message: 'user_id and menu_id required' });
+    const { menu_item_id, quantity } = req.body;
+    const qty = quantity || 1;
+
+    if (!menu_item_id) {
+        return res.status(400).json({ success: false, message: 'menu_item_id is required' });
+    }
 
     try {
-        const [existing] = await pool.query(
-            'SELECT * FROM cart WHERE user_id = ? AND menu_id = ?',
-            [user_id, menu_id]
-        );
+        // Check if item already in cart
+        const [existing] = await pool.query('SELECT * FROM cart WHERE menu_item_id = ?', [menu_item_id]);
 
         if (existing.length > 0) {
-            await pool.query(
-                'UPDATE cart SET quantity = quantity + ? WHERE id = ?',
-                [quantity || 1, existing[0].id]
-            );
-            return res.json({ success: true, message: 'Cart updated' });
+            // Update quantity
+            await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [qty, existing[0].id]);
+            return res.status(200).json({ success: true, message: 'Cart updated' });
         } else {
-            await pool.query(
-                'INSERT INTO cart (user_id, menu_id, quantity) VALUES (?, ?, ?)',
-                [user_id, menu_id, quantity || 1]
+            // Insert new item
+            const [inserted] = await pool.query(
+                `INSERT INTO cart (menu_item_id, item_name, price, quantity)
+                 SELECT id, name, price, ?
+                 FROM menu
+                 WHERE id = ?`,
+                [qty, menu_item_id]
             );
-            return res.json({ success: true, message: 'Item added to cart' });
+
+            if (inserted.affectedRows === 0) {
+                return res.status(404).json({ success: false, message: 'Menu item not found' });
+            }
+
+            return res.status(201).json({ success: true, message: 'Item added to cart' });
         }
     } catch (err) {
         console.error(err);
@@ -60,11 +64,15 @@ router.post('/', async (req, res) => {
 // ============================
 router.put('/:id', async (req, res) => {
     const { quantity } = req.body;
-    if (!quantity || quantity < 1) return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
+    if (!quantity || quantity < 1) {
+        return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
+    }
 
     try {
         const [result] = await pool.query('UPDATE cart SET quantity = ? WHERE id = ?', [quantity, req.params.id]);
-        if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Cart item not found' });
+        }
         res.json({ success: true, message: 'Quantity updated' });
     } catch (err) {
         console.error(err);
@@ -78,7 +86,9 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const [result] = await pool.query('DELETE FROM cart WHERE id = ?', [req.params.id]);
-        if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Cart item not found' });
+        }
         res.json({ success: true, message: 'Item removed' });
     } catch (err) {
         console.error(err);
@@ -87,15 +97,49 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ============================
-// DELETE /api/cart - clear all cart items for a user
+// DELETE /api/cart - clear all cart items
 // ============================
 router.delete('/', async (req, res) => {
-    const { user_id } = req.body;
-    if (!user_id) return res.status(400).json({ success: false, message: 'user_id required' });
-
     try {
-        await pool.query('DELETE FROM cart WHERE user_id = ?', [user_id]);
+        await pool.query('DELETE FROM cart');
         res.json({ success: true, message: 'Cart cleared' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// ============================
+// POST /api/cart/checkout - place order
+// ============================
+router.post('/checkout', async (req, res) => {
+    try {
+        const [cartItems] = await pool.query('SELECT * FROM cart');
+        if (cartItems.length === 0) {
+            return res.status(400).json({ success: false, message: 'Cart is empty' });
+        }
+
+        const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0);
+
+        // Insert order
+        const [orderResult] = await pool.query(
+            'INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)',
+            [null, totalPrice, cartItems.map(i => i.item_name).join(', ')]
+        );
+
+        const orderId = orderResult.insertId;
+
+        // Insert order items
+        const orderValues = cartItems.map(item => [orderId, item.menu_item_id, item.quantity, item.price]);
+        await pool.query(
+            'INSERT INTO order_items (order_id, menu_item_id, quantity, price) VALUES ?',
+            [orderValues]
+        );
+
+        // Clear cart
+        await pool.query('DELETE FROM cart');
+
+        res.json({ success: true, message: 'Order placed successfully', orderId });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
