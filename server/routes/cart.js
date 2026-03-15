@@ -50,7 +50,7 @@ router.get("/:user_id", async (req, res) => {
         m.price,
         m.image_url
       FROM cart c
-      JOIN menu m
+      LEFT JOIN menu m
       ON c.menu_item_id = m.id
       WHERE c.user_id = ?
       ORDER BY c.id DESC
