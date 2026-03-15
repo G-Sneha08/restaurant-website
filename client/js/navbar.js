@@ -1,12 +1,21 @@
-async function updateCartCount(){
+async function updateNavbar(){
 
-  const res = await fetch(API_BASE_URL + "/cart/1");
+  try{
 
-  const data = await res.json();
+    const res = await fetch(API_BASE_URL + "/cart/1");
 
-  document.getElementById("cart-count").innerText =
-    data.cart.length;
+    const data = await res.json();
+
+    const el = document.getElementById("cart-count");
+
+    if(el){
+      el.innerText = data.cart.length;
+    }
+
+  }catch(err){
+    console.error(err);
+  }
 
 }
 
-updateCartCount();
+updateNavbar();
