@@ -1,12 +1,8 @@
 // client/js/config.js
 
 // Detect if running locally or deployed
-const isLocal =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
-// Backend API URL
-const API_BASE_URL = isLocal
+const API_BASE_URL =
+  window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
     : "https://restaurant-backend-cli2.onrender.com/api";
 

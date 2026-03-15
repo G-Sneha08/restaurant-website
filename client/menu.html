@@ -394,26 +394,24 @@
 //const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 //const USER_ID = 1; // Replace with dynamic logged-in user ID
 
-async function addToCart(menu_item_id, quantity = 1) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/cart`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: USER_ID, menu_item_id, quantity })
-        });
-        const data = await res.json();
-        if (data.success) {
-            alert(data.message); // Shows "Item added to cart" or "Cart updated"
-            if (typeof updateNavbar === 'function') updateNavbar(); // Optional: refresh cart count in navbar
-        } else {
-            alert(data.message || "Failed to add item");
-        }
-    } catch (err) {
-        console.error("Add to cart fetch error:", err);
-        alert("Failed to add item to cart");
-    }
-}
+async function addToCart(menuItem) {
 
+  await fetch(`${window.API_BASE_URL}/cart`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user_id: window.USER_ID,
+      menu_item_id: menuItem.id,
+      quantity: 1,
+      price: menuItem.price,
+      item_name: menuItem.name
+    })
+  });
+
+  updateNavbar();
+}
 // Attach event listeners to all Add to Cart buttons
 document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -422,47 +420,31 @@ document.querySelectorAll('.add-to-cart').forEach(btn => {
     });
 });
 async function updateNavbar() {
-    try {
 
-        const url = `${window.API_BASE_URL}/cart/${window.USER_ID}`;
-        console.log("Fetching cart from:", url);
+  try {
 
-        const res = await fetch(url);
+    const res = await fetch(`${window.API_BASE_URL}/cart/${window.USER_ID}`);
 
-        if (!res.ok) {
-            throw new Error(`Server responded with ${res.status}`);
-        }
+    const data = await res.json();
 
-        const data = await res.json();
+    if (data.success) {
 
-        if (data.success) {
+      const count = data.cart.reduce(
+        (sum,item) => sum + item.quantity,
+        0
+      );
 
-            const cartCountEl = document.getElementById("cart-count");
-
-            const totalItems = data.cart.reduce(
-                (sum, item) => sum + item.quantity,
-                0
-            );
-
-            if (cartCountEl) {
-                cartCountEl.innerText = totalItems;
-            }
-
-        } else {
-            console.warn("Cart API error:", data.message);
-        }
-
-    } catch (err) {
-
-        console.error("Navbar cart fetch failed:", err);
-  
-        // optional fallback
-        const cartCountEl = document.getElementById("cart-count");
-        if (cartCountEl) cartCountEl.innerText = "0";
+      document.getElementById("cart-count").innerText = count;
 
     }
+
+  } catch (err) {
+
+    console.error("Navbar cart error:", err);
+
+  }
+
 }
-updateNavbar();
 </script>
 
 <style>

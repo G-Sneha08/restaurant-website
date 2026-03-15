@@ -3,88 +3,40 @@ const router = express.Router();
 const pool = require("../config/db");
 
 
-// ================= CLEAR CART =================
-// placed FIRST to avoid route conflict
-router.delete("/clear/:user_id", async (req,res)=>{
-
-  const userId = req.params.user_id;
-
-  try {
-
-    await pool.query(
-      `DELETE FROM cart WHERE user_id=?`,
-      [userId]
-    );
-
-    res.json({
-      success:true,
-      message:"Cart cleared"
-    });
-
-  } catch (err) {
-
-    console.error("Clear cart error:", err);
-
-    res.status(500).json({
-      success:false
-    });
-
-  }
-
-});
-
-
 // ================= GET CART =================
 router.get("/:user_id", async (req, res) => {
   try {
 
     const userId = req.params.user_id;
 
-    // Step 1: Get cart items
-    const [cartRows] = await pool.query(
-      "SELECT * FROM cart WHERE user_id = ?",
+    const [rows] = await pool.query(
+      `SELECT 
+        id,
+        menu_item_id,
+        quantity,
+        price,
+        item_name
+      FROM cart
+      WHERE user_id = ?
+      ORDER BY id DESC`,
       [userId]
     );
 
-    let cart = [];
     let totalPrice = 0;
 
-    // Step 2: Get menu details for each cart item
-    for (const item of cartRows) {
-
-      const [menuRows] = await pool.query(
-        "SELECT name, price, image_url FROM menu WHERE id = ?",
-        [item.menu_item_id]
-      );
-
-      if (menuRows.length > 0) {
-
-        const menuItem = menuRows[0];
-
-        cart.push({
-          id: item.id,
-          menu_item_id: item.menu_item_id,
-          quantity: item.quantity,
-          name: menuItem.name,
-          price: menuItem.price,
-          image_url: menuItem.image_url
-        });
-
-        totalPrice += menuItem.price * item.quantity;
-
-      }
-
-    }
+    rows.forEach(item => {
+      totalPrice += item.price * item.quantity;
+    });
 
     res.json({
       success: true,
-      cart,
+      cart: rows,
       totalPrice
     });
 
   } catch (err) {
 
-    console.error("Cart API error:", err);
+    console.error("Fetch cart error:", err);
 
     res.status(500).json({
       success: false,
@@ -93,36 +45,33 @@ router.get("/:user_id", async (req, res) => {
 
   }
 });
+
+
 // ================= ADD TO CART =================
 router.post("/", async (req, res) => {
 
-  const { user_id, menu_item_id, quantity } = req.body;
-
-  if (!user_id || !menu_item_id) {
-
-    return res.status(400).json({
-      success:false,
-      message:"user_id and menu_item_id required"
-    });
-
-  }
-
-  const qty = quantity || 1;
-
   try {
 
+    const { user_id, menu_item_id, quantity, price, item_name } = req.body;
+
+    if (!user_id || !menu_item_id) {
+      return res.status(400).json({
+        success: false,
+        message: "user_id and menu_item_id required"
+      });
+    }
+
+    const qty = quantity || 1;
+
     const [existing] = await pool.query(
-      `SELECT * FROM cart 
-       WHERE user_id=? AND menu_item_id=?`,
+      "SELECT * FROM cart WHERE user_id=? AND menu_item_id=?",
       [user_id, menu_item_id]
     );
 
     if (existing.length > 0) {
 
       await pool.query(
-        `UPDATE cart 
-         SET quantity = quantity + ? 
-         WHERE id=?`,
+        "UPDATE cart SET quantity = quantity + ? WHERE id=?",
         [qty, existing[0].id]
       );
 
@@ -130,16 +79,16 @@ router.post("/", async (req, res) => {
 
       await pool.query(
         `INSERT INTO cart
-         (user_id, menu_item_id, quantity)
-         VALUES (?,?,?)`,
-        [user_id, menu_item_id, qty]
+        (user_id, menu_item_id, quantity, price, item_name)
+        VALUES (?,?,?,?,?)`,
+        [user_id, menu_item_id, qty, price, item_name]
       );
 
     }
 
     res.json({
-      success:true,
-      message:"Item added to cart"
+      success: true,
+      message: "Item added to cart"
     });
 
   } catch (err) {
@@ -147,8 +96,8 @@ router.post("/", async (req, res) => {
     console.error("Add cart error:", err);
 
     res.status(500).json({
-      success:false,
-      message:"Server error"
+      success: false,
+      message: "Server error"
     });
 
   }
@@ -156,32 +105,30 @@ router.post("/", async (req, res) => {
 });
 
 
-// ================= UPDATE QUANTITY =================
-router.put("/:id", async (req,res)=>{
-
-  const { quantity } = req.body;
+// ================= UPDATE CART =================
+router.put("/:id", async (req, res) => {
 
   try {
 
+    const { quantity } = req.body;
+
     await pool.query(
-      `UPDATE cart 
-       SET quantity=? 
-       WHERE id=?`,
+      "UPDATE cart SET quantity=? WHERE id=?",
       [quantity, req.params.id]
     );
 
     res.json({
-      success:true,
-      message:"Cart updated"
+      success: true,
+      message: "Cart updated"
     });
 
   } catch (err) {
 
-    console.error("Update cart error:", err);
+    console.error(err);
 
     res.status(500).json({
-      success:false,
-      message:"Server error"
+      success: false,
+      message: "Server error"
     });
 
   }
@@ -189,33 +136,59 @@ router.put("/:id", async (req,res)=>{
 });
 
 
-// ================= DELETE CART ITEM =================
-router.delete("/:id", async (req,res)=>{
+// ================= DELETE ITEM =================
+router.delete("/:id", async (req, res) => {
 
   try {
 
     await pool.query(
-      `DELETE FROM cart WHERE id=?`,
+      "DELETE FROM cart WHERE id=?",
       [req.params.id]
     );
 
     res.json({
-      success:true,
-      message:"Item removed"
+      success: true
     });
 
   } catch (err) {
 
-    console.error("Delete cart error:", err);
+    console.error(err);
 
     res.status(500).json({
-      success:false,
-      message:"Server error"
+      success: false,
+      message: "Server error"
     });
 
   }
 
 });
 
+
+// ================= CLEAR CART =================
+router.delete("/clear/:user_id", async (req, res) => {
+
+  try {
+
+    await pool.query(
+      "DELETE FROM cart WHERE user_id=?",
+      [req.params.user_id]
+    );
+
+    res.json({
+      success: true
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
+  }
+
+});
 
 module.exports = router;
