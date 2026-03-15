@@ -3,12 +3,43 @@ const router = express.Router();
 const pool = require("../config/db");
 
 
-// ================= GET CART =================
-router.get("/:user_id", async (req, res) => {
+// ================= CLEAR CART =================
+// placed FIRST to avoid route conflict
+router.delete("/clear/:user_id", async (req,res)=>{
 
   const userId = req.params.user_id;
 
   try {
+
+    await pool.query(
+      `DELETE FROM cart WHERE user_id=?`,
+      [userId]
+    );
+
+    res.json({
+      success:true,
+      message:"Cart cleared"
+    });
+
+  } catch (err) {
+
+    console.error("Clear cart error:", err);
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
+});
+
+
+// ================= GET CART =================
+router.get("/:user_id", async (req, res) => {
+
+  try {
+
+    const userId = req.params.user_id;
 
     const [rows] = await pool.query(`
       SELECT 
@@ -134,7 +165,7 @@ router.put("/:id", async (req,res)=>{
 
   } catch (err) {
 
-    console.error(err);
+    console.error("Update cart error:", err);
 
     res.status(500).json({
       success:false,
@@ -163,41 +194,11 @@ router.delete("/:id", async (req,res)=>{
 
   } catch (err) {
 
-    console.error(err);
+    console.error("Delete cart error:", err);
 
     res.status(500).json({
       success:false,
       message:"Server error"
-    });
-
-  }
-
-});
-
-
-// ================= CLEAR CART =================
-router.delete("/clear/:user_id", async (req,res)=>{
-
-  const userId = req.params.user_id;
-
-  try {
-
-    await pool.query(
-      `DELETE FROM cart WHERE user_id=?`,
-      [userId]
-    );
-
-    res.json({
-      success:true,
-      message:"Cart cleared"
-    });
-
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-      success:false
     });
 
   }

@@ -32,4 +32,4 @@ async function apiRequest(endpoint, options = {}) {
 
 // expose globally
 window.API_BASE_URL = API_BASE_URL;
-window.apiRequest = apiRequest;
+window.USER_ID = 1;
