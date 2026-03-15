@@ -393,32 +393,41 @@
 <script>
 //const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 //const USER_ID = 1; // Replace with dynamic logged-in user ID
+async function addToCart(id, name, price) {
 
-async function addToCart(menuItem) {
+  try {
 
-  await fetch(`${window.API_BASE_URL}/cart`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      user_id: window.USER_ID,
-      menu_item_id: menuItem.id,
-      quantity: 1,
-      price: menuItem.price,
-      item_name: menuItem.name
-    })
-  });
-
-  updateNavbar();
-}
-// Attach event listeners to all Add to Cart buttons
-document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const id = parseInt(btn.getAttribute('data-id'));
-        addToCart(id);
+    const res = await fetch(`${window.API_BASE_URL}/cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user_id: window.USER_ID,
+        menu_item_id: id,
+        quantity: 1,
+        price: price,
+        item_name: name
+      })
     });
-});
+
+    const data = await res.json();
+
+    if (!data.success) {
+      console.error("Cart error:", data.message);
+      alert(data.message);
+      return;
+    }
+
+    alert("Item added to cart!");
+
+    updateNavbar();
+
+  } catch (err) {
+    console.error("Add to cart failed:", err);
+  }
+
+}
 async function updateNavbar() {
 
   try {
