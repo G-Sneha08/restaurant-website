@@ -3,7 +3,7 @@ async function addToCart(id) {
 
   try {
 
-    await fetch(`${window.API_BASE_URL}/cart`, {
+    const res = await fetch(`${window.API_BASE_URL}/cart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -15,15 +15,26 @@ async function addToCart(id) {
       })
     });
 
-    alert("Item added to cart");
+    const data = await res.json();
 
-    if (typeof updateNavbar === "function") {
-      updateNavbar();
+    if (data.success) {
+
+      alert("Item added to cart");
+
+      if (typeof updateNavbar === "function") {
+        updateNavbar();
+      }
+
+    } else {
+
+      alert(data.message || "Failed to add item");
+
     }
 
   } catch (err) {
 
     console.error("Add cart error:", err);
+    alert("Error adding item to cart");
 
   }
 
@@ -42,11 +53,7 @@ async function loadCart() {
     const totalPriceEl = document.getElementById("total-price");
     const footerActions = document.getElementById("cart-footer-actions");
 
-    // Safety check
-    if (!tbody || !table || !emptyMsg || !totalPriceEl) {
-      console.error("Cart HTML elements missing");
-      return;
-    }
+    if (!tbody || !table) return;
 
     const token = localStorage.getItem("token");
 
@@ -62,19 +69,16 @@ async function loadCart() {
 
     if (!data.success || !data.cart || data.cart.length === 0) {
 
-      table.style.display = "none";
-      emptyMsg.style.display = "block";
-
+      if (table) table.style.display = "none";
+      if (emptyMsg) emptyMsg.style.display = "block";
       if (footerActions) footerActions.style.display = "none";
-
-      totalPriceEl.innerText = "₹0";
+      if (totalPriceEl) totalPriceEl.innerText = "₹0";
 
       return;
     }
 
-    table.style.display = "table";
-    emptyMsg.style.display = "none";
-
+    if (table) table.style.display = "table";
+    if (emptyMsg) emptyMsg.style.display = "none";
     if (footerActions) footerActions.style.display = "block";
 
     let total = 0;
@@ -93,19 +97,17 @@ async function loadCart() {
         <td>₹${price}</td>
 
         <td>
-          <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
+          <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
 
           <span style="margin:0 10px;">${item.quantity}</span>
 
-          <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+          <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
         </td>
 
         <td>₹${subtotal.toFixed(2)}</td>
 
         <td>
-          <button onclick="removeItem(${item.id})" class="btn-remove">
-            🗑
-          </button>
+          <button onclick="removeItem(${item.id})" class="btn-remove">🗑</button>
         </td>
       `;
 
@@ -113,7 +115,9 @@ async function loadCart() {
 
     });
 
-    totalPriceEl.innerText = `₹${total.toFixed(2)}`;
+    if (totalPriceEl) {
+      totalPriceEl.innerText = `₹${total.toFixed(2)}`;
+    }
 
   } catch (err) {
 
@@ -184,6 +188,45 @@ async function removeItem(cartId) {
     console.error("Delete item error:", err);
 
   }
+
+}
+
+
+
+// ================= CLEAR CART =================
+async function clearFullCart() {
+
+  try {
+
+    const token = localStorage.getItem("token");
+
+    await fetch(`${window.API_BASE_URL}/cart`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": token ? `Bearer ${token}` : ""
+      }
+    });
+
+    loadCart();
+
+    if (typeof updateNavbar === "function") {
+      updateNavbar();
+    }
+
+  } catch (err) {
+
+    console.error("Clear cart error:", err);
+
+  }
+
+}
+
+
+
+// ================= CHECKOUT =================
+function checkoutCart() {
+
+  alert("Checkout feature coming soon!");
 
 }
 
