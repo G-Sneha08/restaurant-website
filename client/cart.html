@@ -2,19 +2,23 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Lumina Dine | Cart</title>
 
 <link rel="stylesheet" href="css/styles.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 </head>
 
+
 <body>
 
 <header>
+
 <nav>
 
 <a href="index.html" class="logo">LUMINA DINE</a>
@@ -26,7 +30,9 @@
 </ul>
 
 </nav>
+
 </header>
+
 
 <main>
 
@@ -34,9 +40,11 @@
 
 <h2>Your Shopping Cart</h2>
 
+
 <table id="cart-table" style="display:none;">
 
 <thead>
+
 <tr>
 <th>Item</th>
 <th>Price</th>
@@ -44,19 +52,36 @@
 <th>Subtotal</th>
 <th>Action</th>
 </tr>
+
 </thead>
+
 
 <tbody id="cart-items"></tbody>
 
+
 <tfoot>
+
 <tr>
-<td colspan="3" style="text-align:right;font-weight:700;">Cart Total:</td>
-<td id="total-price" style="font-weight:700;color:#27ae60;">₹0</td>
+
+<td colspan="3" style="text-align:right;font-weight:700;">
+Cart Total:
+</td>
+
+<td id="total-price" style="font-weight:700;color:#27ae60;">
+₹0
+</td>
+
 <td></td>
+
 </tr>
+
 </tfoot>
 
 </table>
+
+
+
+<!-- EMPTY CART -->
 
 <div id="empty-msg" style="text-align:center;padding:100px 0;">
 
@@ -64,11 +89,17 @@
 
 <h3>Your cart is empty</h3>
 
-<a href="index.html#featured" class="btn btn-primary">Browse Menu</a>
+<a href="index.html#featured" class="btn btn-primary">
+Browse Menu
+</a>
 
 </div>
 
-<div id="cart-footer-actions" style="display:none;text-align:center;margin-top:20px;">
+
+
+<!-- FOOTER ACTIONS -->
+
+<div id="cart-footer-actions" style="display:none;text-align:center;margin-top:30px;">
 
 <button onclick="clearFullCart()" class="btn btn-outline" style="margin-right:10px;">
 Clear Cart
@@ -80,9 +111,12 @@ Proceed to Checkout
 
 </div>
 
+
 </div>
 
 </main>
+
+
 
 <!-- JS FILES -->
 
@@ -90,12 +124,15 @@ Proceed to Checkout
 <script src="js/main.js"></script>
 <script src="js/cart.js"></script>
 
+
+
 <style>
 
+/* Remove button */
 .btn-remove{
 background:none;
 border:none;
-font-size:1rem;
+font-size:1.2rem;
 cursor:pointer;
 color:#e53935;
 }
@@ -104,7 +141,31 @@ color:#e53935;
 color:#b71c1c;
 }
 
+
+/* Quantity buttons */
+.qty-btn{
+padding:4px 10px;
+border:1px solid #ddd;
+background:#fff;
+cursor:pointer;
+border-radius:4px;
+}
+
+.qty-btn:hover{
+background:#f4f4f4;
+}
+
+
+/* Quantity container */
+.qty-box{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+}
+
 </style>
+
 
 </body>
 </html>

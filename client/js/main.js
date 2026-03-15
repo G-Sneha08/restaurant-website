@@ -1,72 +1,112 @@
 // ================= BACKEND API =================
-const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+// API_BASE_URL is defined in config.js
+// window.API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+
 
 // ================= NAVBAR =================
 async function updateNavbar() {
+
     const user = JSON.parse(localStorage.getItem('user'));
     const nav = document.querySelector('nav');
+
     if (!nav) return;
 
     const isDashboard = window.location.pathname.includes('admin.html');
     if (isDashboard) return;
 
-    // Fetch cart from backend if user is logged in
     let count = 0;
+
+    // Fetch cart from backend if user is logged in
     if (user) {
+
         try {
+
             const token = localStorage.getItem('token');
-            const res = await fetch(`${API_BASE_URL}/cart`, {
-                headers: { "Authorization": `Bearer ${token}` }
+
+            const res = await fetch(`${window.API_BASE_URL}/cart`, {
+                headers: {
+                    "Authorization": token ? `Bearer ${token}` : ""
+                }
             });
+
             const data = await res.json();
+
             if (data.success && Array.isArray(data.cart)) {
+
                 count = data.cart.reduce((sum, item) => sum + item.quantity, 0);
+
             }
+
         } catch (err) {
+
             console.error("Failed to fetch cart:", err);
+
         }
+
     } else {
+
         // Use localStorage fallback for guests
         const cart = JSON.parse(localStorage.getItem('restaurant_cart')) || [];
+
         count = cart.reduce((total, item) => total + item.quantity, 0);
+
     }
+
 
     const authLinks = user ? `
         <li><a href="orders.html">Orders</a></li>
         ${user.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
         <li>
-            <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">Logout</button>
+            <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">
+                Logout
+            </button>
         </li>
     ` : `
         <li>
-            <a href="login.html" class="btn btn-outline" style="padding:8px 16px;">Login</a>
+            <a href="login.html" class="btn btn-outline" style="padding:8px 16px;">
+                Login
+            </a>
         </li>
     `;
 
+
     nav.innerHTML = `
         <a href="index.html" class="logo">LUMINA DINE</a>
+
         <ul class="nav-links">
+
             <li><a href="index.html">Home</a></li>
+
             <li><a href="menu.html">Menu</a></li>
+
             <li>
                 <a href="cart.html" id="cart-link">
                     Cart <span id="cart-count">(${count})</span>
                 </a>
             </li>
+
             <li><a href="index.html#footer">Contact</a></li>
+
             ${authLinks}
+
         </ul>
     `;
 }
 
+
+
 // ================= LOAD MENU IMAGES =================
 async function loadMenuImages() {
+
     try {
-        const response = await fetch(`${API_BASE_URL}/images`);
+
+        const response = await fetch(`${window.API_BASE_URL}/images`);
         const data = await response.json();
 
         if (data.success) {
+
             const images = data.images;
+
             const ids = {
                 "Paneer Tikka": "paneerTikkaImg",
                 "Crispy Corn": "crispyCornImg",
@@ -76,54 +116,96 @@ async function loadMenuImages() {
             };
 
             for (const [name, id] of Object.entries(ids)) {
+
                 const el = document.getElementById(id);
-                if (el) el.src = images[name];
+
+                if (el) {
+                    el.src = images[name];
+                }
+
             }
+
         }
+
     } catch (error) {
+
         console.error("Error loading menu images:", error);
+
     }
+
 }
+
+
 
 // ================= ADD TO CART =================
 function addToCart(menu_item_id, quantity = 1) {
+
     const token = localStorage.getItem('token');
 
-    fetch(`${API_BASE_URL}/cart`, {
+    fetch(`${window.API_BASE_URL}/cart`, {
+
         method: "POST",
+
         headers: {
+
             "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : ''
+            "Authorization": token ? `Bearer ${token}` : ""
+
         },
-        body: JSON.stringify({ menu_item_id, quantity }) // matches backend
+
+        body: JSON.stringify({ menu_item_id, quantity })
+
     })
+
     .then(res => res.json())
+
     .then(data => {
-        if(data.success){
+
+        if (data.success) {
+
             alert(data.message || "Item added to cart!");
-            updateNavbar(); // refresh cart count
+
+            updateNavbar();
+
         } else {
+
             alert(data.message || "Failed to add item to cart.");
+
         }
+
     })
-    .catch(err => console.error(err));
+
+    .catch(err => console.error("Add to cart error:", err));
+
 }
 
-window.addToCart = addToCart; // expose globally
+
+// expose globally
+window.addToCart = addToCart;
+
+
+
 // ================= LOGOUT =================
 function logout() {
+
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+
     updateNavbar();
+
     window.location.href = "index.html";
+
 }
 
-// Expose addToCart globally for onclick
-window.addToCart = addToCart;
 window.logout = logout;
+
+
 
 // ================= PAGE LOAD =================
 document.addEventListener("DOMContentLoaded", () => {
+
     updateNavbar();
+
     loadMenuImages();
+
 });
