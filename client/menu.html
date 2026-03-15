@@ -422,26 +422,45 @@ document.querySelectorAll('.add-to-cart').forEach(btn => {
 });
 async function updateNavbar() {
     try {
-        const res = await fetch(`${API_BASE_URL}/cart/${USER_ID}`);
+
+        const url = `${window.API_BASE_URL}/cart/${window.USER_ID}`;
+        console.log("Fetching cart from:", url);
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            throw new Error(`Server responded with ${res.status}`);
+        }
+
         const data = await res.json();
 
         if (data.success) {
-            const cartCount = document.getElementById("cart-count");
 
-            const total = data.cart.reduce(
+            const cartCountEl = document.getElementById("cart-count");
+
+            const totalItems = data.cart.reduce(
                 (sum, item) => sum + item.quantity,
                 0
             );
 
-            if (cartCount) {
-                cartCount.innerText = total;
+            if (cartCountEl) {
+                cartCountEl.innerText = totalItems;
             }
+
+        } else {
+            console.warn("Cart API error:", data.message);
         }
+
     } catch (err) {
-        console.error("Failed to update navbar cart count:", err);
+
+        console.error("Navbar cart fetch failed:", err);
+  
+        // optional fallback
+        const cartCountEl = document.getElementById("cart-count");
+        if (cartCountEl) cartCountEl.innerText = "0";
+
     }
 }
-
 updateNavbar();
 </script>
 
