@@ -390,19 +390,20 @@
     <script src="js/cart.js"></script>
     <!-- Add this near the end of <body> before </body> -->
 <script>
-//const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api"; // your backend API
+const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+const USER_ID = 1; // Replace with dynamic logged-in user ID
 
 async function addToCart(menu_item_id, quantity = 1) {
     try {
         const res = await fetch(`${API_BASE_URL}/cart`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ menu_item_id, quantity })
+            body: JSON.stringify({ user_id: USER_ID, menu_item_id, quantity })
         });
         const data = await res.json();
         if (data.success) {
-            alert("Item added to cart!");
-            if (typeof updateNavbar === 'function') updateNavbar();
+            alert(data.message); // Shows "Item added to cart" or "Cart updated"
+            if (typeof updateNavbar === 'function') updateNavbar(); // Optional: refresh cart count in navbar
         } else {
             alert(data.message || "Failed to add item");
         }
@@ -412,12 +413,29 @@ async function addToCart(menu_item_id, quantity = 1) {
     }
 }
 
+// Attach event listeners to all Add to Cart buttons
 document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', () => {
         const id = parseInt(btn.getAttribute('data-id'));
         addToCart(id);
     });
 });
+async function updateNavbar() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/cart/${USER_ID}`);
+        const data = await res.json();
+        if (data.success) {
+            const cartCountEl = document.getElementById('cart-count');
+            const totalItems = data.cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.innerText = totalItems;
+        }
+    } catch (err) {
+        console.error("Failed to update navbar cart count:", err);
+    }
+}
+
+// Call it once on page load to initialize the cart count
+updateNavbar();
 </script>
 
 <style>
