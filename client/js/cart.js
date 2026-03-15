@@ -33,43 +33,36 @@ async function addToCart(menuId){
 
 
 // LOAD CART
-async function loadCart(){
+async function loadCart() {
 
-  try{
+    try {
 
-    const res = await fetch(API_BASE_URL + "/cart/" + USER_ID);
+        const res = await fetch(`${API_BASE_URL}/cart/1`);
 
-    const data = await res.json();
+        const data = await res.json();
 
-    const table = document.getElementById("cart-items");
+        const table = document.getElementById("cart-items");
 
-    if(!table) return;
+        if (!data.success) return;
 
-    table.innerHTML = data.cart.map(item=>`
+        table.innerHTML = data.cart.map(item => `
 
-      <tr>
+        <tr>
 
-        <td>${item.name}</td>
+            <td>${item.name}</td>
+            <td>₹${item.price}</td>
+            <td>${item.quantity}</td>
+            <td>₹${item.price * item.quantity}</td>
 
-        <td>₹${item.price}</td>
+        </tr>
 
-        <td>${item.quantity}</td>
+        `).join("");
 
-        <td>₹${item.price * item.quantity}</td>
+    } catch (err) {
 
-        <td>
-          <button onclick="removeItem(${item.id})">
-            Remove
-          </button>
-        </td>
+        console.error("Load cart error:", err);
 
-      </tr>
-
-    `).join("");
-
-  }catch(err){
-    console.error(err);
-  }
+    }
 
 }
 
