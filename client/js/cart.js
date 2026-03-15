@@ -1,5 +1,4 @@
-// client/js/cart.js
-
+// client/js/cart.js 
 // ===================== CONFIG =====================
 // Make sure config.js is loaded before this file
 const USER_ID = 1; // Replace with dynamic user ID if login system is implemented
