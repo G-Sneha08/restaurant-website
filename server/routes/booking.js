@@ -77,15 +77,17 @@ router.delete("/", protect, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        await pool.query(
+        console.log(`📥 [DELETE_ALL_BOOKINGS] Attempting clear for user ${userId}`);
+        const [result] = await pool.query(
             "DELETE FROM bookings WHERE user_id = ?",
             [userId]
         );
-        res.json({ success: true, message: "Your reservation history has been cleared successfully." });
+        console.log(`✅ [DELETE_ALL_BOOKINGS] Successfully purged ${result.affectedRows} record(s) for user ${userId}`);
+        res.json({ success: true, message: `Your culinary history has been cleared. Purged ${result.affectedRows} reservation(s).` });
 
     } catch (err) {
-        console.error("Clear bookings error:", err);
-        res.status(500).json({ success: false, message: "Server error" });
+        console.error("CRITICAL DELETE_ALL_BOOKINGS ERR:", err);
+        res.status(500).json({ success: false, message: "Server encountered a database error during purge." });
     }
 });
 

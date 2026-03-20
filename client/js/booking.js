@@ -205,14 +205,24 @@ window.clearBookings = async function () {
             }
         });
 
-        if (response.ok) {
-            alert("Reservation history cleared successfully.");
+        const data = await response.json();
+
+        if (response.status === 401) {
+            alert("Session expired. Please login again.");
+            localStorage.clear();
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (response.ok && data.success) {
+            alert(data.message || "Reservation history cleared successfully.");
             loadBookings();
         } else {
-            alert("Failed to clear reservation history.");
+            alert(data.message || "Operation failed: The server refused the purge request.");
         }
     } catch (err) {
         console.error("Clear error:", err);
+        alert("The clearing operation failed to reach the server.");
     }
 };
 
