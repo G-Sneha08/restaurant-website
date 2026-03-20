@@ -179,33 +179,36 @@ async function clearFullCart() {
 // ================= CHECKOUT =================
 async function checkoutCart() {
     const token = localStorage.getItem('token');
-    if (!token) {
-        alert("Please login to checkout!");
+    
+    // Robust token check to handle "null" or "undefined" strings
+    if (!token || token === 'null' || token === 'undefined') {
+        alert("Please login to proceed with your order!");
         window.location.href = "login.html";
         return;
     }
 
-    if (!confirm("Proceed to checkout?")) return;
+    if (!confirm("Would you like to proceed to checkout and place your order?")) return;
 
     try {
-        const res = await fetch(`${window.API_BASE_URL}/cart/checkout`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+        const data = await window.apiRequest('/cart/checkout', {
+            method: 'POST'
         });
-        const data = await res.json();
 
         if (data.success) {
-            alert(data.message || "Order placed successfully!");
+            alert(data.message || "Your order has been placed successfully!");
             window.location.href = "orders.html";
         } else {
-            alert(data.message || "Checkout failed");
+            alert(data.message || "Indulgence failed. Please try again.");
         }
     } catch (err) {
         console.error("Checkout error:", err);
-        alert("Checkout failed. Please try again.");
+        // If 401 alert specifically
+        if (err.message.includes("401") || err.message.includes("authorized")) {
+            alert("Your session has expired. Please log in again.");
+            logout();
+        } else {
+            alert("Checkout failed: " + err.message);
+        }
     }
 }
 

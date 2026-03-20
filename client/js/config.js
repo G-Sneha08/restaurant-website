@@ -28,7 +28,7 @@ window.apiRequest = async function(endpoint, options = {}) {
     const token = localStorage.getItem("token");
     const headers = {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && token !== 'null' && token !== 'undefined' && { Authorization: `Bearer ${token}` }),
         ...(options.headers || {})
     };
 
@@ -39,7 +39,10 @@ window.apiRequest = async function(endpoint, options = {}) {
 
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.message || "API error");
+        // Carry the status code in the error for easier debugging
+        const err = new Error(data.message || `API error ${response.status}`);
+        err.status = response.status;
+        throw err;
     }
     return data;
 };
