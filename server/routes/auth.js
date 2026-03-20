@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
         );
 
         if (users.length === 0) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Invalid credentials"
             });
         }
@@ -97,7 +97,7 @@ router.post("/login", async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Invalid credentials"
             });
         }
