@@ -39,14 +39,16 @@ router.get('/stats', async (req, res) => {
     try {
         const [orders] = await pool.query('SELECT COUNT(*) as totalOrders, SUM(total_amount) as totalRevenue FROM orders');
         const [bookings] = await pool.query('SELECT COUNT(*) as totalBookings FROM bookings');
-        const [todayOrders] = await pool.query('SELECT COUNT(*) as todayCount FROM orders WHERE DATE(created_at) = CURDATE()');
+        const [users] = await pool.query('SELECT COUNT(*) as totalUsers FROM users');
+        const [pendingOrders] = await pool.query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'");
 
         res.json({
             success: true,
             totalOrders: orders[0].totalOrders || 0,
             totalBookings: bookings[0].totalBookings || 0,
             totalRevenue: orders[0].totalRevenue || 0,
-            todayOrders: todayOrders[0].todayCount || 0
+            totalUsers: users[0].totalUsers || 0,
+            pendingOrders: pendingOrders[0].count || 0
         });
     } catch (err) {
         console.error(err);
@@ -112,6 +114,18 @@ router.put('/bookings/:id/status', async (req, res) => {
     }
 });
 
+// @route   GET /api/admin/menu
+// @desc    Get all menu items (including unavailable ones)
+router.get('/menu', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM menu ORDER BY category, name');
+        res.json({ success: true, menu: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 // @route   POST /api/admin/menu
 // @desc    Add menu item
 router.post('/menu', async (req, res) => {
@@ -121,10 +135,10 @@ router.post('/menu', async (req, res) => {
             'INSERT INTO menu (name, description, price, image_url, category) VALUES (?, ?, ?, ?, ?)',
             [name, description, price, image_url, category]
         );
-        res.status(201).json({ message: 'Menu item added' });
+        res.status(201).json({ success: true, message: 'Menu item added' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
@@ -135,12 +149,12 @@ router.put('/menu/:id', async (req, res) => {
     try {
         await pool.query(
             'UPDATE menu SET name = ?, description = ?, price = ?, image_url = ?, category = ?, available = ? WHERE id = ?',
-            [name, description, price, image_url, category, available, req.params.id]
+            [name, description, price, image_url, category, available === undefined ? true : available, req.params.id]
         );
-        res.json({ message: 'Menu item updated' });
+        res.json({ success: true, message: 'Menu item updated' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
@@ -149,10 +163,49 @@ router.put('/menu/:id', async (req, res) => {
 router.delete('/menu/:id', async (req, res) => {
     try {
         await pool.query('DELETE FROM menu WHERE id = ?', [req.params.id]);
-        res.json({ message: 'Menu item deleted' });
+        res.json({ success: true, message: 'Menu item deleted' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   PUT /api/admin/users/:id/role
+// @desc    Update user role/status
+router.put('/users/:id/role', async (req, res) => {
+    const { role } = req.body;
+    try {
+        await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, req.params.id]);
+        res.json({ success: true, message: 'User updated' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   GET /api/admin/reviews
+// @desc    Get all feedback
+router.get('/reviews', async (req, res) => {
+    try {
+        const [rows] = await pool.query(
+            'SELECT feedback.*, users.name as user_name FROM feedback JOIN users ON feedback.user_id = users.id ORDER BY created_at DESC'
+        );
+        res.json({ success: true, reviews: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// @route   DELETE /api/admin/reviews/:id
+// @desc    Delete feedback
+router.delete('/reviews/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM feedback WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'Review deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 

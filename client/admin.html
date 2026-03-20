@@ -3,176 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Lumina Dine</title>
+    <title>Lumina Dine | Command Center</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+            --admin-primary: #6366f1;
+            --admin-dark: #0f172a;
+            --bg-light: #f8fafc;
+        }
+        body { display: flex; background: var(--bg-light); min-height: 100vh; font-family: 'Outfit', sans-serif; }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--admin-dark);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 50px; }
+        .sidebar-header i { font-size: 1.8rem; color: var(--admin-primary); }
+        
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 15px; color: #94a3b8;
+            padding: 14px 18px; text-decoration: none; border-radius: 12px;
+            margin-bottom: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(99, 102, 241, 0.1); color: white; }
+        .sidebar-nav a.active { background: var(--admin-primary); }
+
+        .main-content { margin-left: var(--sidebar-width); flex-grow: 1; padding: 40px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .stat-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .stat-val { font-size: 2rem; font-weight: 800; color: #1e293b; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        .admin-card { background: white; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); padding: 30px; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+        td { padding: 18px 15px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        
+        .badge { padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; }
+        .btn-action { border: none; background: none; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .btn-action:hover { opacity: 0.7; }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 40px; border-radius: 24px; width: 90%; max-width: 600px; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; }
+    </style>
 </head>
-<body class="admin-body">
-    <div class="admin-container">
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>LUMINA DINE</h2>
-                <p>Admin Portal</p>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-shield-alt"></i><h2>ADMIN BOX</h2></div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" onclick="switchSection('dashboard')" id="nav-dashboard"><i class="fas fa-th-large"></i> Overview</a>
+            <a href="#" onclick="switchSection('orders')" id="nav-orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="#" onclick="switchSection('bookings')" id="nav-bookings"><i class="fas fa-calendar-alt"></i> Bookings</a>
+            <a href="#" onclick="switchSection('menu')" id="nav-menu"><i class="fas fa-utensils"></i> Menu</a>
+            <a href="#" onclick="switchSection('users')" id="nav-users"><i class="fas fa-users"></i> Users</a>
+            <a href="#" onclick="switchSection('reviews')" id="nav-reviews"><i class="fas fa-comment-alt"></i> Feedback</a>
+            <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1e293b;">
+                <a href="index.html"><i class="fas fa-home"></i> Main Site</a>
+                <a href="#" onclick="logout()" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="active" data-section="dashboard">
-                        <a href="#"><i class="fas fa-chart-line"></i> Dashboard</a>
-                    </li>
-                    <li data-section="orders">
-                        <a href="#"><i class="fas fa-shopping-bag"></i> Orders</a>
-                    </li>
-                    <li data-section="bookings">
-                        <a href="#"><i class="fas fa-calendar-alt"></i> Bookings</a>
-                    </li>
-                    <li>
-                        <a href="menu.html"><i class="fas fa-utensils"></i> Menu</a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        </nav>
+    </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="section-title">Dashboard</h1>
-                <div class="user-info">
-                    <span id="admin-name">Admin</span>
-                    <i class="fas fa-user-circle"></i>
-                </div>
-            </header>
+    <main class="main-content">
+        <header class="section-header"><h1 id="title-text">Dashboard Overview</h1></header>
 
-            <!-- DASHBOARD SECTION -->
-            <section id="dashboard-section" class="section active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="stat-total-orders">0</h3>
-                            <p>Total Orders</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="stat-total-bookings">0</h3>
-                            <p>Total Bookings</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(241, 196, 15, 0.1); color: #f1c40f;">
-                            <i class="fas fa-indian-rupee-sign"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="stat-total-revenue">₹0</h3>
-                            <p>Total Revenue</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1); color: #9b59b2;">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="stat-today-orders">0</h3>
-                            <p>Today's Orders</p>
-                        </div>
-                    </div>
-                </div>
+        <div id="section-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card"><div><div class="stat-val" id="stat-revenue">₹0</div><div style="color:#64748b;font-weight:600;">REVENUE</div></div><div class="stat-icon" style="background:#ecfdf5;color:#059669;"><i class="fas fa-wallet"></i></div></div>
+                <div class="stat-card"><div><div class="stat-val" id="stat-orders">0</div><div style="color:#64748b;font-weight:600;">ORDERS</div></div><div class="stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="fas fa-box"></i></div></div>
+                <div class="stat-card"><div><div class="stat-val" id="stat-bookings">0</div><div style="color:#64748b;font-weight:600;">BOOKINGS</div></div><div class="stat-icon" style="background:#fdf2f8;color:#db2777;"><i class="fas fa-calendar"></i></div></div>
+                <div class="stat-card"><div><div class="stat-val" id="stat-users">0</div><div style="color:#64748b;font-weight:600;">USERS</div></div><div class="stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-users"></i></div></div>
+            </div>
+        </div>
 
-                <div class="recent-grid">
-                    <div class="card recent-list">
-                        <div class="card-header">
-                            <h3>Recent Orders</h3>
-                            <button class="btn btn-sm btn-outline" data-target="orders">View All</button>
-                        </div>
-                        <div class="table-container">
-                            <table id="recent-orders-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Customer</th>
-                                        <th>Items</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="5" class="text-center">Loading...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <div id="section-orders" style="display:none;"><div class="admin-card"><table><thead><tr><th>ID</th><th>USER</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th><th>OP</th></tr></thead><tbody id="orders-list"></tbody></table></div></div>
+        <div id="section-bookings" style="display:none;"><div class="admin-card"><table><thead><tr><th>ID</th><th>CLIENT</th><th>DATE</th><th>GUESTS</th><th>STATUS</th><th>OP</th></tr></thead><tbody id="bookings-list"></tbody></table></div></div>
+        <div id="section-menu" style="display:none;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h3>Menu List</h3><button class="btn btn-primary" onclick="openMenuModal()">+ Add New</button></div><div class="admin-card"><table><thead><tr><th>ID</th><th>DISH</th><th>CAT</th><th>PRICE</th><th>ST</th><th>OP</th></tr></thead><tbody id="menu-list"></tbody></table></div></div>
+        <div id="section-users" style="display:none;"><div class="admin-card"><table><thead><tr><th>ID</th><th>NAME</th><th>EMAIL</th><th>ROLE</th><th>OP</th></tr></thead><tbody id="users-list"></tbody></table></div></div>
+        <div id="section-reviews" style="display:none;"><div class="admin-card"><table><thead><tr><th>ID</th><th>USER</th><th>TEXT</th><th>RATE</th><th>OP</th></tr></thead><tbody id="reviews-list"></tbody></table></div></div>
+    </main>
 
-            <!-- ORDERS SECTION -->
-            <section id="orders-section" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>All Orders</h3>
-                        <button class="btn btn-sm btn-outline" onclick="loadOrders()">Refresh</button>
-                    </div>
-                    <div class="table-container">
-                        <table id="all-orders-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer Name</th>
-                                    <th>Items</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td colspan="6" class="text-center">Loading orders...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BOOKINGS SECTION -->
-            <section id="bookings-section" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Reservations Management</h3>
-                        <button class="btn btn-sm btn-outline" onclick="loadBookings()">Refresh</button>
-                    </div>
-                    <div class="table-container">
-                        <table id="all-bookings-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Customer</th>
-                                    <th>Contact</th>
-                                    <th>Date & Time</th>
-                                    <th>Guests</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td colspan="7" class="text-center">Loading bookings...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+    <div id="menu-modal" class="modal"><div class="modal-content"><h2>Item Details</h2><form id="menu-form" onsubmit="handleMenuSubmit(event)"><input type="hidden" id="menu-id"><label>Name</label><input type="text" id="menu-name" class="form-control" required><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;"><div><label>Price</label><input type="number" id="menu-price" class="form-control" required></div><div><label>Cat</label><select id="menu-category" class="form-control"><option value="Starters">Starters</option><option value="Main Course">Main Course</option><option value="Breads">Breads</option><option value="Desserts">Desserts</option></select></div></div><label>Image URL</label><input type="text" id="menu-image" class="form-control"><label>Description</label><textarea id="menu-desc" class="form-control"></textarea><div style="display:flex;gap:10px;"><button type="submit" class="btn btn-primary" style="flex:2;">Save</button><button type="button" class="btn btn-outline" style="flex:1;" onclick="closeMenuModal()">Cancel</button></div></form></div></div>
 
     <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/admin.js"></script>
+    <script>
+        const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+        if (!token) window.location.href = "admin-login.html";
+
+        async function switchSection(s) {
+            ['dashboard', 'orders', 'bookings', 'menu', 'users', 'reviews'].forEach(x => {
+                const el = document.getElementById(`section-${x}`);
+                if(el) el.style.display = x === s ? 'block' : 'none';
+                const nav = document.getElementById(`nav-${x}`);
+                if(nav) nav.classList.toggle('active', x === s);
+            });
+            document.getElementById('title-text').innerText = s.charAt(0).toUpperCase() + s.slice(1);
+            if(s==='dashboard') loadStats(); else loadTable(s);
+        }
+
+        async function loadStats() {
+            const data = await apiRequest('/admin/stats');
+            document.getElementById('stat-revenue').innerText = `₹${parseFloat(data.totalRevenue).toLocaleString()}`;
+            document.getElementById('stat-orders').innerText = data.totalOrders;
+            document.getElementById('stat-bookings').innerText = data.totalBookings;
+            document.getElementById('stat-users').innerText = data.totalUsers;
+        }
+
+        async function loadTable(t) {
+            const data = await apiRequest(`/admin/${t}`);
+            const b = document.getElementById(`${t}-list`);
+            if(t==='orders') b.innerHTML = data.orders.map(o => `<tr><td>#${o.id}</td><td>${o.user_name||'Guest'}</td><td style="font-size:0.8rem;">${o.item_name}</td><td>₹${o.total_amount}</td><td><span class="badge" style="background:${getCol(o.status)}20;color:${getCol(o.status)}">${o.status}</span></td><td><select onchange="upd(${o.id},'orders',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></td></tr>`).join('');
+            if(t==='bookings') b.innerHTML = data.bookings.map(x => `<tr><td>#${x.id}</td><td>${x.customer_name}</td><td>${new Date(x.date).toLocaleDateString()}</td><td>${x.guests}</td><td><span class="badge" style="background:${getCol(x.status)}20;color:${getCol(x.status)}">${x.status}</span></td><td><select onchange="upd(${x.id},'bookings',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Confirmed" ${x.status==='Confirmed'?'selected':''}>Confirmed</option></select></td></tr>`).join('');
+            if(t==='menu') b.innerHTML = data.menu.map(m => `<tr><td>#${m.id}</td><td>${m.name}</td><td>${m.category}</td><td>₹${m.price}</td><td>${m.available?'✅':'❌'}</td><td><button class="btn-action" onclick="editM(${m.id},'${m.name}',${m.price},'${m.category}','${m.image_url}',\`${m.description}\`)"><i class="fas fa-edit"></i></button><button class="btn-action" onclick="delM(${m.id})" style="color:red;"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+            if(t==='users') b.innerHTML = data.map(u => `<tr><td>#${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td><button onclick="updRole(${u.id},'${u.role==='admin'?'user':'admin'}')">Toggle</button></td></tr>`).join('');
+        }
+
+        async function upd(id,t,s) { await apiRequest(`/admin/${t}/${id}/status`, {method:'PUT', body:JSON.stringify({status:s})}); loadTable(t); }
+        async function updRole(id,r) { await apiRequest(`/admin/users/${id}/role`, {method:'PUT', body:JSON.stringify({role:r})}); loadTable('users'); }
+        function getCol(s) { const c={'Pending':'#eab308','Delivered':'#10b981','Confirmed':'#10b981','Cancelled':'#ef4444'}; return c[s]||'#64748b'; }
+        function logout() { localStorage.removeItem("adminToken"); window.location.href="admin-login.html"; }
+
+        // Menu Modal
+        function openMenuModal() { document.getElementById('menu-form').reset(); document.getElementById('menu-id').value=''; document.getElementById('menu-modal').style.display='flex'; }
+        function closeMenuModal() { document.getElementById('menu-modal').style.display='none'; }
+        function editM(id,n,p,c,i,d) { document.getElementById('menu-id').value=id; document.getElementById('menu-name').value=n; document.getElementById('menu-price').value=p; document.getElementById('menu-category').value=c; document.getElementById('menu-image').value=i; document.getElementById('menu-desc').value=d; document.getElementById('menu-modal').style.display='flex'; }
+        async function handleMenuSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('menu-id').value;
+            const p = { name: document.getElementById('menu-name').value, price: document.getElementById('menu-price').value, category: document.getElementById('menu-category').value, image_url: document.getElementById('menu-image').value, description: document.getElementById('menu-desc').value };
+            await apiRequest(id ? `/admin/menu/${id}` : '/admin/menu', { method: id ? 'PUT' : 'POST', body: JSON.stringify(p) });
+            closeMenuModal(); loadTable('menu');
+        }
+        async function delM(id) { if(confirm("Remove?")) { await apiRequest(`/admin/menu/${id}`, {method:'DELETE'}); loadTable('menu'); } }
+        loadStats();
+    </script>
 </body>
 </html>

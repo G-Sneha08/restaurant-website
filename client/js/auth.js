@@ -37,11 +37,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (data.user) {
                         localStorage.setItem("user", JSON.stringify(data.user));
+                        if (data.user.role === 'admin') {
+                            localStorage.setItem("adminToken", data.token);
+                            localStorage.setItem("adminLoggedIn", "true");
+                        }
                     }
 
                     alert("Login Successful!");
-
-                    window.location.href = "index.html";
+                    
+                    if (data.user && data.user.role === 'admin') {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "index.html";
+                    }
 
                 } else {
 
