@@ -57,4 +57,27 @@ router.get('/:id', protect, async (req, res) => {
     }
 });
 
+// @route DELETE /api/orders
+// @desc Clear all order history for logged in user
+router.delete('/', protect, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log(`[ORDERS] User ${userId} requested to clear their order history.`);
+
+        // Due to CASCADE foreign keys in schema.sql, deleting from 'orders' 
+        // will automatically delete associated rows in 'order_items'.
+        const [result] = await pool.query(
+            'DELETE FROM orders WHERE user_id = ?',
+            [userId]
+        );
+
+        console.log(`[ORDERS] Success: ${result.affectedRows} orders removed for user ${userId}`);
+        res.json({ success: true, message: 'All order history has been cleared successfully.' });
+        
+    } catch (err) {
+        console.error('Clear Orders error:', err);
+        res.status(500).json({ success: false, message: 'Server error while clearing orders' });
+    }
+});
+
 module.exports = router;

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Dine | Order Details</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .details-container {
+            max-width: 800px;
+            margin: 60px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f9f9f9;
+            align-items: center;
+        }
+        .item-row:last-child { border-bottom: none; }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .back-btn:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="navbar">
+            <a href="index.html" class="logo">LUMINA DINE</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="menu.html">Menu</a></li>
+                <li><a href="cart.html">Cart <span id="cart-count"></span></a></li>
+                <li id="auth-links"></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="details-container">
+            <a href="orders.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Orders</a>
+            
+            <div id="order-meta" style="margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 id="order-id-title" style="font-size: 2rem; margin: 0;">Order #--</h2>
+                    <span id="order-status" class="badge">--</span>
+                </div>
+                <p id="order-date" style="color: var(--text-light); margin-top: 10px;"><i class="far fa-calendar"></i> --</p>
+            </div>
+
+            <div id="items-list">
+                <p class="text-center">Loading exquisite details...</p>
+            </div>
+
+            <div id="order-summary" style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="font-size: 1.5rem;">Grand Total</h3>
+                    <h3 id="order-total" style="font-size: 2rem; color: #27ae60;">₹0</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/order-details.js"></script>
+</body>
+</html>

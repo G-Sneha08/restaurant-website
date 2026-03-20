@@ -11,55 +11,68 @@ async function loadOrders() {
 
     const list = document.getElementById('orders-list');
     const loading = document.getElementById('loading');
+    const clearBtn = document.getElementById('clear-orders-btn');
     if (!list) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/orders`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const orders = await response.json();
+        const orders = await apiRequest('/orders');
 
         if (loading) loading.style.display = 'none';
 
-        if (orders.length === 0) {
-            list.innerHTML = '<p class="text-center">No orders found.</p>';
+        if (!orders || orders.length === 0) {
+            list.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align:center; padding: 60px;">
+                    <i class="fas fa-receipt" style="font-size:4rem; color:#eee; margin-bottom:20px;"></i>
+                    <p style="color:var(--text-light);">Your culinary history is empty.</p>
+                    <a href="menu.html" class="btn btn-primary" style="margin-top:20px;">Start Your Journey</a>
+                </div>`;
+            if (clearBtn) clearBtn.style.display = 'none';
             return;
         }
 
+        if (clearBtn) clearBtn.style.display = 'block';
+
         list.innerHTML = orders.map(order => `
-            <div class="card" style="margin-bottom: 20px; padding: 20px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <h4 style="margin-bottom:5px;">Order #${order.id}</h4>
-                        <p style="font-size:0.85rem; color:var(--text-light);">${new Date(order.created_at).toLocaleString()}</p>
+            <div class="card" style="padding: 25px; display:flex; flex-direction:column; justify-content:space-between; border: 1px solid #f0f0f0;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:0.8rem; color:var(--text-light); font-weight:600;">ORDER #${order.id}</span>
+                        <span class="badge badge-${order.status.toLowerCase()}">${order.status}</span>
                     </div>
-                    <span class="badge badge-${order.status.toLowerCase()}">${order.status}</span>
+                    <h3 style="margin: 15px 0 5px; font-size:1.1rem; line-height:1.4;">${order.item_name}</h3>
+                    <p style="font-size:0.85rem; color:var(--text-light);"><i class="far fa-calendar-alt"></i> ${new Date(order.created_at).toLocaleDateString()}</p>
                 </div>
-                <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:flex-end;">
-                    <p style="font-weight:600;">Total: ₹${order.total_price}</p>
-                    <button onclick="viewOrderDetails(${order.id})" class="btn btn-outline" style="padding: 5px 15px; font-size:0.8rem;">View Details</button>
+                
+                <div style="margin-top:25px; padding-top:15px; border-top:1px solid #f9f9f9; display:flex; justify-content:space-between; align-items:center;">
+                    <p style="font-weight:700; font-size:1.2rem; color:var(--secondary);">₹${parseFloat(order.total_amount).toLocaleString('en-IN')}</p>
+                    <button onclick="viewOrderDetails(${order.id})" class="btn btn-primary btn-sm" style="padding: 10px 20px;">
+                        Details
+                    </button>
                 </div>
             </div>
         `).join('');
     } catch (err) {
-        console.error(err);
-        if (loading) loading.innerText = "Error loading orders.";
+        console.error("Load orders error:", err);
+        if (loading) loading.innerHTML = `<p style="grid-column: 1 / -1; color:#ff4d4d;">Failed to load your orders. Please try again.</p>`;
     }
 }
 
-async function viewOrderDetails(id) {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch(`${API_BASE_URL}/orders/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
+function viewOrderDetails(id) {
+    window.location.href = `order-details.html?orderId=${id}`;
+}
 
-        const items = data.items.map(i => `${i.name} (x${i.quantity}) - ₹${i.price}`).join('\n');
-        alert(`Order #${id} Items:\n\n${items}\n\nTotal: ₹${data.total_price}`);
+async function clearOrders() {
+    if (!confirm("Are you absolutely sure you want to clear your entire order history? This action cannot be undone.")) return;
+
+    try {
+        const data = await apiRequest('/orders', { method: 'DELETE' });
+        if (data.success) {
+            alert(data.message);
+            loadOrders(); // Refresh UI
+        }
     } catch (err) {
-        console.error("Failed to load order details", err);
-        alert("Failed to load order details");
+        console.error("Clear orders error:", err);
+        alert("Unable to clear history. Please try again later.");
     }
 }
 
