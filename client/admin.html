@@ -20,7 +20,7 @@
             --bg-light: #f1f5f9;
             --white: #ffffff;
             --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --transition: all 0.3s ease;
+            --transition: all 0.2s ease;
             
             /* Status Colors */
             --status-pending: #eab308;
@@ -91,19 +91,13 @@
             transition: var(--transition);
         }
 
-        .sidebar-nav a i {
-            width: 20px;
-            font-size: 1.1rem;
-        }
-
-        .sidebar-nav a:hover {
+        .sidebar-nav a:hover, .sidebar-nav a.active {
             background: rgba(255, 255, 255, 0.05);
             color: white;
         }
 
         .sidebar-nav a.active {
             background: var(--admin-primary);
-            color: white;
             box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
         }
 
@@ -115,6 +109,18 @@
             bottom: 24px;
             width: calc(100% - 48px);
         }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 10px;
+            transition: 0.3s;
+        }
+
+        .sidebar-footer a:hover { color: white; }
 
         /* Main Content */
         .main-container {
@@ -143,41 +149,13 @@
             color: var(--admin-dark);
         }
 
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .admin-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--admin-primary);
-            color: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        /* Content Area */
-        .content-area {
-            padding: 40px;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 24px;
             margin-bottom: 40px;
+            padding: 40px;
         }
 
         .stat-card {
@@ -188,19 +166,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #f1f5f9;
         }
 
-        .stat-info .stat-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .stat-info .stat-value {
+        .stat-value {
             font-size: 1.875rem;
             font-weight: 800;
             color: #0f172a;
@@ -216,464 +184,93 @@
             font-size: 1.5rem;
         }
 
-        /* Table Dashboard */
+        /* Tables */
         .admin-card {
             background: var(--white);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: var(--card-shadow);
+            margin: 0 40px 40px 40px;
             overflow: hidden;
-            border: 1px solid #f1f5f9;
         }
 
         .card-header {
-            padding: 24px 30px;
+            padding: 24px;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .card-header h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 16px 24px; text-align: left; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        td { padding: 20px 24px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 16px 24px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #64748b;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        td {
-            padding: 20px 24px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.9375rem;
-            color: #334155;
-            vertical-align: middle;
-        }
-
-        tr:hover td {
-            background: #fcfcfc;
-        }
-
-        /* Badges */
-        .badge {
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
+        .badge { padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; }
         .badge-pending { background: #fef9c3; color: #854d0e; }
         .badge-delivered { background: #dcfce7; color: #166534; }
         .badge-confirmed { background: #dcfce7; color: #166534; }
-        .badge-cancelled { background: #fee2e2; color: #991b1b; }
 
-        /* Buttons */
-        .btn-sm {
-            padding: 8px 12px;
-            font-size: 0.875rem;
-            border-radius: 8px;
-        }
-
-        .btn-action {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #e2e8f0;
-            background: white;
-            color: #64748b;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-action:hover {
-            border-color: var(--admin-primary);
-            color: var(--admin-primary);
-            background: #f5f3ff;
-        }
-
-        .btn-danger-light:hover {
-            border-color: #ef4444;
-            color: #ef4444;
-            background: #fef2f2;
-        }
-
-        select.status-select {
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            font-family: inherit;
-            font-size: 0.875rem;
-            outline: none;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        select.status-select:focus {
-            border-color: var(--admin-primary);
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--white);
-            padding: 32px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 550px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            animation: modalIn 0.3s ease-out;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--admin-dark);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 1rem;
-            color: #1e293b;
-            transition: var(--transition);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--admin-primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar { width: 80px; padding: 20px 10px; }
-            .sidebar-header h2, .sidebar-nav a span { display: none; }
-            .sidebar-nav a { justify-content: center; padding: 15px; }
-            .main-container { margin-left: 80px; width: calc(100% - 80px); }
-            .sidebar-footer a span { display: none; }
-        }
-
-        @media (max-width: 768px) {
-            .top-header { padding: 0 20px; }
-            .content-area { padding: 20px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .stat-value { font-size: 1.5rem; }
-            .form-row { grid-template-columns: 1fr; }
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 32px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <i class="fas fa-utensils"></i>
-            <h2>LUMINA ADMIN</h2>
-        </div>
+        <div class="sidebar-header"><i class="fas fa-utensils"></i><h2>LUMINA ADMIN</h2></div>
         <nav class="sidebar-nav">
-            <a href="#" class="active" onclick="switchSection('dashboard')" id="nav-dashboard">
-                <i class="fas fa-th-large"></i> <span>Overview</span>
-            </a>
-            <a href="#" onclick="switchSection('orders')" id="nav-orders">
-                <i class="fas fa-shopping-cart"></i> <span>Orders</span>
-            </a>
-            <a href="#" onclick="switchSection('bookings')" id="nav-bookings">
-                <i class="fas fa-calendar-alt"></i> <span>Bookings</span>
-            </a>
-            <a href="#" onclick="switchSection('menu')" id="nav-menu">
-                <i class="fas fa-hamburger"></i> <span>Menu Items</span>
-            </a>
-            <a href="#" onclick="switchSection('users')" id="nav-users">
-                <i class="fas fa-users"></i> <span>User Access</span>
-            </a>
-            <a href="#" onclick="switchSection('reviews')" id="nav-reviews">
-                <i class="fas fa-star"></i> <span>Reviews</span>
-            </a>
+            <a href="#" class="active" onclick="switchSection('dashboard')" id="nav-dashboard"><i class="fas fa-th-large"></i><span>Overview</span></a>
+            <a href="#" onclick="switchSection('orders')" id="nav-orders"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+            <a href="#" onclick="switchSection('bookings')" id="nav-bookings"><i class="fas fa-calendar-alt"></i><span>Bookings</span></a>
+            <a href="#" onclick="switchSection('menu')" id="nav-menu"><i class="fas fa-hamburger"></i><span>Menu Items</span></a>
+            <a href="#" onclick="switchSection('users')" id="nav-users"><i class="fas fa-users"></i><span>User Access</span></a>
+            <a href="#" onclick="switchSection('reviews')" id="nav-reviews"><i class="fas fa-star"></i><span>Reviews</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/index.html"><i class="fas fa-home"></i> <span>Main Site</span></a>
-            <a href="#" onclick="logout()" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> <span>Sign Out</span></a>
+            <a href="/index.html"><i class="fas fa-home"></i><span>Main Site</span></a>
+            <a href="#" onclick="logout()" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i><span>Sign Out</span></a>
         </div>
     </aside>
 
     <div class="main-container">
-        <!-- Top Header -->
         <header class="top-header">
-            <div class="welcome-text">
-                <h1 id="title-text">Dashboard Overview</h1>
-            </div>
-            <div class="admin-profile">
-                <div style="text-align: right; margin-right: 15px;">
-                    <p style="font-weight: 700; font-size: 0.9rem;">Sneha Admin</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">Super Administrator</p>
-                </div>
-                <div class="admin-avatar">S</div>
-            </div>
+            <div class="welcome-text"><h1 id="title-text">Dashboard</h1></div>
+            <div class="admin-avatar" style="width:40px;height:40px;background:#6366f1;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">A</div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="content-area">
-            <!-- Dashboard Stats -->
-            <div id="section-dashboard">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <div class="stat-label">Net Revenue</div>
-                            <div class="stat-value" id="stat-revenue">₹0</div>
-                        </div>
-                        <div class="stat-icon" style="background:#f0fdf4;color:#16a34a;">
-                            <i class="fas fa-indian-rupee-sign"></i>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <div class="stat-label">Total Orders</div>
-                            <div class="stat-value" id="stat-orders">0</div>
-                        </div>
-                        <div class="stat-icon" style="background:#eff6ff;color:#2563eb;">
-                            <i class="fas fa-shopping-bag"></i>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <div class="stat-label">Confirmed Bookings</div>
-                            <div class="stat-value" id="stat-bookings">0</div>
-                        </div>
-                        <div class="stat-icon" style="background:#fff7ed;color:#ea580c;">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <div class="stat-label">Active Users</div>
-                            <div class="stat-value" id="stat-users">0</div>
-                        </div>
-                        <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                    </div>
-                </div>
+        <div id="section-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card"><div><div id="stat-revenue" class="stat-value">₹0</div><div style="font-size:0.8rem;color:#64748b;">REVENUE</div></div><div class="stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-wallet"></i></div></div>
+                <div class="stat-card"><div><div id="stat-orders" class="stat-value">0</div><div style="font-size:0.8rem;color:#64748b;">ORDERS</div></div><div class="stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="fas fa-box"></i></div></div>
+                <div class="stat-card"><div><div id="stat-bookings" class="stat-value">0</div><div style="font-size:0.8rem;color:#64748b;">BOOKINGS</div></div><div class="stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="fas fa-calendar-check"></i></div></div>
+                <div class="stat-card"><div><div id="stat-users" class="stat-value">0</div><div style="font-size:0.8rem;color:#64748b;">USERS</div></div><div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;"><i class="fas fa-user-shield"></i></div></div>
             </div>
+        </div>
 
-            <!-- Orders Section -->
-            <div id="section-orders" style="display:none;">
-                <div class="admin-card">
-                    <div class="card-header">
-                        <h3>Customer Orders</h3>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Ref ID</th>
-                                    <th>Customer</th>
-                                    <th>Items Ordered</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Control</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bookings Section -->
-            <div id="section-bookings" style="display:none;">
-                <div class="admin-card">
-                    <div class="card-header">
-                        <h3>Table Reservations</h3>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Booking ID</th>
-                                    <th>Guest Name</th>
-                                    <th>Date</th>
-                                    <th>Guests</th>
-                                    <th>Status</th>
-                                    <th>Manage</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bookings-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Menu Management -->
-            <div id="section-menu" style="display:none;">
-                <div class="section-header" style="margin-bottom: 25px;">
-                    <h3>Catalog Management</h3>
-                    <button class="btn btn-primary" onclick="openMenuModal()" style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-plus"></i> New Item
-                    </button>
-                </div>
-                <div class="admin-card">
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Dish ID</th>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Price</th>
-                                    <th>Availability</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="menu-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- User Management -->
-            <div id="section-users" style="display:none;">
-                <div class="admin-card">
-                    <div class="card-header">
-                        <h3>System Users</h3>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Full Name</th>
-                                    <th>Email Address</th>
-                                    <th>Security Role</th>
-                                    <th>Permissions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="users-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reviews Section -->
-            <div id="section-reviews" style="display:none;">
-                <div class="admin-card">
-                    <div class="card-header">
-                        <h3>Customer Feedback</h3>
-                    </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Review ID</th>
-                                    <th>User</th>
-                                    <th>Comment</th>
-                                    <th>Rating</th>
-                                    <th>Moderation</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reviews-list"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <div id="section-orders" style="display:none;"><div class="admin-card"><div class="card-header"><h3>Recent Orders</h3></div><table><thead><tr><th>ID</th><th>User</th><th>Items</th><th>Total</th><th>Status</th><th>Operation</th></tr></thead><tbody id="orders-list"></tbody></table></div></div>
+        <div id="section-bookings" style="display:none;"><div class="admin-card"><div class="card-header"><h3>Reservations</h3></div><table><thead><tr><th>ID</th><th>Client</th><th>Date</th><th>Guests</th><th>Status</th><th>Manage</th></tr></thead><tbody id="bookings-list"></tbody></table></div></div>
+        <div id="section-menu" style="display:none;"><div style="margin:20px 40px;display:flex;justify-content:space-between;"><h3>Catalog</h3><button onclick="openMenuModal()" class="btn btn-primary">+ Add New</button></div><div class="admin-card"><table><thead><tr><th>ID</th><th>Dish</th><th>Cat</th><th>Price</th><th>Avail</th><th>Action</th></tr></thead><tbody id="menu-list"></tbody></table></div></div>
+        <div id="section-users" style="display:none;"><div class="admin-card"><div class="card-header"><h3>System Users</h3></div><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead><tbody id="users-list"></tbody></table></div></div>
+        <div id="section-reviews" style="display:none;"><div class="admin-card"><div class="card-header"><h3>Feedback</h3></div><table><thead><tr><th>ID</th><th>User</th><th>Message</th><th>Rate</th><th>Action</th></tr></thead><tbody id="reviews-list"></tbody></table></div></div>
     </div>
 
-    <!-- Menu Item Modal (Fixed Accessibility) -->
     <div id="menu-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Dish Configuration</h2>
-                <button type="button" class="btn-action" onclick="closeMenuModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <h3>Dish Configuration</h3>
             <form id="menu-form" onsubmit="handleMenuSubmit(event)">
                 <input type="hidden" id="menu-id" name="id">
-                
                 <div class="form-group">
                     <label for="menu-name" class="form-label">Dish Name</label>
-                    <input type="text" id="menu-name" name="name" class="form-control" placeholder="e.g., Spicy Paneer Tikka" required>
+                    <input type="text" id="menu-name" name="name" class="form-control" required autocomplete="off">
                 </div>
-
-                <div class="form-row">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
                     <div class="form-group">
                         <label for="menu-price" class="form-label">Price (₹)</label>
-                        <input type="number" id="menu-price" name="price" class="form-control" placeholder="299" required>
+                        <input type="number" id="menu-price" name="price" class="form-control" required autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label for="menu-category" class="form-label">Category</label>
@@ -685,20 +282,17 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label for="menu-image" class="form-label">Showcase Image URL</label>
-                    <input type="text" id="menu-image" name="image_url" class="form-control" placeholder="https://example.com/image.jpg">
+                    <label for="menu-image" class="form-label">Image URL</label>
+                    <input type="text" id="menu-image" name="image_url" class="form-control" autocomplete="off">
                 </div>
-
                 <div class="form-group">
                     <label for="menu-desc" class="form-label">Description</label>
-                    <textarea id="menu-desc" name="description" class="form-control" rows="3" placeholder="Describe the flavors and ingredients..."></textarea>
+                    <textarea id="menu-desc" name="description" class="form-control" rows="3" autocomplete="off"></textarea>
                 </div>
-
-                <div style="display:flex; gap:12px; margin-top: 30px;">
-                    <button type="submit" class="btn btn-primary" style="flex:2; padding: 14px;">Commit Changes</button>
-                    <button type="button" class="btn btn-outline" style="flex:1; padding: 14px;" onclick="closeMenuModal()">Discard</button>
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <button type="submit" class="btn btn-primary" style="flex:2;">Save</button>
+                    <button type="button" onclick="closeMenuModal()" class="btn btn-outline" style="flex:1;">Cancel</button>
                 </div>
             </form>
         </div>
@@ -708,10 +302,7 @@
     <script>
         const user = JSON.parse(localStorage.getItem("user") || "null");
         const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-        
-        if (!token || !user || user.role !== "admin") {
-            window.location.href = "login.html";
-        }
+        if (!token || !user || user.role !== "admin") window.location.href = "/login.html";
 
         async function switchSection(s) {
             ['dashboard', 'orders', 'bookings', 'menu', 'users', 'reviews'].forEach(x => {
@@ -740,135 +331,58 @@
                 const b = document.getElementById(`${t}-list`);
                 if(!b) return;
 
+                // RESILIENCE FIX: Handle both array and object responses
+                let items = [];
+                if (Array.isArray(data)) {
+                    items = data;
+                } else if (data && data.success && Array.isArray(data[t])) {
+                    items = data[t];
+                } else if (data && Array.isArray(data[t])) {
+                    items = data[t];
+                } else if (data && data.orders) {
+                    items = data.orders;
+                } else if (data && data.bookings) {
+                    items = data.bookings;
+                } else if (data && data.menu) {
+                    items = data.menu;
+                }
+
+                if(!Array.isArray(items)) {
+                    console.error("Invalid data format for", t, data);
+                    return;
+                }
+
                 if(t==='orders') {
-                    b.innerHTML = data.orders.map(o => `
-                        <tr>
-                            <td>#${o.id}</td>
-                            <td style="font-weight:600;">${o.user_name||'Guest Account'}</td>
-                            <td style="font-size:0.85rem; color:#64748b;">${o.item_name}</td>
-                            <td style="font-weight:700;">₹${o.total_amount}</td>
-                            <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
-                            <td>
-                                <select class="status-select" onchange="upd(${o.id},'orders',this.value)">
-                                    <option value="Pending" ${o.status==='Pending'?'selected':''}>Set Pending</option>
-                                    <option value="Delivered" ${o.status==='Delivered'?'selected':''}>Set Delivered</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `).join('');
+                    b.innerHTML = items.map(o => `<tr><td>#${o.id}</td><td>${o.user_name||'Guest'}</td><td style="font-size:0.8rem;">${o.item_name}</td><td>₹${o.total_amount}</td><td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td><td><select onchange="upd(${o.id},'orders',this.value)"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option></select></td></tr>`).join('');
+                } else if(t==='bookings') {
+                    b.innerHTML = items.map(x => `<tr><td>#${x.id}</td><td>${x.customer_name}</td><td>${new Date(x.date).toLocaleDateString()}</td><td>${x.guests}</td><td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td><td><select onchange="upd(${x.id},'bookings',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Confirmed" ${x.status==='Confirmed'?'selected':''}>Confirmed</option></select></td></tr>`).join('');
+                } else if(t==='menu') {
+                    b.innerHTML = items.map(m => `<tr><td>#${m.id}</td><td>${m.name}</td><td>${m.category}</td><td>₹${m.price}</td><td>${m.available?'✅':'❌'}</td><td><button onclick="editM(${m.id},'${m.name}',${m.price},'${m.category}','${m.image_url}',\`${m.description}\`)"><i class="fas fa-edit"></i></button><button onclick="delM(${m.id})" style="color:red;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+                } else if(t==='users') {
+                    b.innerHTML = items.map(u => `<tr><td>#${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td><button onclick="updRole(${u.id},'${u.role==='admin'?'user':'admin'}')">Toggle</button></td></tr>`).join('');
+                } else if(t==='reviews') {
+                    b.innerHTML = items.map(r => `<tr><td>#${r.id}</td><td>${r.user_name||'Anon'}</td><td style="font-size:0.8rem;">${r.review_text}</td><td>${r.rating}⭐</td><td><button onclick="delReview(${r.id})" style="color:red;"><i class="fas fa-trash"></i></button></td></tr>`).join('');
                 }
-                
-                if(t==='bookings') {
-                    b.innerHTML = data.bookings.map(x => `
-                        <tr>
-                            <td>#${x.id}</td>
-                            <td style="font-weight:600;">${x.customer_name}</td>
-                            <td>${new Date(x.date).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}</td>
-                            <td>${x.guests} Persons</td>
-                            <td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td>
-                            <td>
-                                <select class="status-select" onchange="upd(${x.id},'bookings',this.value)">
-                                    <option value="Pending" ${x.status==='Pending'?'selected':''}>Set Pending</option>
-                                    <option value="Confirmed" ${x.status==='Confirmed'?'selected':''}>Set Confirmed</option>
-                                </select>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-                if(t==='menu') {
-                    b.innerHTML = data.menu.map(m => `
-                        <tr>
-                            <td>#${m.id}</td>
-                            <td style="font-weight:600;">${m.name}</td>
-                            <td><span class="badge" style="background:#f1f5f9;color:#64748b;">${m.category}</span></td>
-                            <td style="font-weight:700;">₹${m.price}</td>
-                            <td>${m.available ? '<span style="color:#10b981"><i class="fas fa-check-circle"></i> In Stock</span>' : '<span style="color:#ef4444"><i class="fas fa-times-circle"></i> Out</span>'}</td>
-                            <td>
-                                <div style="display:flex; gap:8px;">
-                                    <button class="btn-action" title="Edit Item" onclick="editM(${m.id},'${m.name}',${m.price},'${m.category}','${m.image_url}',\`${m.description}\`)"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-action btn-danger-light" title="Remove Item" onclick="delM(${m.id})"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-                if(t==='users') {
-                    b.innerHTML = data.map(u => `
-                        <tr>
-                            <td>#${u.id}</td>
-                            <td style="font-weight:600;">${u.name}</td>
-                            <td>${u.email}</td>
-                            <td><span class="badge" style="background:${u.role==='admin'?'#f5f3ff':'#f8fafc'};color:${u.role==='admin'?'#7c3aed':'#64748b'};">${u.role.toUpperCase()}</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="updRole(${u.id},'${u.role==='admin'?'user':'admin'}')">
-                                    Change to ${u.role==='admin'?'User':'Admin'}
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-                if(t==='reviews') {
-                    b.innerHTML = data.map(r => `
-                        <tr>
-                            <td>#${r.id}</td>
-                            <td style="font-weight:600;">${r.user_name || 'Anonymous'}</td>
-                            <td style="font-size:0.85rem; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.review_text}</td>
-                            <td><div style="color:#fbbf24;"><i class="fas fa-star"></i> ${r.rating}/5</div></td>
-                            <td>
-                                <button class="btn-action btn-danger-light" onclick="delReview(${r.id})"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("LoadTable Error:", err); }
         }
 
         async function upd(id,t,s) { try { await apiRequest(`/admin/${t}/${id}/status`, {method:'PUT', body:JSON.stringify({status:s})}); loadTable(t); } catch(err){console.error(err);} }
         async function updRole(id,r) { try { await apiRequest(`/admin/users/${id}/role`, {method:'PUT', body:JSON.stringify({role:r})}); loadTable('users'); } catch(err){console.error(err);} }
-        
         function logout() { localStorage.removeItem("adminToken"); localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.href="/admin-login.html"; }
 
-        // Menu Modal Controls
         function openMenuModal() { document.getElementById('menu-form').reset(); document.getElementById('menu-id').value=''; document.getElementById('menu-modal').style.display='flex'; }
         function closeMenuModal() { document.getElementById('menu-modal').style.display='none'; }
+        function editM(id,n,p,c,i,d) { document.getElementById('menu-id').value=id; document.getElementById('menu-name').value=n; document.getElementById('menu-price').value=p; document.getElementById('menu-category').value=c; document.getElementById('menu-image').value=i; document.getElementById('menu-desc').value=d; document.getElementById('menu-modal').style.display='flex'; }
         
-        function editM(id,n,p,c,i,d) { 
-            document.getElementById('menu-id').value=id; 
-            document.getElementById('menu-name').value=n; 
-            document.getElementById('menu-price').value=p; 
-            document.getElementById('menu-category').value=c; 
-            document.getElementById('menu-image').value=i; 
-            document.getElementById('menu-desc').value=d; 
-            document.getElementById('menu-modal').style.display='flex'; 
-        }
-
         async function handleMenuSubmit(e) {
             e.preventDefault();
             const id = document.getElementById('menu-id').value;
-            const p = { 
-                name: document.getElementById('menu-name').value, 
-                price: document.getElementById('menu-price').value, 
-                category: document.getElementById('menu-category').value, 
-                image_url: document.getElementById('menu-image').value, 
-                description: document.getElementById('menu-desc').value 
-            };
-            try {
-                await apiRequest(id ? `/admin/menu/${id}` : '/admin/menu', { method: id ? 'PUT' : 'POST', body: JSON.stringify(p) });
-                closeMenuModal(); 
-                loadTable('menu'); 
-            } catch(err){console.error(err);}
+            const p = { name: document.getElementById('menu-name').value, price: document.getElementById('menu-price').value, category: document.getElementById('menu-category').value, image_url: document.getElementById('menu-image').value, description: document.getElementById('menu-desc').value };
+            try { await apiRequest(id ? `/admin/menu/${id}` : '/admin/menu', { method: id ? 'PUT' : 'POST', body: JSON.stringify(p) }); closeMenuModal(); loadTable('menu'); } catch(err){console.error(err);}
         }
-
-        async function delM(id) { if(confirm("Are you sure you want to remove this item from the catalog?")) { try { await apiRequest(`/admin/menu/${id}`, {method:'DELETE'}); loadTable('menu'); } catch(err){console.error(err);} } }
-        async function delReview(id) { if(confirm("Delete this review?")) { try { await apiRequest(`/admin/reviews/${id}`, {method:'DELETE'}); loadTable('reviews'); } catch(err){console.error(err);} } }
-        
-        // Initial Load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStats();
-        });
+        async function delM(id) { if(confirm("Delete?")) { await apiRequest(`/admin/menu/${id}`, {method:'DELETE'}); loadTable('menu'); } }
+        async function delReview(id) { if(confirm("Delete?")) { await apiRequest(`/admin/reviews/${id}`, {method:'DELETE'}); loadTable('reviews'); } }
+        loadStats();
     </script>
 </body>
 </html>
