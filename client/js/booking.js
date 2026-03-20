@@ -36,8 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.innerText = "Booking...";
 
         try {
-
-            const response = await fetch(`${API_BASE_URL}/bookings`, {
+            // Explicitly use window.API_BASE_URL for global scope reliability
+            const response = await fetch(`${window.API_BASE_URL}/bookings`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -47,6 +47,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
+
+            // Redirect to login if token is expired or invalid
+            if (response.status === 401) {
+                alert("Session expired. Please login again.");
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.href = "login.html";
+                return;
+            }
 
             if (response.ok && data.success) {
 
@@ -94,7 +103,7 @@ async function loadBookings() {
 
     try {
 
-        const response = await fetch(`${API_BASE_URL}/bookings`, {
+        const response = await fetch(`${window.API_BASE_URL}/bookings`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
@@ -151,7 +160,7 @@ window.cancelBooking = async function (id) {
 
     try {
 
-        const response = await fetch(`${API_BASE_URL}/bookings/${id}`, {
+        const response = await fetch(`${window.API_BASE_URL}/bookings/${id}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`
