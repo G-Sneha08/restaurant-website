@@ -7,6 +7,10 @@ const pool = require("../config/db");
 
 
 // FIX 1️⃣ correct import
+// ===============================
+// AUTH ROUTES LOADED
+// ===============================
+console.log("🚀 Auth routes loaded successfully at /api/auth");
 const { sendWelcomeEmail } = require("../utils/sendEmail");
 
 
