@@ -78,9 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             e.preventDefault();
 
-            const name = document.querySelector("input[name='name']").value;
-            const email = document.querySelector("input[name='email']").value;
-            const password = document.querySelector("input[name='password']").value;
+            // Robust selector endpoints using IDs
+            const nameEl = document.getElementById("name");
+            const emailEl = document.getElementById("email");
+            const passwordEl = document.getElementById("password");
+
+            const name = nameEl ? nameEl.value : "";
+            const email = emailEl ? emailEl.value : "";
+            const password = passwordEl ? passwordEl.value : "";
 
             try {
 

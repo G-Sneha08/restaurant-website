@@ -19,10 +19,12 @@ const { sendWelcomeEmail } = require("../utils/sendEmail");
 // ===============================
 router.post("/register", async (req, res) => {
 
+    console.log("📥 Registration Request received:", req.body);
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+        console.warn("⚠️ Registration failed: Missing mandatory fields", { name:!!name, email:!!email, pass:!!password });
+        return res.status(400).json({ message: "Mandatory fields ('name', 'email', 'password') are missing." });
     }
 
     try {
