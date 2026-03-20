@@ -109,10 +109,14 @@ async function loadBookings() {
         const data = await response.json();
         const bookings = data.bookings || [];
 
+        const clearBtn = document.getElementById("clear-bookings-btn");
         if (!data.success || bookings.length === 0) {
             list.innerHTML = `<div class="card text-center" style="padding:20px; color:#aaa;">No active reservations found. Your seat is waiting!</div>`;
+            if (clearBtn) clearBtn.style.display = "none";
             return;
         }
+
+        if (clearBtn) clearBtn.style.display = "block";
 
         list.innerHTML = bookings.map(b => {
             const dateStr = new Date(b.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -184,6 +188,32 @@ window.cancelBooking = async function (id) {
 
     }
 
+};
+
+// =======================
+// Clear Bookings
+// =======================
+window.clearBookings = async function () {
+    const token = localStorage.getItem("token");
+    if (!confirm("Are you sure you want to permanently clear ALL reservation records? This cannot be undone.")) return;
+
+    try {
+        const response = await fetch(`${window.API_BASE_URL}/bookings`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            alert("Reservation history cleared successfully.");
+            loadBookings();
+        } else {
+            alert("Failed to clear reservation history.");
+        }
+    } catch (err) {
+        console.error("Clear error:", err);
+    }
 };
 
 function getStatusColor(status) {

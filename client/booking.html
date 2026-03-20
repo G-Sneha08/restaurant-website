@@ -71,7 +71,12 @@
 
                 <!-- RIGHT SIDE BOOKINGS -->
                 <div class="status-section">
-                    <h2>Your Bookings</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2>Your Bookings</h2>
+                        <button id="clear-bookings-btn" onclick="clearBookings()" class="btn btn-outline" style="border-color:#ff4d4d; color:#ff4d4d; display:none; padding: 4px 10px; font-size: 0.85rem;">
+                             <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
                     <div id="booking-list" style="margin-top:30px;">
                         <p class="text-center">Loading your reservations...</p>
                     </div>

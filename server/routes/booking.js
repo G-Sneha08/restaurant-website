@@ -71,6 +71,25 @@ router.get("/", protect, async (req, res) => {
 });
 
 /* ==============================
+   DELETE ALL BOOKINGS (USER)
+============================== */
+router.delete("/", protect, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        await pool.query(
+            "DELETE FROM bookings WHERE user_id = ?",
+            [userId]
+        );
+        res.json({ success: true, message: "Your reservation history has been cleared successfully." });
+
+    } catch (err) {
+        console.error("Clear bookings error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* ==============================
    CANCEL BOOKING (USER)
 ============================== */
 router.delete("/:id", protect, async (req, res) => {
