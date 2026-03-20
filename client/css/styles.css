@@ -117,7 +117,21 @@ nav {
     background: var(--primary);
     color: var(--white);
 }
+/* Add this to css/styles.css */
+.add-to-cart {
+    background-color: #e53935; /* red button */
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px; /* slightly curved corners */
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
 
+.add-to-cart:hover {
+    background-color: #b71c1c; /* darker red on hover */
+}
 /* Hero Section - Improved with Blur Overlay */
 .hero-new {
     height: 100vh;
@@ -622,4 +636,4 @@ footer {
 .badge {
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
+}

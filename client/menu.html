@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exquisite Menu | Lumina Dine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <title>🍽️ Exquisite Menu | Lumina Dine ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -29,17 +28,15 @@
 
     <main>
         <div class="container">
-            <!-- Page Title -->
             <div class="section-title">
                 <h1>Our Culinary Gallery</h1>
                 <p>Explore the finest selection of dishes at Lumina Dine</p>
             </div>
 
-            <!-- Starters Section -->
+            <!-- ========== STARTERS ========== -->
             <section id="starters" class="menu-section">
                 <h2 class="section-heading">Starters</h2>
                 <div class="grid">
-                    <!-- Veg Spring Rolls -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/4001867/pexels-photo-4001867.jpeg" alt="Veg Spring Rolls" class="card-img">
                         <div class="card-body">
@@ -47,13 +44,11 @@
                             <p class="card-desc">Crispy golden rolls stuffed with seasoned vegetables.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹119</span>
-                                <button onclick="addToCart(6, 'Veg Spring Rolls', 119, 'https://images.pexels.com/photos/4001867/pexels-photo-4001867.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="6">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Chicken 65 -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/12916901/pexels-photo-12916901.jpeg" alt="Chicken 65" class="card-img">
                         <div class="card-body">
@@ -61,13 +56,11 @@
                             <p class="card-desc">South Indian spicy, deep-fried chicken delicacy.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹149</span>
-                                <button onclick="addToCart(7, 'Chicken 65', 149, 'https://images.pexels.com/photos/12916901/pexels-photo-12916901.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="7">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- French Fries -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/115740/pexels-photo-115740.jpeg" alt="French Fries" class="card-img">
                         <div class="card-body">
@@ -75,13 +68,11 @@
                             <p class="card-desc">Classic salted crispy potato sticks.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹79</span>
-                                <button onclick="addToCart(8, 'French Fries', 79, 'https://images.pexels.com/photos/115740/pexels-photo-115740.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="8">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Garlic Bread -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/13062441/pexels-photo-13062441.jpeg" alt="Garlic Bread" class="card-img">
                         <div class="card-body">
@@ -89,13 +80,11 @@
                             <p class="card-desc">Oven-baked bread with garlic butter and herbs.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹89</span>
-                                <button onclick="addToCart(9, 'Garlic Bread', 89, 'https://images.pexels.com/photos/13062441/pexels-photo-13062441.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="9">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Paneer Tikka -->
                     <div class="card">
                         <img src="images/panner-tikka.jpg" alt="Paneer Tikka" class="card-img">
                         <div class="card-body">
@@ -103,13 +92,11 @@
                             <p class="card-desc">Grilled cottage cheese cubes marinated in Indian spices.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹199</span>
-                                <button onclick="addToCart(10, 'Paneer Tikka', 199, 'images/panner-tikka.jpg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="10">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Crispy Corn -->
                     <div class="card">
                         <img src="images/crispy-corn.jpg" alt="Crispy Corn" class="card-img">
                         <div class="card-body">
@@ -117,19 +104,17 @@
                             <p class="card-desc">Golden fried sweet corn tossed with spices.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹180</span>
-                                <button onclick="addToCart(11, 'Crispy Corn', 180, 'images/crispy-corn.jpg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="11">Add to Cart</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Main Course Section -->
+            <!-- ========== MAIN COURSE ========== -->
             <section id="main-course" class="menu-section">
                 <h2 class="section-heading">Main Course</h2>
                 <div class="grid">
-                    <!-- Paneer Butter Masala -->
                     <div class="card">
                         <img src="images/panner-butter-masala.jpg" alt="Paneer Butter Masala" class="card-img">
                         <div class="card-body">
@@ -137,13 +122,11 @@
                             <p class="card-desc">Rich creamy tomato gravy with soft paneer cubes.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹250</span>
-                                <button onclick="addToCart(12, 'Paneer Butter Masala', 250, 'images/panner-butter-masala.jpg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="12">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Chicken Biryani -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/4439740/pexels-photo-4439740.jpeg" alt="Chicken Biryani" class="card-img">
                         <div class="card-body">
@@ -151,13 +134,11 @@
                             <p class="card-desc">Flavorful basmati rice with spiced chicken.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹229</span>
-                                <button onclick="addToCart(13, 'Chicken Biryani', 229, 'https://images.pexels.com/photos/4439740/pexels-photo-4439740.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="13">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Veg Fried Rice -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/343871/pexels-photo-343871.jpeg" alt="Veg Fried Rice" class="card-img">
                         <div class="card-body">
@@ -165,13 +146,11 @@
                             <p class="card-desc">Stir-fried rice with assorted crispy vegetables.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹149</span>
-                                <button onclick="addToCart(14, 'Veg Fried Rice', 149, 'https://images.pexels.com/photos/343871/pexels-photo-343871.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="14">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Butter Naan -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/10337726/pexels-photo-10337726.jpeg" alt="Butter Naan" class="card-img">
                         <div class="card-body">
@@ -179,13 +158,11 @@
                             <p class="card-desc">Soft, leavened bread brushed with fresh butter.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹39</span>
-                                <button onclick="addToCart(15, 'Butter Naan', 39, 'https://images.pexels.com/photos/10337726/pexels-photo-10337726.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="15">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Dal Tadka -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/4595313/pexels-photo-4595313.jpeg" alt="Dal Tadka" class="card-img">
                         <div class="card-body">
@@ -193,13 +170,11 @@
                             <p class="card-desc">Yellow lentils tempered with ghee, cumin, and garlic.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹139</span>
-                                <button onclick="addToCart(16, 'Dal Tadka', 139, 'https://images.pexels.com/photos/4595313/pexels-photo-4595313.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="16">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Margherita Pizza -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg" alt="Margherita Pizza" class="card-img">
                         <div class="card-body">
@@ -207,19 +182,17 @@
                             <p class="card-desc">Wood-fired pizza with tomato, basil, and mozzarella.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹149</span>
-                                <button onclick="addToCart(17, 'Margherita Pizza', 149, 'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="17">Add to Cart</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Beverages Section -->
+            <!-- ========== BEVERAGES ========== -->
             <section id="beverages" class="menu-section">
                 <h2 class="section-heading">Beverages</h2>
                 <div class="grid">
-                    <!-- Espresso -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/131053/pexels-photo-131053.jpeg" alt="Espresso" class="card-img">
                         <div class="card-body">
@@ -227,13 +200,11 @@
                             <p class="card-desc">Strong and bold single-shot coffee.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹59</span>
-                                <button onclick="addToCart(18, 'Espresso', 59, 'https://images.pexels.com/photos/131053/pexels-photo-131053.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="18">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cappuccino -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg" alt="Cappuccino" class="card-img">
                         <div class="card-body">
@@ -241,13 +212,11 @@
                             <p class="card-desc">Classic coffee with steamed milk and froth.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹79</span>
-                                <button onclick="addToCart(19, 'Cappuccino', 79, 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="19">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Fresh Lime Soda -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/4045205/pexels-photo-4045205.jpeg" alt="Fresh Lime Soda" class="card-img">
                         <div class="card-body">
@@ -255,13 +224,11 @@
                             <p class="card-desc">Refreshing lime drink with a fizzy twist.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹49</span>
-                                <button onclick="addToCart(20, 'Fresh Lime Soda', 49, 'https://images.pexels.com/photos/4045205/pexels-photo-4045205.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="20">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Mango Shake -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/8211179/pexels-photo-8211179.jpeg" alt="Mango Shake" class="card-img">
                         <div class="card-body">
@@ -269,13 +236,11 @@
                             <p class="card-desc">Thick and creamy seasonal mango shake.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹89</span>
-                                <button onclick="addToCart(21, 'Mango Shake', 89, 'https://images.pexels.com/photos/8211179/pexels-photo-8211179.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="21">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cold Coffee -->
                     <div class="card">
                         <img src="images/cold-coffee.jpg" alt="Cold Coffee" class="card-img">
                         <div class="card-body">
@@ -283,13 +248,11 @@
                             <p class="card-desc">Chilled coffee blended with milk and ice cream.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹120</span>
-                                <button onclick="addToCart(22, 'Cold Coffee', 120, 'images/cold-coffee.jpg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="22">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Mineral Water -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/113734/pexels-photo-113734.jpeg" alt="Mineral Water" class="card-img">
                         <div class="card-body">
@@ -297,19 +260,17 @@
                             <p class="card-desc">Pure bottled drinking water.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹20</span>
-                                <button onclick="addToCart(23, 'Mineral Water', 20, 'https://images.pexels.com/photos/113734/pexels-photo-113734.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="23">Add to Cart</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Desserts Section -->
+            <!-- ========== DESSERTS ========== -->
             <section id="desserts" class="menu-section">
                 <h2 class="section-heading">Desserts</h2>
                 <div class="grid">
-                    <!-- Gulab Jamun -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/11887844/pexels-photo-11887844.jpeg" alt="Gulab Jamun" class="card-img">
                         <div class="card-body">
@@ -317,13 +278,11 @@
                             <p class="card-desc">Soft milk-based balls soaked in sugar syrup.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹49</span>
-                                <button onclick="addToCart(24, 'Gulab Jamun', 49, 'https://images.pexels.com/photos/11887844/pexels-photo-11887844.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="24">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Chocolate Brownie -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/45202/brownie-dessert-cake-sweet-45202.jpeg" alt="Chocolate Brownie" class="card-img">
                         <div class="card-body">
@@ -331,13 +290,11 @@
                             <p class="card-desc">Fudgy chocolate squares with nuts.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹119</span>
-                                <button onclick="addToCart(25, 'Chocolate Brownie', 119, 'https://images.pexels.com/photos/45202/brownie-dessert-cake-sweet-45202.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="25">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ice Cream Sundae -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/6025810/pexels-photo-6025810.jpeg" alt="Ice Cream Sundae" class="card-img">
                         <div class="card-body">
@@ -345,13 +302,11 @@
                             <p class="card-desc">Creamy vanilla ice cream with chocolate and cherry.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹99</span>
-                                <button onclick="addToCart(26, 'Ice Cream Sundae', 99, 'https://images.pexels.com/photos/6025810/pexels-photo-6025810.jpeg')"
-                                    class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="26">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Rasmalai -->
                     <div class="card">
                         <img src="images/rasmalai.jpg" alt="Rasmalai" class="card-img">
                         <div class="card-body">
@@ -359,12 +314,11 @@
                             <p class="card-desc">Soft cheese dumplings soaked in cardamom-flavored milk.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹150</span>
-                                <button onclick="addToCart(27, 'Rasmalai', 150, 'images/rasmalai.jpg')" class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="27">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cheesecake -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/3071821/pexels-photo-3071821.jpeg" alt="Cheesecake" class="card-img">
                         <div class="card-body">
@@ -372,12 +326,11 @@
                             <p class="card-desc">Creamy baked dessert with a biscuit base.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹119</span>
-                                <button onclick="addToCart(28, 'Cheesecake', 119, 'https://images.pexels.com/photos/3071821/pexels-photo-3071821.jpeg')" class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="28">Add to Cart</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Fruit Custard -->
                     <div class="card">
                         <img src="https://images.pexels.com/photos/773724/pexels-photo-773724.jpeg" alt="Fruit Custard" class="card-img">
                         <div class="card-body">
@@ -385,7 +338,7 @@
                             <p class="card-desc">Assorted seasonal fruits in creamy custard.</p>
                             <div class="card-footer">
                                 <span class="card-price">₹69</span>
-                                <button onclick="addToCart(29, 'Fruit Custard', 69, 'https://images.pexels.com/photos/773724/pexels-photo-773724.jpeg')" class="btn btn-primary btn-sm">Add to Cart</button>
+                                <button class="btn add-to-cart" data-id="29">Add to Cart</button>
                             </div>
                         </div>
                     </div>
@@ -395,17 +348,132 @@
     </main>
 
     <!-- Footer -->
-    <footer id="footer">
+    <!-- <footer id="footer">
         <div class="container">
-            <p>&copy; 2026 Lumina Dine. All Rights Reserved.</p>
+            <div class="footer-content">
+                <p>&copy; 2026 Lumina Dine. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
         </div>
-    </footer>
+    </footer> -->
+    <!-- Footer Start -->
+<footer style="background-color:#1a1a1a; color:#f5f5f5; text-align:center; padding:40px 20px; font-family:'Outfit', sans-serif;">
+    <!-- Logo / Icon -->
+    <div style="font-size:2rem; margin-bottom:10px;">
+        ✨ <span style="font-weight:700;">Lumina Dine</span> ✨
+    </div>
 
-    <!-- Cart JS -->
-    <script src="js/config.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/cart.js"></script>
+    <!-- Tagline -->
+    <p style="font-size:1rem; margin-bottom:20px; color:#dcdcdc;">
+        Curating flavors, creating memories
+    </p>
+
+    <!-- Social Icons -->
+    <div style="margin-bottom:20px;">
+        <a href="#" style="color:#f5f5f5; margin:0 10px; font-size:1.2rem; text-decoration:none;">🌐</a>
+        <a href="#" style="color:#f5f5f5; margin:0 10px; font-size:1.2rem; text-decoration:none;">📸</a>
+        <a href="#" style="color:#f5f5f5; margin:0 10px; font-size:1.2rem; text-decoration:none;">🍴</a>
+        <a href="#" style="color:#f5f5f5; margin:0 10px; font-size:1.2rem; text-decoration:none;">💌</a>
+    </div>
+
+    <!-- Copyright -->
+    <p style="font-size:0.85rem; color:#a9a9a9;">
+        © 2026 Lumina Dine 🥂 Curating flavors, creating memories
+    </p>
+</footer>
+<!-- Footer End -->
+ <script src="./js/config.js"></script>
+  <script src="./js/cart.js"></script>
+    <!-- Add this near the end of <body> before </body> -->
+<script>
+//const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
+//const USER_ID = 1; // Replace with dynamic logged-in user ID
+async function addToCart(id, name, price) {
+
+  try {
+
+    const res = await fetch(`${window.API_BASE_URL}/cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user_id: window.USER_ID,
+        menu_item_id: id,
+        quantity: 1,
+        price: price,
+        item_name: name
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      console.error("Cart error:", data.message);
+      alert(data.message);
+      return;
+    }
+
+    alert("Item added to cart!");
+
+    updateNavbar();
+
+  } catch (err) {
+    console.error("Add to cart failed:", err);
+  }
+
+}
+async function updateNavbar() {
+
+  try {
+
+    const res = await fetch(`${window.API_BASE_URL}/cart/${window.USER_ID}`);
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      const count = data.cart.reduce(
+        (sum,item) => sum + item.quantity,
+        0
+      );
+
+      document.getElementById("cart-count").innerText = count;
+
+    }
+
+  } catch (err) {
+
+    console.error("Navbar cart error:", err);
+
+  }
+
+}
+</script>
+
+<style>
+/* Add to Cart Button Red Styling */
+.add-to-cart {
+    background-color: #e53935; /* red button */
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px; /* slightly curved corners */
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: #b71c1c; /* darker red on hover */
+}
+</style>
+    
+   
 </body>
-
 </html>

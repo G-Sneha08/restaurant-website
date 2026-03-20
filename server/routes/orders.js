@@ -1,6 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require('../config/db');
+const pool = require("../config/db");
 const { protect } = require('../middleware/authMiddleware');
 
 // @route GET /api/orders
@@ -12,7 +12,7 @@ router.get('/', protect, async (req, res) => {
             [req.user.id]
         );
         
-        // Map total_amount to total_price for frontend compatibility if needed
+        // Map total_amount to total_price for frontend compatibility
         const orders = rows.map(o => ({
             ...o,
             total_price: o.total_amount 
@@ -56,7 +56,5 @@ router.get('/:id', protect, async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Redundant checkout removed as it's handled in cart routes to match frontend call
 
 module.exports = router;

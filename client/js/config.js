@@ -10,8 +10,6 @@ if (window.location.hostname.endsWith('.github.dev')) {
     API_BASE_URL = `${window.location.protocol}//${window.location.hostname.replace('-3000.', '-5000.')}/api`;
 } else if (isLocal) {
     // Standard local dev usually has backend on 5000
-    // If you're serving frontend from port 5000 too, current host works.
-    // But often frontend is 3000/5500. Let's force 5000 for backend locally.
     API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:5000/api`;
 } else {
     // Production Render URL
@@ -21,6 +19,8 @@ if (window.location.hostname.endsWith('.github.dev')) {
 console.log(`[CONFIG] Environment: ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'}`);
 console.log(`[CONFIG] Source: ${window.location.hostname}`);
 console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
+
+window.API_BASE_URL = API_BASE_URL;
 
 window.apiRequest = async function(endpoint, options = {}) {
     const token = localStorage.getItem("token");

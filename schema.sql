@@ -26,10 +26,10 @@ CREATE TABLE IF NOT EXISTS menu (
 CREATE TABLE IF NOT EXISTS cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    menu_id INT NOT NULL,
+    menu_item_id INT NOT NULL,
     quantity INT DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES menu(id) ON DELETE CASCADE
+    FOREIGN KEY (menu_item_id) REFERENCES menu(id) ON DELETE CASCADE
 );
 
 -- Orders table
@@ -47,13 +47,13 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
-    menu_id INT NOT NULL,
+    menu_item_id INT NOT NULL,
     item_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES menu(id) ON DELETE CASCADE
-);
+    FOREIGN KEY (menu_item_id) REFERENCES menu(id) ON DELETE CASCADE
+); 
 
 -- Bookings table
 CREATE TABLE IF NOT EXISTS bookings (

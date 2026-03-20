@@ -4,29 +4,35 @@ async function updateNavbar() {
     const nav = document.querySelector('nav');
     if (!nav) return;
 
-    const isDashboard = window.location.pathname.includes('admin-dashboard.html');
+    const isDashboard = window.location.pathname.includes('admin.html');
     if (isDashboard) return;
 
-    // Fetch cart count from server
     let count = 0;
+
+    // Fetch cart from backend if use API_BASE_URL
     try {
-        const res = await fetch(`${API_BASE_URL}/cart`);
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${window.API_BASE_URL}/cart`, {
+            headers: {
+                "Authorization": token ? `Bearer ${token}` : ""
+            }
+        });
         const data = await res.json();
-        if (data.success) {
+        if (data.success && Array.isArray(data.cart)) {
             count = data.cart.reduce((sum, item) => sum + item.quantity, 0);
         }
-    } catch (err) { console.error("Error fetching cart count:", err); }
+    } catch (err) {
+        console.error("Failed to fetch cart count:", err);
+    }
 
     const authLinks = user ? `
         <li><a href="orders.html">Orders</a></li>
-        ${user.role === 'admin' ? '<li><a href="#" onclick="openAdminModal(); return false;">Admin Panel</a></li>' : ''}
+        ${user.role === 'admin' ? '<li><a href="admin.html">Admin</a></li>' : ''}
         <li>
             <button onclick="logout()" class="btn btn-outline" style="padding:5px 15px;margin-left:10px;">Logout</button>
         </li>
     ` : `
-        <li>
-            <a href="login.html" class="btn btn-outline" style="padding:8px 16px;">Login</a>
-        </li>
+        <li><a href="login.html" class="btn btn-outline" style="padding:8px 16px;">Login</a></li>
     `;
 
     nav.innerHTML = `
@@ -34,12 +40,9 @@ async function updateNavbar() {
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="menu.html">Menu</a></li>
-            <li><a href="booking.html">Book Table</a></li>
-            <li>
-                <a href="cart.html" id="cart-link">
-                    Cart <span id="cart-count">(${count})</span>
-                </a>
-            </li>
+            <li><a href="cart.html" id="cart-link">
+                Cart <span id="cart-count">(${count})</span>
+            </a></li>
             <li><a href="index.html#footer">Contact</a></li>
             ${authLinks}
         </ul>
@@ -49,9 +52,8 @@ async function updateNavbar() {
 // ================= LOAD MENU IMAGES =================
 async function loadMenuImages() {
     try {
-        const response = await fetch(`${API_BASE_URL}/images`);
+        const response = await fetch(`${window.API_BASE_URL}/images`);
         const data = await response.json();
-
         if (data.success) {
             const images = data.images;
             const ids = {
@@ -61,7 +63,6 @@ async function loadMenuImages() {
                 "Cold Coffee": "coldCoffeeImg",
                 "Rasmalai": "rasmalaiImg"
             };
-
             for (const [name, id] of Object.entries(ids)) {
                 const el = document.getElementById(id);
                 if (el) el.src = images[name];
@@ -73,63 +74,39 @@ async function loadMenuImages() {
 }
 
 // ================= ADD TO CART =================
-function addToCart(itemId, name, price, image, quantity = 1) {
-    let finalQty = (typeof name === 'number') ? name : quantity;
-    if (typeof name === 'string' && arguments.length < 5) finalQty = 1;
-
+function addToCart(menu_item_id, quantity = 1) {
     const token = localStorage.getItem('token');
-    fetch(`${API_BASE_URL}/cart`, {
+    fetch(`${window.API_BASE_URL}/cart`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` })
+            "Authorization": token ? `Bearer ${token}` : ""
         },
-        body: JSON.stringify({ 
-            menu_item_id: itemId, 
-            quantity: finalQty 
-        })
+        body: JSON.stringify({ menu_item_id, quantity })
     })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert("Item added to cart!");
-            updateNavbar(); // update cart count
+            alert(data.message || "Item added to cart!");
+            updateNavbar();
         } else {
-            alert(data.message || "Failed to add item.");
+            alert(data.message || "Failed to add item to cart.");
         }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("Add to cart error:", err));
 }
 
-// Expose globally
 window.addToCart = addToCart;
 
 // ================= LOGOUT =================
 function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    alert("You have been logged out.");
-    window.location.href = "login.html";
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    updateNavbar();
+    window.location.href = "index.html";
 }
 
-// ================= ADMIN MODAL =================
-function openAdminModal() {
-    const modal = document.getElementById('adminModal');
-    if (modal) {
-        modal.style.display = 'block';
-        if (typeof loadAdminBookings === 'function') {
-            loadAdminBookings();
-        }
-    }
-}
-
-function closeAdminModal() {
-    const modal = document.getElementById('adminModal');
-    if (modal) modal.style.display = 'none';
-}
-
-window.openAdminModal = openAdminModal;
-window.closeAdminModal = closeAdminModal;
+window.logout = logout;
 
 // ================= PAGE LOAD =================
 document.addEventListener("DOMContentLoaded", () => {
