@@ -65,14 +65,15 @@ async function clearOrders() {
     if (!confirm("Are you absolutely sure you want to clear your entire order history? This action cannot be undone.")) return;
 
     try {
-        const data = await apiRequest('/orders/clear', { method: 'DELETE' });
+        const data = await apiRequest('/orders', { method: 'DELETE' });
         if (data.success) {
-            alert(data.message || "History cleared!");
+            alert(data.message || "Your history has been cleared.");
             loadOrders(); // Refresh UI
         }
     } catch (err) {
         console.error("Clear orders frontend error:", err);
-        alert(`Failed: ${err.message}`);
+        // User requested throw new Error(await res.text()) logic which is inside apiRequest now
+        alert(`Failed to clear orders: ${err.message}`);
     }
 }
 

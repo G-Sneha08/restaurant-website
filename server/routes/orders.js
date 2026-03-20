@@ -25,6 +25,25 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
+// @route DELETE /api/orders
+// @desc Clear all order history for logged in user
+router.delete('/', protect, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log(`[ORDERS] Request to clear all history for user ${userId}`);
+
+        const [result] = await pool.query(
+            'DELETE FROM orders WHERE user_id = ?',
+            [userId]
+        );
+
+        res.json({ success: true, message: `Culinary history cleared: Removed ${result.affectedRows} order(s).` });
+    } catch (err) {
+        console.error('Clear Orders API error:', err);
+        res.status(500).json({ success: false, message: 'Server error while clearing orders' });
+    }
+});
+
 // @route GET /api/orders/:id
 // @desc Get order details
 router.get('/:id', protect, async (req, res) => {
@@ -54,25 +73,6 @@ router.get('/:id', protect, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
-    }
-});
-
-// @route DELETE /api/orders/clear
-// @desc Clear all order history for logged in user
-router.delete('/clear', protect, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        console.log(`[ORDERS] Request to clear history for user ${userId}`);
-
-        const [result] = await pool.query(
-            'DELETE FROM orders WHERE user_id = ?',
-            [userId]
-        );
-
-        res.json({ success: true, message: `Successfully cleared ${result.affectedRows} order(s).` });
-    } catch (err) {
-        console.error('Clear Orders API error:', err);
-        res.status(500).json({ success: false, message: 'Server error while clearing orders' });
     }
 });
 
