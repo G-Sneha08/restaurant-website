@@ -69,6 +69,16 @@ router.post("/register", async (req, res) => {
 // ===============================
 // LOGIN ROUTE
 // ===============================
+
+// GET handler for testing and clarity
+router.get("/login", (req, res) => {
+    res.json({
+        message: "Login endpoint is operational. Please use a POST request with 'email' and 'password' to authenticate.",
+        method: "GET",
+        instructions: "To log in, send a POST request to this same URL."
+    });
+});
+
 router.post("/login", async (req, res) => {
 
     const { email, password } = req.body;

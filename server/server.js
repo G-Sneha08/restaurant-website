@@ -76,7 +76,11 @@ app.get('/api/images', (req, res) => {
 app.get('*', (req, res) => {
   // If request is for an API route that wasn't matched above, return 404 instead of index.html
   if (req.path.startsWith('/api')) {
-    return res.status(404).json({ message: 'API route not found' });
+    return res.status(404).json({ 
+        message: 'API route not found',
+        success: false,
+        path: req.originalUrl
+    });
   }
   const indexPath = path.join(clientPath, 'index.html');
   res.sendFile(indexPath);
