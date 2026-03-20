@@ -16,14 +16,12 @@ async function loadMenu() {
         const mainCourse = items.filter(item => item.category === 'Main Course');
         const beverages = items.filter(item => item.category === 'Beverages');
         const desserts = items.filter(item => item.category === 'Desserts');
-        const breads = items.filter(item => item.category === 'Breads');
 
         // Render categories
         renderCategory(starters, 'starters');
         renderCategory(mainCourse, 'main-course');
         renderCategory(beverages, 'beverages');
         renderCategory(desserts, 'desserts');
-        renderCategory(breads, 'breads');
 
     } catch (error) {
         console.error("Error loading menu:", error);
