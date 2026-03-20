@@ -223,4 +223,16 @@ router.delete('/reviews/:id', async (req, res) => {
     }
 });
 
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete a registered user and all their related data (cascade)
+router.delete('/users/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM users WHERE id = ?', [req.params.id]);
+        res.json({ success: true, message: 'User and all related records deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
 module.exports = router;

@@ -239,7 +239,7 @@
                     if(t==='orders') return `<tr><td>#${x.id}</td><td>${x.user_name||'Guest'}</td><td>₹${x.total_amount}</td><td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td><td><select onchange="upd(${x.id},'orders',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Delivered" ${x.status==='Delivered'?'selected':''}>Delivered</option></select></td></tr>`;
                     if(t==='bookings') return `<tr><td>#${x.id}</td><td>${x.customer_name}</td><td>${new Date(x.date).toLocaleDateString()}</td><td>${x.guests}</td><td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td><td><select onchange="upd(${x.id},'bookings',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Confirmed" ${x.status==='Confirmed'?'selected':''}>Confirmed</option></select></td></tr>`;
                     if(t==='menu') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.category}</td><td>₹${x.price}</td><td><button onclick="editM(${i})" class="btn-icon"><i class="fas fa-edit"></i></button><button onclick="delM(${x.id})" class="btn-icon" style="color:#ef4444;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`;
-                    if(t==='users') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.email}</td><td>${x.role}</td><td><button onclick="updRole(${x.id},'${x.role==='admin'?'user':'admin'}')" class="btn btn-outline btn-sm">Toggle Role</button></td></tr>`;
+                    if(t==='users') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.email}</td><td>${x.role}</td><td><button onclick="updRole(${x.id},'${x.role==='admin'?'user':'admin'}')" class="btn btn-outline btn-sm">Role</button><button onclick="delU(${x.id})" class="btn-icon" style="color:#ef4444;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`;
                     if(t==='reviews') return `<tr><td>#${x.id}</td><td>${x.user_name||'Anon'}</td><td>${x.rating}⭐</td><td>${x.review_text}</td><td><button onclick="delReview(${x.id})" style="color:#ef4444;"><i class="fas fa-trash"></i></button></td></tr>`;
                     return '';
                 }).join('');
@@ -284,6 +284,7 @@
         }
 
         async function delM(id) { if(confirm("Permanently delete this item?")) { try { await apiRequest(`/admin/menu/${id}`, {method:'DELETE'}); loadTable('menu'); } catch(e){console.error(e);} } }
+        async function delU(id) { if(confirm("Permanently delete this user and all their history (orders/bookings)?")) { try { await apiRequest(`/admin/users/${id}`, {method:'DELETE'}); loadTable('users'); } catch(e){console.error(e);} } }
         async function delReview(id) { if(confirm("Remove this feedback?")) { try { await apiRequest(`/admin/reviews/${id}`, {method:'DELETE'}); loadTable('reviews'); } catch(e){console.error(e);} } }
         
         document.addEventListener('DOMContentLoaded', () => { loadStats(); });
