@@ -3,7 +3,6 @@ const router = express.Router();
 const pool = require('../config/db');
 const { protect } = require('../middleware/authMiddleware');
 const jwt = require('jsonwebtoken');
-const { sendOrderEmail } = require('../utils/sendEmail');
 
 // Helper to get userId from token or return null
 const getUserId = (req) => {
@@ -189,17 +188,6 @@ router.post('/checkout', protect, async (req, res) => {
         await pool.query('DELETE FROM cart WHERE user_id = ?', [userId]);
 
         console.log(`[CHECKOUT] Success: Order ${orderId} placed for user ${userId}`);
-
-        // Send Order Email (Non-blocking)
-        try {
-            const [users] = await pool.query("SELECT name, email FROM users WHERE id = ?", [userId]);
-            if (users.length > 0) {
-                await sendOrderEmail(users[0].email, users[0].name, orderId, totalPrice);
-            }
-        } catch (mailErr) {
-            console.error("Order Email Failed:", mailErr.message);
-        }
-
         res.json({ success: true, message: 'Your exquisite order has been placed successfully!', orderId });
 
     } catch (err) {

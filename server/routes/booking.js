@@ -2,13 +2,12 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const { protect } = require("../middleware/authMiddleware");
-const { sendBookingEmail } = require("../utils/sendEmail");
 
 /* ==============================
    CREATE BOOKING
 ============================== */
 router.post("/", protect, async (req, res) => {
-    let { name, email, phone, date, time, guests } = req.body;
+    const { name, email, phone, date, time, guests } = req.body;
     const userId = req.user.id;
 
     if (!date || !time || !guests) {
@@ -16,28 +15,10 @@ router.post("/", protect, async (req, res) => {
     }
 
     try {
-        // If email/name not provided, fetch from user record
-        if (!email || !name) {
-            const [users] = await pool.query("SELECT name, email FROM users WHERE id = ?", [userId]);
-            if (users.length > 0) {
-                name = name || users[0].name;
-                email = email || users[0].email;
-            }
-        }
-
         const [result] = await pool.query(
             "INSERT INTO bookings (user_id, customer_name, customer_email, customer_phone, date, time, guests, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [userId, name || null, email || null, phone || null, date, time, guests, "Pending"]
         );
-
-        // Send Email (Non-blocking)
-        if (email) {
-            try {
-                await sendBookingEmail(email, name || 'Valued Guest', date, time, guests);
-            } catch (err) {
-                console.error("Booking Email Failed:", err.message);
-            }
-        }
 
         res.status(201).json({
             success: true,
