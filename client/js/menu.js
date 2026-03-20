@@ -7,17 +7,23 @@ async function loadMenu() {
         const response = await fetch(`${API_BASE_URL}/menu`);
         const menuItems = await response.json();
 
-        // Categorize items
-        const starters = menuItems.filter(item => item.category === 'Starters');
-        const mainCourse = menuItems.filter(item => item.category === 'Main Course');
-        const beverages = menuItems.filter(item => item.category === 'Beverages');
-        const desserts = menuItems.filter(item => item.category === 'Desserts');
+        // RESILIENCE: Ensure menuItems is an array
+        const items = Array.isArray(menuItems) ? menuItems : (menuItems.menu || []);
+        console.log("Menu items loaded:", items.length);
 
-        // This assumes the HTML has sections with specific IDs
+        // Categorize items
+        const starters = items.filter(item => item.category === 'Starters');
+        const mainCourse = items.filter(item => item.category === 'Main Course');
+        const beverages = items.filter(item => item.category === 'Beverages');
+        const desserts = items.filter(item => item.category === 'Desserts');
+        const breads = items.filter(item => item.category === 'Breads');
+
+        // Render categories
         renderCategory(starters, 'starters');
         renderCategory(mainCourse, 'main-course');
         renderCategory(beverages, 'beverages');
         renderCategory(desserts, 'desserts');
+        renderCategory(breads, 'breads');
 
     } catch (error) {
         console.error("Error loading menu:", error);
