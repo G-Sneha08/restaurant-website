@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumina Dine | Command Center</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -68,7 +68,7 @@
             <a href="#" onclick="switchSection('users')" id="nav-users"><i class="fas fa-users"></i> Users</a>
             <a href="#" onclick="switchSection('reviews')" id="nav-reviews"><i class="fas fa-comment-alt"></i> Feedback</a>
             <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #1e293b;">
-                <a href="index.html"><i class="fas fa-home"></i> Main Site</a>
+                <a href="/index.html"><i class="fas fa-home"></i> Main Site</a>
                 <a href="#" onclick="logout()" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </nav>
@@ -95,7 +95,7 @@
 
     <div id="menu-modal" class="modal"><div class="modal-content"><h2>Item Details</h2><form id="menu-form" onsubmit="handleMenuSubmit(event)"><input type="hidden" id="menu-id"><label>Name</label><input type="text" id="menu-name" class="form-control" required><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;"><div><label>Price</label><input type="number" id="menu-price" class="form-control" required></div><div><label>Cat</label><select id="menu-category" class="form-control"><option value="Starters">Starters</option><option value="Main Course">Main Course</option><option value="Breads">Breads</option><option value="Desserts">Desserts</option></select></div></div><label>Image URL</label><input type="text" id="menu-image" class="form-control"><label>Description</label><textarea id="menu-desc" class="form-control"></textarea><div style="display:flex;gap:10px;"><button type="submit" class="btn btn-primary" style="flex:2;">Save</button><button type="button" class="btn btn-outline" style="flex:1;" onclick="closeMenuModal()">Cancel</button></div></form></div></div>
 
-    <script src="js/config.js"></script>
+    <script src="/js/config.js"></script>
     <script>
         const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
         if (!token) window.location.href = "admin-login.html";

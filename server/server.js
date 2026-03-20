@@ -72,8 +72,12 @@ app.get('/api/images', (req, res) => {
   res.json({ success: true, images: imageMap });
 });
 
-// Root route - serve index.html
+// Root route - serve index.html (SPA Fallback)
 app.get('*', (req, res) => {
+  // If request is for an API route that wasn't matched above, return 404 instead of index.html
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
   const indexPath = path.join(clientPath, 'index.html');
   res.sendFile(indexPath);
 });
