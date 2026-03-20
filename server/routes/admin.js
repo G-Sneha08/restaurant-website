@@ -99,9 +99,9 @@ router.get('/bookings', async (req, res) => {
     }
 });
 
-// @route   PUT /api/bookings/:id/status
+// @route   PUT /api/admin/bookings/:id/status
 // @desc    Update booking status
-router.put('/:id/status', async (req, res) => {
+router.put('/bookings/:id/status', async (req, res) => {
     const { status } = req.body;
     try {
         await pool.query('UPDATE bookings SET status = ? WHERE id = ?', [status, req.params.id]);

@@ -42,8 +42,12 @@ router.post("/register", async (req, res) => {
             [name, email, hashedPassword]
         );
 
-        // FIX 2️⃣ send email BEFORE response
-        await sendWelcomeEmail(email, name);
+        // Attempt to send email but don't fail if it doesn't work (might not be configured)
+        try {
+            await sendWelcomeEmail(email, name);
+        } catch (emailError) {
+            console.error("Email Sending Failed:", emailError.message);
+        }
 
         res.status(201).json({
             message: "User registered successfully"
@@ -99,14 +103,20 @@ router.post("/login", async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id },
+            { id: user.id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
         res.json({
             message: "Login successful",
-            token
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (error) {

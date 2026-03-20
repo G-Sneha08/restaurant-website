@@ -26,12 +26,12 @@ async function seed() {
             ['Crispy Corn','Golden fried sweet corn tossed with spices.',180,'images/crispy-corn.jpg','Starters'],
 
             // Main Course
-            ['Paneer Butter Masala','Rich creamy tomato gravy with paneer cubes.',250,'images/panner-butter-masala.jpg','Main'],
-            ['Chicken Biryani','Flavorful basmati rice with spiced chicken.',229,'https://images.pexels.com/photos/4439740/pexels-photo-4439740.jpeg','Main'],
-            ['Veg Fried Rice','Stir fried rice with vegetables.',149,'https://images.pexels.com/photos/343871/pexels-photo-343871.jpeg','Main'],
-            ['Butter Naan','Soft Indian bread brushed with butter.',39,'https://images.pexels.com/photos/10337726/pexels-photo-10337726.jpeg','Main'],
-            ['Dal Tadka','Yellow lentils tempered with spices.',139,'https://images.pexels.com/photos/4595313/pexels-photo-4595313.jpeg','Main'],
-            ['Margherita Pizza','Classic Italian pizza with tomato and mozzarella.',149,'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg','Main'],
+            ['Paneer Butter Masala','Rich creamy tomato gravy with paneer cubes.',250,'images/panner-butter-masala.jpg','Main Course'],
+            ['Chicken Biryani','Flavorful basmati rice with spiced chicken.',229,'https://images.pexels.com/photos/4439740/pexels-photo-4439740.jpeg','Main Course'],
+            ['Veg Fried Rice','Stir fried rice with vegetables.',149,'https://images.pexels.com/photos/343871/pexels-photo-343871.jpeg','Main Course'],
+            ['Butter Naan','Soft Indian bread brushed with butter.',39,'https://images.pexels.com/photos/10337726/pexels-photo-10337726.jpeg','Main Course'],
+            ['Dal Tadka','Yellow lentils tempered with spices.',139,'https://images.pexels.com/photos/4595313/pexels-photo-4595313.jpeg','Main Course'],
+            ['Margherita Pizza','Classic Italian pizza with tomato and mozzarella.',149,'https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg','Main Course'],
 
             // Beverages
             ['Espresso','Strong black coffee.',59,'https://images.pexels.com/photos/131053/pexels-photo-131053.jpeg','Beverages'],

@@ -77,10 +77,12 @@ function addToCart(itemId, name, price, image, quantity = 1) {
     let finalQty = (typeof name === 'number') ? name : quantity;
     if (typeof name === 'string' && arguments.length < 5) finalQty = 1;
 
+    const token = localStorage.getItem('token');
     fetch(`${API_BASE_URL}/cart`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` })
         },
         body: JSON.stringify({ 
             menu_item_id: itemId, 

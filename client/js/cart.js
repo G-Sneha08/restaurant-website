@@ -10,7 +10,12 @@ async function loadCart() {
     const totalPriceEl = document.getElementById('total-price');
 
     try {
-        const res = await fetch(`${API_BASE_URL}/cart`);
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/cart`, {
+            headers: {
+                ...(token && { "Authorization": `Bearer ${token}` })
+            }
+        });
         const data = await res.json();
 
         if (!data.success || !data.cart || data.cart.length === 0) {
@@ -57,9 +62,13 @@ async function loadCart() {
 async function updateCartQuantity(cartId, quantity) {
     if (quantity < 1) return;
     try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            },
             body: JSON.stringify({ quantity })
         });
         const data = await res.json();
@@ -73,8 +82,12 @@ async function updateCartQuantity(cartId, quantity) {
 async function deleteCartItem(cartId) {
     if (!confirm("Remove item?")) return;
     try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE_URL}/cart/${cartId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
         });
         const data = await res.json();
         if (data.success) {
@@ -128,8 +141,12 @@ async function checkoutCart() {
 async function clearFullCart() {
     if (!confirm("Clear your cart?")) return;
     try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE_URL}/cart`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
         });
         const data = await res.json();
         if (data.success) {

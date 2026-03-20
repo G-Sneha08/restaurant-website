@@ -16,14 +16,17 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 
 // ===================== Middleware =====================
+const allowedOrigins = [
+  "https://restaurant-website-umber-three.vercel.app",
+  "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [
-        "https://restaurant-website-umber-three.vercel.app",
-        "https://restaurant-website-489aafoff-g-sneha08s-projects.vercel.app"
-      ]
-    : true, // true reflects the request origin, useful for local/codespaces
+    ? allowedOrigins
+    : true, 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
