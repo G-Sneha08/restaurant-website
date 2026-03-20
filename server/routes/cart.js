@@ -145,31 +145,58 @@ router.post('/checkout', protect, async (req, res) => {
     try {
         const userId = req.user.id;
         
-        // Claim guest items if any
+        console.log(`[CHECKOUT] Starting checkout for user ${userId}`);
+
+        // Claim any guest items associated with this user session (optional but helpful)
         await pool.query('UPDATE cart SET user_id = ? WHERE user_id IS NULL', [userId]);
 
+        // Get final cart items
         const [finalItems] = await pool.query('SELECT * FROM cart WHERE user_id = ?', [userId]);
-        if (finalItems.length === 0) return res.status(400).json({ success: false, message: 'Cart is empty' });
+        
+        if (finalItems.length === 0) {
+            console.log(`[CHECKOUT] Cart is empty for user ${userId}`);
+            return res.status(400).json({ success: false, message: 'Your cart is empty' });
+        }
 
-        const totalPrice = finalItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+        const totalPrice = finalItems.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.quantity), 0);
         const itemNames = finalItems.map(i => i.item_name).join(', ');
 
-        const [orderResult] = await pool.query('INSERT INTO orders (user_id, total_amount, item_name) VALUES (?, ?, ?)', [
-            userId,
-            totalPrice,
-            itemNames
-        ]);
+        // Create main order record
+        const [orderResult] = await pool.query(
+            'INSERT INTO orders (user_id, total_amount, item_name, status) VALUES (?, ?, ?, ?)', 
+            [userId, totalPrice, itemNames, 'Pending']
+        );
         const orderId = orderResult.insertId;
 
-        const orderValues = finalItems.map(item => [orderId, item.menu_item_id, item.item_name, item.quantity, item.price]);
-        await pool.query('INSERT INTO order_items (order_id, menu_id, item_name, quantity, price) VALUES ?', [orderValues]);
+        // Create specific order items
+        // NOTE: Column names must match 'order_items' table schema (menu_item_id, item_name, quantity, price)
+        const orderValues = finalItems.map(item => [
+            orderId, 
+            item.menu_item_id, 
+            item.item_name, 
+            item.quantity, 
+            item.price
+        ]);
 
+        // Batch insert for performance
+        await pool.query(
+            'INSERT INTO order_items (order_id, menu_item_id, item_name, quantity, price) VALUES ?', 
+            [orderValues]
+        );
+
+        // Clear the cart
         await pool.query('DELETE FROM cart WHERE user_id = ?', [userId]);
 
-        res.json({ success: true, message: 'Order placed successfully', orderId });
+        console.log(`[CHECKOUT] Success: Order ${orderId} placed for user ${userId}`);
+        res.json({ success: true, message: 'Your exquisite order has been placed successfully!', orderId });
+
     } catch (err) {
-        console.error('Checkout error:', err);
-        res.status(500).json({ success: false, message: 'Server error during checkout' });
+        console.error('CRITICAL CHECKOUT ERROR:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error during checkout',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+        });
     }
 });
 
