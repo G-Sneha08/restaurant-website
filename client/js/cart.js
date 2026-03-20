@@ -66,23 +66,35 @@ async function loadCart() {
     let total = 0;
 
     data.cart.forEach(item => {
-      const price = item.price || 0;
+      const price = parseFloat(item.price) || 0;
       const subtotal = price * item.quantity;
       total += subtotal;
 
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${item.item_name || "Item"}</td>
-        <td>₹${price}</td>
-        <td>
-          <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
-          <span style="margin:0 10px;">${item.quantity}</span>
-          <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+        <td data-label="ItemSelection">
+          <div style="display:flex; align-items:center; gap:15px;">
+            <div style="font-weight:600; font-size:1.1rem;">${item.item_name || "Exquisite Dish"}</div>
+          </div>
         </td>
-        <td>₹${subtotal.toFixed(2)}</td>
-        <td>
-          <button onclick="removeItem(${item.id})" class="btn-remove">🗑</button>
+        <td data-label="Price" class="cart-price">₹${price.toLocaleString('en-IN')}</td>
+        <td data-label="Quantity">
+          <div class="qty-box">
+            <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">
+              <i class="fas fa-minus" style="font-size:0.7rem;"></i>
+            </button>
+            <span style="font-weight:700; min-width:20px;">${item.quantity}</span>
+            <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">
+              <i class="fas fa-plus" style="font-size:0.7rem;"></i>
+            </button>
+          </div>
+        </td>
+        <td data-label="Subtotal" class="subtotal">₹${subtotal.toLocaleString('en-IN')}</td>
+        <td data-label="Remove">
+          <button onclick="removeItem(${item.id})" class="btn-remove">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </td>
       `;
 
@@ -90,7 +102,7 @@ async function loadCart() {
     });
 
     if (totalPriceEl) {
-      totalPriceEl.innerText = `₹${total.toFixed(2)}`;
+      totalPriceEl.innerText = `₹${total.toLocaleString('en-IN')}`;
     }
 
   } catch (err) {
