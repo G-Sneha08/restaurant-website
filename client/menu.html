@@ -388,73 +388,8 @@
 </footer>
 <!-- Footer End -->
  <script src="./js/config.js"></script>
-  <script src="./js/cart.js"></script>
-    <!-- Add this near the end of <body> before </body> -->
-<script>
-//const API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
-//const USER_ID = 1; // Replace with dynamic logged-in user ID
-async function addToCart(id, name, price) {
-
-  try {
-
-    const res = await fetch(`${window.API_BASE_URL}/cart`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        user_id: window.USER_ID,
-        menu_item_id: id,
-        quantity: 1,
-        price: price,
-        item_name: name
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      console.error("Cart error:", data.message);
-      alert(data.message);
-      return;
-    }
-
-    alert("Item added to cart!");
-
-    updateNavbar();
-
-  } catch (err) {
-    console.error("Add to cart failed:", err);
-  }
-
-}
-async function updateNavbar() {
-
-  try {
-
-    const res = await fetch(`${window.API_BASE_URL}/cart/${window.USER_ID}`);
-
-    const data = await res.json();
-
-    if (data.success) {
-
-      const count = data.cart.reduce(
-        (sum,item) => sum + item.quantity,
-        0
-      );
-
-      document.getElementById("cart-count").innerText = count;
-
-    }
-
-  } catch (err) {
-
-    console.error("Navbar cart error:", err);
-
-  }
-
-}
-</script>
+ <script src="./js/main.js"></script>
+ <script src="./js/cart.js"></script>
 
 <style>
 /* Add to Cart Button Red Styling */

@@ -49,6 +49,16 @@ async function updateNavbar() {
     `;
 }
 
+// ================= ADD TO CART LISTENER =================
+document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList.contains('add-to-cart')) {
+        const id = e.target.getAttribute('data-id');
+        if (id) {
+            addToCart(id);
+        }
+    }
+});
+
 // ================= LOAD MENU IMAGES =================
 async function loadMenuImages() {
     try {

@@ -16,6 +16,8 @@ if (window.location.hostname.endsWith('.github.dev')) {
     API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 }
 
+window.API_BASE_URL = API_BASE_URL;
+
 console.log(`[CONFIG] Environment: ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'}`);
 console.log(`[CONFIG] Source: ${window.location.hostname}`);
 console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
