@@ -97,8 +97,12 @@
 
     <script src="/js/config.js"></script>
     <script>
+        const user = JSON.parse(localStorage.getItem("user") || "null");
         const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-        if (!token) window.location.href = "admin-login.html";
+        
+        if (!token || !user || user.role !== "admin") {
+            window.location.href = "login.html";
+        }
 
         async function switchSection(s) {
             ['dashboard', 'orders', 'bookings', 'menu', 'users', 'reviews'].forEach(x => {
