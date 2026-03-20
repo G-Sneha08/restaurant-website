@@ -3,19 +3,33 @@ const router = express.Router();
 const pool = require('../config/db');
 const { protect, admin } = require('../middleware/authMiddleware');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // @route   POST /api/admin/login
 // @desc    Admin login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // Example admin credentials (temporary)
-    if (email === 'admin@restaurant.com' && password === 'password123') {
-        const token = jwt.sign({ id: 'admin', role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-        return res.json({ success: true, token, message: 'Login successful' });
+    try {
+        const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (rows.length > 0) {
+            const user = rows[0];
+            const isMatch = await bcrypt.compare(password, user.password);
+            
+            if (isMatch && user.role === 'admin') {
+                const token = jwt.sign(
+                    { id: user.id, role: user.role }, 
+                    process.env.JWT_SECRET || 'secret', 
+                    { expiresIn: '1d' }
+                );
+                return res.json({ success: true, token, user: { id: user.id, name: user.name, role: user.role }, message: 'Login successful' });
+            }
+        }
+        res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
-    
-    res.status(401).json({ success: false, message: 'Invalid admin credentials' });
 });
 
 // All subsequent routes here should be protected and admin-only
