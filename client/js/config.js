@@ -37,9 +37,16 @@ window.apiRequest = async function(endpoint, options = {}) {
         headers
     });
 
-    const data = await response.json();
+    let data = {};
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        const text = await response.text();
+        data = { message: text || `Error ${response.status}` };
+    }
+
     if (!response.ok) {
-        // Carry the status code in the error for easier debugging
         const err = new Error(data.message || `API error ${response.status}`);
         err.status = response.status;
         throw err;
