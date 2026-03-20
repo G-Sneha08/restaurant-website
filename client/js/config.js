@@ -18,11 +18,11 @@ if (window.location.hostname.endsWith('.github.dev')) {
 
 window.API_BASE_URL = API_BASE_URL;
 
-console.log(`[CONFIG] Environment: ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'}`);
-console.log(`[CONFIG] Source: ${window.location.hostname}`);
-console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
-
-window.API_BASE_URL = API_BASE_URL;
+if (isLocal) {
+    console.log(`[CONFIG] Environment: ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'}`);
+    console.log(`[CONFIG] Source: ${window.location.hostname}`);
+    console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
+}
 
 window.apiRequest = async function(endpoint, options = {}) {
     const token = localStorage.getItem("token");
