@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
             if (isMatch && user.role === 'admin') {
                 const token = jwt.sign(
                     { id: user.id, role: user.role }, 
-                    process.env.JWT_SECRET || 'secret', 
+                    process.env.JWT_SECRET || 'your_super_secret_jwt_key', 
                     { expiresIn: '1d' }
                 );
                 return res.json({ success: true, token, user: { id: user.id, name: user.name, role: user.role }, message: 'Login successful' });

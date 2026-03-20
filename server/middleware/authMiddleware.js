@@ -18,7 +18,7 @@ const protect = (req, res, next) => {
                 return res.status(401).json({ message: 'Not authorized, invalid token format' });
             }
 
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_if_missing');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key');
             req.user = decoded;
             return next();
         } catch (error) {
