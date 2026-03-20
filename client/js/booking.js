@@ -62,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(data.message || "Table reserved successfully!");
                 form.reset();
                 loadBookings();
-
             } else {
 
                 alert(data.message || "Booking failed. Please try again.");
@@ -102,41 +101,42 @@ async function loadBookings() {
     }
 
     try {
-
+        console.log("📥 [SYNC] Refreshing user reservations...");
         const response = await fetch(`${window.API_BASE_URL}/bookings`, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
         const data = await response.json();
         const bookings = data.bookings || [];
 
         if (!data.success || bookings.length === 0) {
-            list.innerHTML = "<p class='text-center'>No reservations found.</p>";
+            list.innerHTML = `<div class="card text-center" style="padding:20px; color:#aaa;">No active reservations found. Your seat is waiting!</div>`;
             return;
         }
 
-        list.innerHTML = bookings.map(b => `
-            <div class="card" style="margin-bottom: 15px; padding: 15px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <p style="font-weight:600; margin-bottom:5px;">
-                            ${new Date(b.date).toLocaleDateString('en-GB')} at ${b.time}
-                        </p>
-                        <p style="font-size:0.85rem; color:var(--text-light);">
-                            ${b.guests} Guests | Status: <span style="color:${getStatusColor(b.status)}">${b.status}</span>
-                        </p>
+        list.innerHTML = bookings.map(b => {
+            const dateStr = new Date(b.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = b.time.substring(0, 5); // Display HH:MM
+            return `
+                <div class="card reveal active" style="margin-bottom: 20px; padding: 20px; border-left: 4px solid ${getStatusColor(b.status)};">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-weight:700; font-size:1.1rem; margin-bottom:8px; color:white;">
+                                ${dateStr} at ${timeStr}
+                            </p>
+                            <p style="font-size:0.9rem; color:var(--text-light); margin-bottom:0;">
+                                <i class="fas fa-users" style="margin-right:5px;"></i> ${b.guests} Guests | Status: 
+                                <span class="badge" style="background:${getStatusColor(b.status)}; color:white; padding:2px 8px; border-radius:4px; font-size:0.75rem;">${b.status}</span>
+                            </p>
+                        </div>
+                        ${b.status === 'Pending' ? `
+                        <button onclick="cancelBooking(${b.id})" class="btn-icon" style="color:#ef4444; font-size:1.2rem;" title="Cancel Reservation">
+                            <i class="fas fa-times-circle"></i>
+                        </button>` : ''}
                     </div>
-                    ${b.status === 'Pending' ? `
-                    <button 
-                        onclick="cancelBooking(${b.id})"
-                        style="background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">
-                        Cancel
-                    </button>` : ''}
                 </div>
-            </div>
-        `).join("");
+            `;
+        }).join("");
 
     } catch (error) {
 
