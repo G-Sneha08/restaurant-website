@@ -649,8 +649,8 @@ footer {
 
 .empty-icon {
     width: 75px;
-    opacity: 0.6;
-    margin-bottom: 8px;
+    opacity: 0.65;
+    margin-bottom: 10px;
 }
 
 .empty-orders p {
