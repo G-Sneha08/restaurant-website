@@ -648,9 +648,9 @@ footer {
 }
 
 .empty-icon {
-    width: 90px;
+    width: 75px;
     opacity: 0.6;
-    filter: grayscale(20%);
+    margin-bottom: 8px;
 }
 
 .empty-orders p {
