@@ -88,8 +88,12 @@ app.get('*', (req, res) => {
 
 // ===================== Error handling middleware =====================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error("🌋 [CRITICAL_SERVER_CRASH]:", err.stack);
+  res.status(500).json({ 
+      success: false, 
+      message: 'Critical system error: Our culinary engine encountered an unexpected hurdle. We have logged this and are on it.',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 // ===================== Start server =====================
