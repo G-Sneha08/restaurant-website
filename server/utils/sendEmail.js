@@ -6,8 +6,11 @@ const nodemailer = require("nodemailer");
 const EMAIL_USER = (process.env.EMAIL_USER || "").trim();
 const EMAIL_PASS = (process.env.EMAIL_PASS || "").trim();
 
+// Using explicit host/port for Gmail as it's often more reliable than 'service: gmail'
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // Use SSL
     auth: {
         user: EMAIL_USER,
         pass: EMAIL_PASS
@@ -21,7 +24,9 @@ const transporter = nodemailer.createTransport({
 transporter.verify((error, success) => {
     if (error) {
         console.error("❌ [MAIL_SYSTEM] SMTP Configuration failure:", error.message);
-        console.warn("   [MAIL_SYSTEM] Hint: Ensure EMAIL_USER/EMAIL_PASS are correct and App Passwords are used for Gmail.");
+        if (EMAIL_USER.includes("example") || EMAIL_USER.includes("yourgmail")) {
+            console.error("⚠️ [MAIL_SYSTEM] ALERT: EMAIL_USER looks like a placeholder. Please update it in .env.");
+        }
     } else {
         console.log("📧 [MAIL_SYSTEM] SMTP Ready - Connection Verified");
     }
@@ -33,17 +38,21 @@ transporter.verify((error, success) => {
  */
 const sendMailHelper = async (options) => {
     try {
-        console.log(`📧 [MAIL_QUEUE] Sending ${options.subject} to: ${options.to}`);
+        console.log(`📧 [MAIL_QUEUE] Preparing to send: ${options.subject} to: ${options.to}`);
+        
+        if (!EMAIL_USER || !EMAIL_PASS) {
+            console.error("❌ [MAIL_FAILURE] Missing email credentials in environment variables.");
+            return null;
+        }
+
         const info = await transporter.sendMail({
             from: `"Lumina Dine" <${EMAIL_USER}>`,
             ...options
         });
-        console.log(`✅ [MAIL_SUCCESS] Sent: ${info.messageId}`);
+        console.log(`✅ [MAIL_SUCCESS] Sent! MessageID: ${info.messageId}`);
         return info;
     } catch (err) {
-        console.error(`❌ [MAIL_FAILURE] To: ${options.to} | Error: ${err.message}`);
-        // We do not throw here to avoid crashing the caller (e.g. registration flow),
-        // but we log it heavily.
+        console.error(`❌ [MAIL_FAILURE] Distribution to ${options.to} aborted. Error: ${err.message}`);
         return null;
     }
 };
@@ -58,17 +67,25 @@ const sendWelcomeEmail = async (email, name) => {
         to: email,
         subject: "Welcome to Lumina Dine 🍽️",
         html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
-            <h2 style="color: #d4af37;">Hello ${name}!</h2>
-            <p>Your journey with the finest dining experience has successfully begun.</p>
-            <p>With your new account, you can now:</p>
-            <ul style="line-height: 1.6;">
-                <li><b>Exquisite Bookings:</b> Reserve your preferred table in seconds.</li>
-                <li><b>Gourmet Orders:</b> Enjoy our chef's specials from the comfort of your home.</li>
-            </ul>
-            <p>We are delighted to have you with us!</p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 0.8rem; color: #888;">Lumina Dine | Experience the Taste of Excellence</p>
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #333; max-width: 600px; margin: auto;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                 <h1 style="color: #d4af37; margin-bottom: 5px;">LUMINA DINE</h1>
+                 <p style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; color: #888;">Experience the Taste of Excellence</p>
+            </div>
+            <h2 style="color: #333;">Welcome, ${name}!</h2>
+            <p>Your journey with the finest dining experience has officially begun. We are thrilled to have you as part of our culinary family.</p>
+            <p>You can now indulge in:</p>
+            <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 10px;">✨ <b>Signature Tables:</b> Reserve your spot in seconds.</li>
+                    <li style="margin-bottom: 10px;">✨ <b>Gourmet Delivery:</b> Order chef-crafted meals to your door.</li>
+                    <li>✨ <b>Exclusive Previews:</b> Be the first to know about our seasonal menus.</li>
+                </ul>
+            </div>
+            <p>We look forward to serving you soon!</p>
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; color: #888; font-size: 0.8rem;">
+                <p>&copy; 2026 Lumina Dine. All rights reserved.</p>
+            </div>
         </div>
         `
     });
@@ -82,21 +99,26 @@ const sendBookingEmail = async (email, name, date, time, guests) => {
 
     return await sendMailHelper({
         to: email,
-        subject: "Reservation Confirmed: Table for ${guests} 🍽️",
+        subject: `Your Reservation is Confirmed - ${date} 🍽️`,
         html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
-            <h2 style="color: #2ecc71;">Reservation Confirmed</h2>
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #333; max-width: 600px; margin: auto;">
+             <div style="text-align: center; margin-bottom: 20px;">
+                 <h1 style="color: #d4af37; margin-bottom: 5px;">LUMINA DINE</h1>
+            </div>
+            <h2 style="color: #2ecc71; text-align: center;">Reservation Confirmed</h2>
             <p>Greetings ${name || 'Valued Guest'},</p>
-            <p>Your table booking has been successfully secured for an exquisite dining experience.</p>
+            <p>We are delighted to confirm your upcoming visit to Lumina Dine.</p>
             
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h4 style="margin-top: 0; color: #333;">Booking Summary</h4>
-                <p style="margin: 5px 0;">📅 <b>Date:</b> ${date}</p>
-                <p style="margin: 5px 0;">⏰ <b>Time:</b> ${time}</p>
-                <p style="margin: 5px 0;">👥 <b>Guests:</b> ${guests}</p>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f1f1f1;">
+                <h4 style="margin-top: 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px;">Booking Details</h4>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 5px 0; color: #666;">Date</td><td style="padding: 5px 0; font-weight: bold; text-align: right;">${date}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #666;">Time</td><td style="padding: 5px 0; font-weight: bold; text-align: right;">${time}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #666;">Guests</td><td style="padding: 5px 0; font-weight: bold; text-align: right;">${guests} Person(s)</td></tr>
+                </table>
             </div>
 
-            <p>We look forward to serving you with our finest delicacies.</p>
+            <p style="text-align: center; font-style: italic;">We look forward to serving you with clinical precision and gastronomic excellence.</p>
         </div>
         `
     });
@@ -110,21 +132,26 @@ const sendOrderEmail = async (email, name, orderId, totalPrice) => {
 
     return await sendMailHelper({
         to: email,
-        subject: "Order Placed Successfully: #${orderId} 🍔",
+        subject: `Indulgence Received: Order #${orderId} 🍔`,
         html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
-            <h2 style="color: #3498db;">Indulgence Confirmed</h2>
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px; background-color: #ffffff; color: #333; max-width: 600px; margin: auto;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                 <h1 style="color: #d4af37; margin-bottom: 5px;">LUMINA DINE</h1>
+            </div>
+            <h2 style="color: #3498db; text-align: center;">Order Placed Successfully</h2>
             <p>Hello ${name},</p>
-            <p>Your exquisite selection is being prepared with perfection.</p>
+            <p>Your selection of exquisite flavors is now being prepared for you.</p>
 
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h4 style="margin-top: 0; color: #333;">Order Details</h4>
-                <p style="margin: 5px 0;">📦 <b>Order ID:</b> #${orderId}</p>
-                <p style="margin: 5px 0;">💰 <b>Total Amount:</b> ₹${totalPrice}</p>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #f1f1f1;">
+                <h4 style="margin-top: 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px;">Order Summary</h4>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 5px 0; color: #666;">Order ID</td><td style="padding: 5px 0; font-weight: bold; text-align: right;">#${orderId}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #666;">Total Amount</td><td style="padding: 5px 0; font-weight: bold; text-align: right; color: #2ecc71;">₹${totalPrice}</td></tr>
+                </table>
             </div>
 
-            <p>Your culinary journey will reach you shortly.</p>
-            <p>Thank you for choosing Lumina Dine!</p>
+            <p style="text-align: center;">Your culinary journey will reach your doorstep very soon.</p>
+            <p style="text-align: center; font-weight: bold;">Thank you for trusting Lumina Dine.</p>
         </div>
         `
     });
@@ -134,4 +161,4 @@ module.exports = {
     sendWelcomeEmail,
     sendBookingEmail,
     sendOrderEmail
-};
+};
