@@ -49,7 +49,7 @@ router.get('/', async (req, res) => {
 // ================= ADD TO CART =================
 router.post('/', async (req, res) => {
     const { menu_item_id, quantity } = req.body;
-    const qty = quantity || 1;
+    const qty = parseInt(quantity) || 1;
 
     if (!menu_item_id) {
         return res.status(400).json({ success: false, message: 'A valid menu_item_id is required to add items to the cart.' });
@@ -95,12 +95,13 @@ router.post('/', async (req, res) => {
 // ================= UPDATE QUANTITY =================
 router.put('/:id', async (req, res) => {
     const { quantity } = req.body;
-    if (!quantity || quantity < 1) return res.status(400).json({ success: false, message: 'Quantity must be at least 1' });
+    const qty = parseInt(quantity);
+    if (isNaN(qty) || qty < 1) return res.status(400).json({ success: false, message: 'Quantity must be a positive integer.' });
 
     try {
         const [result] = await pool.query(
             'UPDATE cart SET quantity = ? WHERE id = ?',
-            [quantity, req.params.id]
+            [qty, req.params.id]
         );
 
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });

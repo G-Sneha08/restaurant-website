@@ -42,8 +42,8 @@ router.get('/users', async (req, res) => {
         const [rows] = await pool.query('SELECT id, name, email, role, created_at FROM users');
         res.json(rows);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("❌ [ADMIN_GET_USERS_ERROR]:", err.message);
+        res.status(500).json({ message: 'Server error retrieving user base' });
     }
 });
 
@@ -56,13 +56,16 @@ router.get('/stats', async (req, res) => {
         const [users] = await pool.query('SELECT COUNT(*) as totalUsers FROM users');
         const [pendingOrders] = await pool.query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'");
 
+        const [todayOrders] = await pool.query("SELECT COUNT(*) as count FROM orders WHERE DATE(created_at) = CURDATE()");
+
         res.json({
             success: true,
             totalOrders: orders[0].totalOrders || 0,
             totalBookings: bookings[0].totalBookings || 0,
             totalRevenue: orders[0].totalRevenue || 0,
             totalUsers: users[0].totalUsers || 0,
-            pendingOrders: pendingOrders[0].count || 0
+            pendingOrders: pendingOrders[0].count || 0,
+            todayOrders: todayOrders[0].count || 0
         });
     } catch (err) {
         console.error(err);
@@ -202,7 +205,7 @@ router.put('/users/:id/role', async (req, res) => {
 router.get('/reviews', async (req, res) => {
     try {
         const [rows] = await pool.query(
-            'SELECT feedback.*, users.name as user_name FROM feedback JOIN users ON feedback.user_id = users.id ORDER BY created_at DESC'
+            'SELECT feedback.id, feedback.user_id, feedback.message as review_text, feedback.rating, feedback.created_at, users.name as user_name FROM feedback JOIN users ON feedback.user_id = users.id ORDER BY created_at DESC'
         );
         res.json({ success: true, reviews: rows });
     } catch (err) {

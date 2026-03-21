@@ -7,10 +7,10 @@ const pool = require('../config/db');
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT * FROM menu WHERE available = TRUE');
-        res.json(rows);
+        res.json({ success: true, menu: rows });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("❌ [GET_MENU_ERROR]:", err.message);
+        res.status(500).json({ success: false, message: 'Server error: Unable to load menu items.' });
     }
 });
 

@@ -35,7 +35,7 @@ router.post("/", protect, async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Booking error:", err.message);
+        console.error("❌ [CREATE_BOOKING_ERROR]:", err.message);
         res.status(500).json({ 
             success: false, 
             message: "Table reservation failed due to a server error. Please try again later.",
@@ -61,8 +61,8 @@ router.get("/", protect, async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Get bookings error:", err);
-        res.status(500).json({ success: false, message: "Server error" });
+        console.error("❌ [GET_BOOKINGS_ERROR]:", err.message);
+        res.status(500).json({ success: false, message: "Could not retrieve your reservations at this time." });
     }
 });
 
@@ -102,7 +102,7 @@ router.delete("/:id", protect, async (req, res) => {
         res.json({ success: true, message: "Booking cancelled" });
 
     } catch (err) {
-        console.error("Cancel booking error:", err.message);
+        console.error("❌ [CANCEL_BOOKING_ERROR]:", err.message);
         res.status(500).json({ 
             success: false, 
             message: "Unable to cancel booking at this time.",

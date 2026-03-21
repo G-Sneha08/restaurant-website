@@ -12,10 +12,10 @@ router.post('/', protect, async (req, res) => {
             'INSERT INTO feedback (user_id, message, rating) VALUES (?, ?, ?)',
             [req.user.id, message, rating]
         );
-        res.status(201).json({ message: 'Feedback submitted' });
+        res.status(201).json({ success: true, message: 'Feedback submitted' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("❌ [SUBMIT_FEEDBACK_ERROR]:", err.message);
+        res.status(500).json({ success: false, message: 'Server error: Unable to submit feedback.' });
     }
 });
 

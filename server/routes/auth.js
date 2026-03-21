@@ -47,7 +47,7 @@ router.post("/register", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("❌ [REGISTRATION_CRITICAL_ERROR]:", error);
+        console.error("❌ [REGISTRATION_ERROR]:", error.message);
         
         // Handle race conditions (unique constraint hit at DB level)
         if (error.code === 'ER_DUP_ENTRY') {
@@ -59,7 +59,7 @@ router.post("/register", async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Registration failed due to a server-side error. Please verify your connection or try again later.",
+            message: "Registration failed due to a server-side error. Please verify your connection.",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
@@ -136,7 +136,7 @@ router.post("/login", async (req, res) => {
 
     } catch (error) {
 
-        console.error("Login Error:", error);
+        console.error("❌ [LOGIN_ERROR]:", error.message);
 
         res.status(500).json({
             success: false,
