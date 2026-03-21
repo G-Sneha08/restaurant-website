@@ -2,46 +2,41 @@ const nodemailer = require("nodemailer");
 
 /**
  * =============================================================================
- * EMAIL SYSTEM - PRODUCTION INFRASTRUCTURE UPDATE
+ * GMAIL SMTP INFRASTRUCTURE - ADVANCED PRODUCTION SETUP
  * =============================================================================
  */
 const EMAIL_USER = (process.env.EMAIL_USER || "sneha901932@gmail.com").trim();
-const EMAIL_PASS = (process.env.EMAIL_PASS || "harzjwlgjsbazgrh").trim();
+const EMAIL_PASS = (process.env.EMAIL_PASS || "lqfmxrkvrcakdprs").trim();
 
-/**
- * 🛰️ NETWORK COMPATIBILITY NOTE:
- * Render Free tier is known to block outbound SMTP (465/587).
- * If this fails, consider upgrading Render or using an API-based provider 
- * like SendGrid, Brevo, or Mailgun (which work via HTTP Port 443).
- */
-const transportConfig = {
-    service: "gmail",
+// Configuration using Pool for better persistence in cloud environments
+const transportOptions = {
+    service: "gmail", // Handles port negotiation internally (465/587)
+    pool: true,      // Keeps the connection open to avoid repeated handshake timeouts
+    maxConnections: 5,
+    maxMessages: 100,
     auth: {
         user: EMAIL_USER,
         pass: EMAIL_PASS
     },
-    // Adding keep-alive and timeouts for cloud environments
-    connectionTimeout: 10000, 
-    greetingTimeout: 5000,
-    socketTimeout: 15000,
-    debug: true, // Output SMTP traffic to console logs for Render debugging
-    logger: true,
     tls: {
-       rejectUnauthorized: false
-    }
+       rejectUnauthorized: false // Prevents SSL verification errors common on Vercel/Render
+    },
+    connectionTimeout: 20000, // Aggregate timeout (20s)
+    greetingTimeout: 10000,
+    socketTimeout: 30000,
+    debug: true,
+    logger: true // Force detailed traffic logs to Render console
 };
 
-const transporter = nodemailer.createTransport(transportConfig);
+const transporter = nodemailer.createTransport(transportOptions);
 
-// Critical Verification with Diagnostic Logs
+// Verification Diagnostic Output
 transporter.verify((error, success) => {
     if (error) {
-        console.error("❌ [SMTP_CRITICAL] Authentication/Network failure for: " + EMAIL_USER);
-        console.error("❌ [SMTP_DETAIL] Error: " + error.message);
-        console.log("   [SMTP_TROUBLESHOOT] 1. Check if Render Free blocks outbound SMTP ports.");
-        console.log("   [SMTP_TROUBLESHOOT] 2. Set EMAIL_USER/PASS in Render 'Environment' tab.");
+        console.error("❌ [SMTP_CRITICAL] Authentication/Network Timeout for: " + EMAIL_USER);
+        console.error("❌ [SMTP_DETAIL] Render Free Tier identifies as blocked. Error: " + error.message);
     } else {
-        console.log("✅ [SMTP_READY] Status: CONNECTED. Credentials verified for: " + EMAIL_USER);
+        console.log("✅ [SMTP_READY] Gmail Connection Secured (Pooleed Mode): " + EMAIL_USER);
     }
 });
 
@@ -51,15 +46,15 @@ transporter.verify((error, success) => {
 const sendMailHelper = async (options) => {
     try {
         if (!EMAIL_USER || !EMAIL_PASS) {
-            console.error("❌ [MAIL_FAILURE] Distribution aborted: Credentials missing in Environment.");
+            console.error("❌ [MAIL_FAILURE] Missing Credentials.");
             return null;
         }
 
-        console.log(`📡 [MAIL_QUEUE] Attempting delivery: "${options.subject}" to: ${options.to}`);
+        console.log(`📡 [MAIL_QUEUE] Attempting delivery to: ${options.to}`);
         
         const mailOptions = {
             from: `"Lumina Dine" <${EMAIL_USER}>`,
-            bcc: EMAIL_USER, // Copy admin automatically
+            bcc: EMAIL_USER, // Copy admin for confirmation
             ...options
         };
 
@@ -67,7 +62,7 @@ const sendMailHelper = async (options) => {
         console.log(`✅ [MAIL_SUCCESS] Delivered! ID: ${info.messageId}`);
         return info;
     } catch (err) {
-        console.error(`❌ [MAIL_FAILURE] Connection error to ${options.to}: ${err.message}`);
+        console.error(`❌ [MAIL_FAILURE] Transmission error: ${err.message}`);
         return null;
     }
 };
@@ -80,11 +75,7 @@ const sendWelcomeEmail = async (email, name) => {
     return await sendMailHelper({
         to: email,
         subject: "Welcome to Lumina Dine 🍽️",
-        html: `<div style="padding:20px;border:1px solid #ddd;border-radius:10px;font-family:sans-serif;">
-                <h2 style="color:#d4af37;">Hello ${name}!</h2>
-                <p>Welcome to our culinary family. Your account has been registered successfully.</p>
-                <p>Enjoy our menu and secure your table whenever you wish.</p>
-               </div>`
+        html: `<h2>Hello ${name}!</h2><p>Your exquisite journey with us has begun.</p>`
     });
 };
 
@@ -92,12 +83,8 @@ const sendBookingEmail = async (email, name, date, time, guests) => {
     if (!email) return;
     return await sendMailHelper({
         to: email,
-        subject: "Reservation Confirmed: Your Table at Lumina 📅",
-        html: `<div style="padding:20px;border:1px solid #ddd;border-radius:10px;font-family:sans-serif;">
-                <h2 style="color:#2ecc71;">Reservation Secured</h2>
-                <p>Greetings ${name || 'Valued Guest'},</p>
-                <p>Your table is confirmed for ${date} at ${time} for ${guests} guests.</p>
-               </div>`
+        subject: "Reservation Confirmed 📅",
+        html: `<h2>Table Confirmed</h2><p>${date} at ${time} for ${guests} guests.</p>`
     });
 };
 
@@ -105,11 +92,8 @@ const sendOrderEmail = async (email, name, orderId, totalPrice) => {
     if (!email) return;
     return await sendMailHelper({
         to: email,
-        subject: "Order Received: Flavor #${orderId} 🍔",
-        html: `<div style="padding:20px;border:1px solid #ddd;border-radius:10px;font-family:sans-serif;">
-                <h2 style="color:#3498db;">Indulgence Confirmed</h2>
-                <p>Hello ${name}, your order #${orderId} totalling ₹${totalPrice} is being prepared.</p>
-               </div>`
+        subject: "Order Received: #${orderId} 🍔",
+        html: `<h2>Order Success</h2><p>Order #${orderId} - Total: ₹${totalPrice}</p>`
     });
 };
 
