@@ -12,8 +12,8 @@ if (window.location.hostname.endsWith('.github.dev')) {
     // Standard local dev usually has backend on 5000
     API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:5000/api`;
 } else {
-    // Production Vercel relative path (fallback to onrender if needed)
-    API_BASE_URL = window.location.origin + "/api";
+    // Production Render URL (Confirmed stable)
+    API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
 }
 
 window.API_BASE_URL = API_BASE_URL;
