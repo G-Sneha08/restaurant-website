@@ -81,7 +81,6 @@ cd restaurant-website
 
 2️⃣ **Install Dependencies**  
 ```bash
-node server/server.js
 npm install
 ```
 
@@ -106,22 +105,22 @@ FRONTEND_URL=http://localhost:5000
 4️⃣ **Setup Database**  
 ```sql
 CREATE DATABASE restaurant_db;
-mysql -u root -p restaurant_db < schema.sql
+mysql -u root -p 
 ```
 
 5️⃣ **Run the Project**  
 ```bash
+node server/server.js
 npm run dev
 ```
 
 ---
-
 ## 🔄 Environment Configuration
 
-| Environment | Database |
-| :--- | :--- |
-| **Local** | `restaurant_db` |
-| **Production** | `Railway` |
+| Environment   | Database        |
+|---------------|-----------------|
+| Local         | `restaurant_db` |
+| Production    | `Railway`       |
 
 ---
 
