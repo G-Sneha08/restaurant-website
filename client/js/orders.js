@@ -25,7 +25,7 @@ async function loadOrders() {
         if (!orders || orders.length === 0) {
             list.innerHTML = `
                 <div class="empty-orders">
-                    <img src="https://cdn-icons-png.flaticon.com/512/565/565491.png" alt="Empty Trash" class="empty-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="Empty State" class="empty-icon">
                     <p>No orders yet — your next delicious experience is just a click away.</p>
                     <a href="menu.html" class="btn btn-primary" style="margin-top:10px;">Start Your Journey</a>
                 </div>`;
