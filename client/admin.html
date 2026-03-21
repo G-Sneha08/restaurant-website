@@ -155,7 +155,7 @@
         <header class="top-header">
             <div class="welcome-text"><h1 id="title-text">Dashboard</h1></div>
             <div class="admin-profile" style="display:flex;align-items:center;gap:12px;">
-                <div style="text-align:right;"><div style="font-weight:700;font-size:0.9rem;">Admin User</div><div style="font-size:0.7rem;color:#64748b;">Super Admin</div></div>
+                <div style="text-align:right;"><div style="font-weight:700;font-size:0.9rem;">Chief Management Officer</div><div style="font-size:0.7rem;color:#64748b;">Grand System Architect</div></div>
                 <div style="width:40px;height:40px;background:#6366f1;color:white;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;">A</div>
             </div>
         </header>
@@ -239,7 +239,7 @@
                     if(t==='orders') return `<tr><td>#${x.id}</td><td>${x.user_name||'Guest'}</td><td>₹${x.total_amount}</td><td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td><td><select onchange="upd(${x.id},'orders',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Delivered" ${x.status==='Delivered'?'selected':''}>Delivered</option></select></td></tr>`;
                     if(t==='bookings') return `<tr><td>#${x.id}</td><td>${x.customer_name}</td><td>${new Date(x.date).toLocaleDateString()}</td><td>${x.guests}</td><td><span class="badge badge-${x.status.toLowerCase()}">${x.status}</span></td><td><select onchange="upd(${x.id},'bookings',this.value)"><option value="Pending" ${x.status==='Pending'?'selected':''}>Pending</option><option value="Confirmed" ${x.status==='Confirmed'?'selected':''}>Confirmed</option></select></td></tr>`;
                     if(t==='menu') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.category}</td><td>₹${x.price}</td><td><button onclick="editM(${i})" class="btn-icon"><i class="fas fa-edit"></i></button><button onclick="delM(${x.id})" class="btn-icon" style="color:#ef4444;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`;
-                    if(t==='users') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.email}</td><td>${x.role}</td><td><button onclick="updRole(${x.id},'${x.role==='admin'?'user':'admin'}')" class="btn btn-outline btn-sm">Role</button><button onclick="delU(${x.id})" class="btn-icon" style="color:#ef4444;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`;
+                    if(t==='users') return `<tr><td>#${x.id}</td><td>${x.name}</td><td>${x.email}</td><td>${x.role === 'admin' ? 'Grand System Architect' : 'Valued Patron'}</td><td><button onclick="updRole(${x.id},'${x.role==='admin'?'user':'admin'}')" class="btn btn-outline btn-sm">Role</button><button onclick="delU(${x.id})" class="btn-icon" style="color:#ef4444;margin-left:8px;"><i class="fas fa-trash"></i></button></td></tr>`;
                     if(t==='reviews') return `<tr><td>#${x.id}</td><td>${x.user_name||'Anon'}</td><td>${x.rating}⭐</td><td>${x.review_text}</td><td><button onclick="delReview(${x.id})" style="color:#ef4444;"><i class="fas fa-trash"></i></button></td></tr>`;
                     return '';
                 }).join('');

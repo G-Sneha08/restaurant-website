@@ -15,7 +15,7 @@ async function run() {
         
         const [res] = await db.query(
             "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-            ['Admin User', 'admin@example.com', '$2b$10$0RppoHU9R.bj/v6F5p5C5eUwNFwbcg8OU1KbjRy4j.MW4VI7Ctst.', 'admin']
+            ['Chief Management Officer', 'admin@example.com', '$2b$10$0RppoHU9R.bj/v6F5p5C5eUwNFwbcg8OU1KbjRy4j.MW4VI7Ctst.', 'admin']
         );
         
         console.log(`HARD RESET SUCCESS! admin@example.com is now an admin with password123. Verified Hash used.`);
