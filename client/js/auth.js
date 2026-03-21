@@ -73,52 +73,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const registerForm = document.getElementById("registerForm");
 
     if (registerForm) {
+        const submitBtn = registerForm.querySelector("button[type='submit']");
 
         registerForm.addEventListener("submit", async (e) => {
-
             e.preventDefault();
 
-            // Robust selector endpoints using IDs
             const nameEl = document.getElementById("name");
             const emailEl = document.getElementById("email");
             const passwordEl = document.getElementById("password");
 
-            const name = nameEl ? nameEl.value : "";
-            const email = emailEl ? emailEl.value : "";
+            const name = nameEl ? nameEl.value.trim() : "";
+            const email = emailEl ? emailEl.value.trim() : "";
             const password = passwordEl ? passwordEl.value : "";
 
-            try {
+            if (!name || !email || !password) {
+                alert("All fields are required.");
+                return;
+            }
 
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Creating Account...";
+            }
+
+            try {
                 const response = await fetch(`${window.API_BASE_URL}/auth/register`, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, email, password })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-
-                    alert(data.message || "Welcome to Lumina Dine! Your account has been successfully created. Please login to continue.");
+                    alert(data.message || "Welcome to Lumina Dine! Your account has been created.");
                     window.location.href = "login.html";
-
                 } else {
-
                     alert(data.message || "Registration failed");
-
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = "Register";
+                    }
                 }
-
             } catch (error) {
-
                 console.error("Register Error:", error);
                 alert("Server error during registration");
-
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Register";
+                }
             }
-
         });
-
     }
 
 });

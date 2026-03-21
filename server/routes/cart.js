@@ -190,17 +190,19 @@ router.post('/checkout', protect, async (req, res) => {
 
         console.log(`[CHECKOUT] Success: Order ${orderId} placed for user ${userId}`);
 
-        // Send Order Email (Non-blocking)
-        try {
-            const [users] = await pool.query("SELECT name, email FROM users WHERE id = ?", [userId]);
-            if (users.length > 0) {
-                await sendOrderEmail(users[0].email, users[0].name, orderId, totalPrice);
-            }
-        } catch (mailErr) {
-            console.error("Order Email Failed:", mailErr.message);
+        // Send Order Email (Non-blocking for immediate UI feedback)
+        const [users] = await pool.query("SELECT name, email FROM users WHERE id = ?", [userId]);
+        if (users.length > 0) {
+            sendOrderEmail(users[0].email, users[0].name, orderId, totalPrice).catch(err => {
+                console.error("📧 [ORDER_EMAIL_ERROR]:", err.message);
+            });
         }
 
-        res.json({ success: true, message: 'Your exquisite order has been placed successfully!', orderId });
+        return res.json({ 
+            success: true, 
+            message: 'Your exquisite order has been placed successfully! Check your email for details.', 
+            orderId 
+        });
 
     } catch (err) {
         console.error('CRITICAL CHECKOUT ERROR:', err);

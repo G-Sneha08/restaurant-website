@@ -30,18 +30,16 @@ router.post("/", protect, async (req, res) => {
             [userId, name || null, email || null, phone || null, date, time, guests, "Pending"]
         );
 
-        // Send Email (Awaited for reliability)
+        // Send Email (Non-blocking but logged for speed)
         if (email) {
-            try {
-                await sendBookingEmail(email, name || 'Valued Guest', date, time, guests);
-            } catch (err) {
-                console.error("Booking Email Failed:", err.message);
-            }
+            sendBookingEmail(email, name || 'Valued Guest', date, time, guests).catch(err => {
+                console.error("📧 [BOOKING_EMAIL_ERROR]:", err.message);
+            });
         }
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "Table booked successfully",
+            message: "Table reserved successfully! Check your email for confirmation.",
             bookingId: result.insertId
         });
 
