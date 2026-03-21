@@ -28,10 +28,13 @@ router.get('/', async (req, res) => {
              JOIN users ON feedback.user_id = users.id 
              ORDER BY created_at DESC`
         );
-        res.json(rows);
+        res.json({
+            success: true,
+            feedback: rows
+        });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("GET_FEEDBACK_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Server error: Unable to load feedback at this time.' });
     }
 });
 

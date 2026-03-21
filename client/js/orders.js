@@ -15,7 +15,10 @@ async function loadOrders() {
     if (!list) return;
 
     try {
-        const orders = await apiRequest('/orders');
+        const responseData = await apiRequest('/orders');
+        
+        // Support both direct array (legacy) and successful object response
+        const orders = Array.isArray(responseData) ? responseData : (responseData?.orders || []);
 
         if (loading) loading.style.display = 'none';
 

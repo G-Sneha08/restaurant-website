@@ -51,13 +51,16 @@ async function loadFeedback() {
     try {
         const res = await fetch(`${API_BASE_URL}/feedback`);
         const data = await res.json();
+        
+        // Handle both array (legacy) and successful object response
+        const feedbackItems = Array.isArray(data) ? data : (data?.feedback || []);
 
-        if (data.length === 0) {
+        if (feedbackItems.length === 0) {
             feedbackGrid.innerHTML = '<p class="text-center">No feedback yet. Be the first to share your experience!</p>';
             return;
         }
 
-        feedbackGrid.innerHTML = data.map(item => `
+        feedbackGrid.innerHTML = feedbackItems.map(item => `
             <div class="card" style="margin-bottom: 20px; padding: 20px;">
                 <div style="color: gold; margin-bottom: 10px;">${'★'.repeat(item.rating)}${'☆'.repeat(5 - item.rating)}</div>
                 <p style="font-style: italic; color: var(--text-dark);">"${item.message}"</p>
