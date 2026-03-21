@@ -99,8 +99,15 @@ app.use((err, req, res, next) => {
 // ===================== Start server =====================
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  }).on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`❌ Port ${PORT} already in use. Try a different PORT in .env`);
+      process.exit(1);
+    } else {
+      console.error("🌋 [SERVER_START_ERROR]:", err);
+    }
   });
 }
 

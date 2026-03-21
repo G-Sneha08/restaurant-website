@@ -1,12 +1,11 @@
 // client/js/config.js
 
-// Determine if we are running in a local environment
 const isLocalhost = window.location.hostname === 'localhost' || 
                    window.location.hostname === '127.0.0.1';
 
 // Set the global API Base URL
 window.API_BASE_URL = isLocalhost
-    ? "http://localhost:5000/api"
+    ? "http://localhost:5001/api"
     : "https://restaurant-backend-cli2.onrender.com/api";
 
 console.log(`[CONFIG] Environment: ${isLocalhost ? 'LOCAL' : 'PRODUCTION'}`);
