@@ -647,10 +647,12 @@ footer {
     gap: 14px;
 }
 
-.empty-icon {
-    width: 75px;
-    opacity: 0.65;
+.empty-video {
+    width: 140px;
+    border-radius: 12px;
+    opacity: 0.85;
     margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .empty-orders p {
