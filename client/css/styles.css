@@ -633,7 +633,22 @@ footer {
 }
 
 /* Ensure badges look consistent */
-.badge {
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+
+/* Empty States */
+.empty-orders {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    text-align: center;
+    font-size: 1.125rem;
+    color: var(--text-light);
+    grid-column: 1 / -1;
+}
+
+.empty-orders p {
+    max-width: 400px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }

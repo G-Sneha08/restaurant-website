@@ -24,10 +24,9 @@ async function loadOrders() {
 
         if (!orders || orders.length === 0) {
             list.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align:center; padding: 60px;">
-                    <i class="fas fa-receipt" style="font-size:4rem; color:#eee; margin-bottom:20px;"></i>
-                    <p style="color:var(--text-light);">Your culinary history is empty.</p>
-                    <a href="menu.html" class="btn btn-primary" style="margin-top:20px;">Start Your Journey</a>
+                <div class="empty-orders">
+                    <p>No orders yet — your next delicious experience is just a click away.</p>
+                    <a href="menu.html" class="btn btn-primary">Start Your Journey</a>
                 </div>`;
             if (clearBtn) clearBtn.style.display = 'none';
             return;
