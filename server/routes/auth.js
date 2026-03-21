@@ -82,7 +82,8 @@ router.post("/register", async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "An internal server error occurred. Please try again later."
+            message: "Registration failed due to a server-side error. Please verify your connection or try again later.",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });
@@ -95,6 +96,7 @@ router.post("/register", async (req, res) => {
 // GET handler for testing and clarity
 router.get("/login", (req, res) => {
     res.json({
+        success: true,
         message: "Login endpoint is operational. Please use a POST request with 'email' and 'password' to authenticate.",
         method: "GET",
         instructions: "To log in, send a POST request to this same URL."
@@ -107,7 +109,8 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
         return res.status(400).json({
-            message: "All fields are required"
+            success: false,
+            message: "Email and password are required"
         });
     }
 
@@ -120,7 +123,8 @@ router.post("/login", async (req, res) => {
 
         if (users.length === 0) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                success: false,
+                message: "Authentication failed: Invalid credentials"
             });
         }
 
@@ -130,7 +134,8 @@ router.post("/login", async (req, res) => {
 
         if (!isMatch) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                success: false,
+                message: "Authentication failed: Invalid credentials"
             });
         }
 
@@ -141,6 +146,7 @@ router.post("/login", async (req, res) => {
         );
 
         res.json({
+            success: true,
             message: "Login successful",
             token,
             user: {
@@ -156,7 +162,9 @@ router.post("/login", async (req, res) => {
         console.error("Login Error:", error);
 
         res.status(500).json({
-            message: "Server error"
+            success: false,
+            message: "Login failed due to a server error. Please try again later.",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
 
     }

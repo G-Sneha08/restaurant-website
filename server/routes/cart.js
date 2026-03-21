@@ -42,8 +42,8 @@ router.get('/', async (req, res) => {
         const totalPrice = rows.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
         res.json({ success: true, cart: rows, totalPrice });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("GET_CART_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Something went wrong while retrieving your cart. Please try again later.' });
     }
 });
 
@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
     const qty = quantity || 1;
 
     if (!menu_item_id) {
-        return res.status(400).json({ success: false, message: 'Invalid menu_item_id' });
+        return res.status(400).json({ success: false, message: 'A valid menu_item_id is required to add items to the cart.' });
     }
 
     try {
@@ -73,23 +73,23 @@ router.post('/', async (req, res) => {
 
         if (existing.length > 0) {
             await pool.query('UPDATE cart SET quantity = quantity + ? WHERE id = ?', [qty, existing[0].id]);
-            res.status(200).json({ success: true, message: 'Cart updated' });
+            res.status(200).json({ success: true, message: 'Cart updated successfully' });
         } else {
             // Get item details from menu
             const [menuItems] = await pool.query('SELECT name, price FROM menu WHERE id = ?', [menu_item_id]);
             if (menuItems.length === 0) {
-                return res.status(404).json({ success: false, message: 'Menu item not found' });
+                return res.status(404).json({ success: false, message: 'The selected menu item was not found.' });
             }
 
             await pool.query(
                 `INSERT INTO cart (user_id, menu_item_id, item_name, price, quantity) VALUES (?, ?, ?, ?, ?)`,
                 [userId, menu_item_id, menuItems[0].name, menuItems[0].price, qty]
             );
-            res.status(201).json({ success: true, message: 'Item added to cart' });
+            res.status(201).json({ success: true, message: 'Exquisite item added to your cart' });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("ADD_TO_CART_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Server encountered a problem adding this item to your cart.' });
     }
 });
 
@@ -107,8 +107,8 @@ router.put('/:id', async (req, res) => {
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
         res.json({ success: true, message: 'Quantity updated' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("UPDATE_QUANTITY_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Internal error: Could not update quantity.' });
     }
 });
 
@@ -118,10 +118,10 @@ router.delete('/:id', async (req, res) => {
         const [result] = await pool.query('DELETE FROM cart WHERE id = ?', [req.params.id]);
 
         if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Cart item not found' });
-        res.json({ success: true, message: 'Item removed' });
+        res.json({ success: true, message: 'Item removed from your culinary collection' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("DELETE_CART_ITEM_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Server error: Failed to remove cart item.' });
     }
 });
 
@@ -135,10 +135,10 @@ router.delete('/', async (req, res) => {
         } else {
             await pool.query('DELETE FROM cart WHERE user_id IS NULL');
         }
-        res.json({ success: true, message: 'Cart cleared' });
+        res.json({ success: true, message: 'Cart cleared successfully' });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("CLEAR_CART_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Could not empty your cart due to a database error.' });
     }
 });
 
@@ -206,10 +206,10 @@ router.post('/checkout', protect, async (req, res) => {
         });
 
     } catch (err) {
-        console.error('CRITICAL CHECKOUT ERROR:', err);
+        console.error('CRITICAL CHECKOUT ERROR:', err.message);
         res.status(500).json({ 
             success: false, 
-            message: 'Server error during checkout',
+            message: 'Checkout process interrupted by a server error. Please try again.',
             error: process.env.NODE_ENV === 'development' ? err.message : undefined 
         });
     }

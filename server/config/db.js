@@ -10,13 +10,16 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
  */
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    port: parseInt(process.env.DB_PORT || '3306', 10),
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 10000,
     ssl: {
         rejectUnauthorized: false // Required for Railway/Render
     }
@@ -25,10 +28,11 @@ const pool = mysql.createPool({
 async function testConnection() {
     try {
         const connection = await pool.getConnection();
-        console.log(`✅ [DB_SUCCESS] Connected to database: ${process.env.DB_NAME}`);
+        console.log(`✅ [DB_SUCCESS] Secured tunnel established to: ${process.env.DB_NAME} at ${process.env.DB_HOST}`);
         connection.release();
     } catch (err) {
         console.error('❌ [DB_FAILURE] MySQL Connection Error:', err.message);
+        console.error('💡 PRO-TIP: Ensure DB_HOST, DB_NAME, DB_USER, and DB_PASSWORD are correct in Render.');
     }
 }
 

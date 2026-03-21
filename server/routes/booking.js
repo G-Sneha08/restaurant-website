@@ -44,8 +44,12 @@ router.post("/", protect, async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Booking error:", err);
-        res.status(500).json({ success: false, message: "Server error" });
+        console.error("Booking error:", err.message);
+        res.status(500).json({ 
+            success: false, 
+            message: "Table reservation failed due to a server error. Please try again later.",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 });
 
@@ -107,8 +111,12 @@ router.delete("/:id", protect, async (req, res) => {
         res.json({ success: true, message: "Booking cancelled" });
 
     } catch (err) {
-        console.error("Cancel booking error:", err);
-        res.status(500).json({ success: false, message: "Server error" });
+        console.error("Cancel booking error:", err.message);
+        res.status(500).json({ 
+            success: false, 
+            message: "Unable to cancel booking at this time.",
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
 });
 

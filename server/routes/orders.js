@@ -35,10 +35,14 @@ router.get('/', protect, async (req, res) => {
             'SELECT id, total_amount, item_name, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC',
             [req.user.id]
         );
-        res.json(rows.map(o => ({ ...o, total_price: o.total_amount })));
+        res.json({
+            success: true,
+            total_price: rows.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0),
+            orders: rows.map(o => ({ ...o, total_price: o.total_amount }))
+        });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("GET_ORDERS_HISTORY_ERROR:", err.message);
+        res.status(500).json({ success: false, message: ' Culinary history retrieval interrupted. Please check your connection.' });
     }
 });
 
@@ -51,17 +55,20 @@ router.get('/:id', protect, async (req, res) => {
             [req.params.id, req.user.id]
         );
 
-        if (orderRows.length === 0) return res.status(404).json({ message: 'Order not found' });
+        if (orderRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Order was not found in our records.' });
+        }
 
         const [itemRows] = await pool.query('SELECT * FROM order_items WHERE order_id = ?', [req.params.id]);
         res.json({
+            success: true,
             ...orderRows[0],
             total_price: orderRows[0].total_amount,
             items: itemRows.map(i => ({ ...i, name: i.item_name }))
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+        console.error("GET_ORDER_DETAIL_ERROR:", err.message);
+        res.status(500).json({ success: false, message: 'Server error: Unable to load order details.' });
     }
 });
 
