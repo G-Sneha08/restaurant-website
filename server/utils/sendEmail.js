@@ -1,26 +1,18 @@
 const axios = require("axios");
+const nodemailer = require("nodemailer");
 
 /**
  * =============================================================================
- * SENDINBLUE (BREVO) API INFRASTRUCTURE
+ * SENDINBLUE (BREVO) SMART INFRASTRUCTURE
  * =============================================================================
  */
 const SENDINBLUE_API_KEY = (process.env.SENDINBLUE_API_KEY || "").trim();
-const SENDER_EMAIL = "sneha901932@gmail.com"; // Verified sender for the Brevo account
+const SENDER_EMAIL = "sneha901932@gmail.com"; 
 const SENDER_NAME = "Lumina Dine";
 
-// Diagnostic: Log API Key availability and format (masking most of it)
-if (SENDINBLUE_API_KEY) {
-    const keyPreview = SENDINBLUE_API_KEY.startsWith("xkeysib") 
-        ? "V3 Key (Correct Format)" 
-        : "Format seems unusual (V3 keys normally start with xkeysib-)";
-    console.log(`📡 [MAIL_DIAGNOSTIC] Key Present: ${keyPreview}. ID Preview: ${SENDINBLUE_API_KEY.slice(0, 4)}... (Length: ${SENDINBLUE_API_KEY.length})`);
-} else {
-    console.error("❌ [MAIL_DIAGNOSTIC] SENDINBLUE_API_KEY IS MISSING IN LOGS.");
-}
-
 /**
- * Robust Wrapper to dispatch emails via Brevo API with detailed tracking
+ * Robust Wrapper to dispatch emails. 
+ * Detects if the key is an API V3 Key (xkeysib-) or an SMTP Key (32-char hex).
  */
 const sendMailHelper = async (options) => {
     try {
@@ -29,44 +21,56 @@ const sendMailHelper = async (options) => {
             return null;
         }
 
-        console.log(`📡 [MAIL_QUEUE] Attempting delivery to: ${options.to} via Brevo API`);
+        // AUTO-DETECTION LOGIC
+        const isV3ApiKey = SENDINBLUE_API_KEY.startsWith("xkeysib-");
+        
+        if (isV3ApiKey) {
+            // MODE A: BREVO V3 HTTP API
+            console.log(`📡 [MAIL_MODE] Using Brevo V3 API (Axios) for ${options.to}`);
+            const data = {
+                sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+                to: [{ email: options.to, name: options.name || options.to }],
+                subject: options.subject,
+                htmlContent: options.html
+            };
 
-        const data = {
-            sender: {
-                name: SENDER_NAME,
-                email: SENDER_EMAIL
-            },
-            to: [
-                {
-                    email: options.to,
-                    name: options.name || options.to
+            const response = await axios.post("https://api.brevo.com/v3/smtp/email", data, {
+                headers: {
+                    "api-key": SENDINBLUE_API_KEY,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
                 }
-            ],
-            subject: options.subject,
-            htmlContent: options.html
-        };
-
-        const response = await axios.post("https://api.brevo.com/v3/smtp/email", data, {
-            headers: {
-                "api-key": SENDINBLUE_API_KEY,
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        });
-
-        if (response.status === 201 || response.status === 200) {
-            console.log(`✅ [MAIL_SUCCESS] Delivered! MessageID: ${response.data.messageId}`);
+            });
+            console.log(`✅ [MAIL_SUCCESS] Delivered via API! MessageID: ${response.data.messageId}`);
             return response.data;
+
         } else {
-            console.error(`❌ [MAIL_FAILURE] Brevo API responded with status ${response.status}:`, response.data);
-            return null;
+            // MODE B: BREVO SMTP RELAY (Often used when 32-char hex keys are provided)
+            console.log(`📡 [MAIL_MODE] Using Brevo SMTP Relay (Nodemailer) for ${options.to}`);
+            const transporter = nodemailer.createTransport({
+                host: "smtp-relay.brevo.com",
+                port: 587,
+                auth: {
+                    user: SENDER_EMAIL,
+                    pass: SENDINBLUE_API_KEY
+                }
+            });
+
+            const mailOptions = {
+                from: `"${SENDER_NAME}" <${SENDER_EMAIL}>`,
+                to: options.to,
+                subject: options.subject,
+                html: options.html
+            };
+
+            const info = await transporter.sendMail(mailOptions);
+            console.log(`✅ [MAIL_SUCCESS] Delivered via SMTP! MessageID: ${info.messageId}`);
+            return info;
         }
+
     } catch (err) {
         const errorDetail = err.response ? JSON.stringify(err.response.data) : err.message;
         console.error(`❌ [MAIL_FAILURE] Transmission error: ${errorDetail}`);
-        if (errorDetail.includes("unauthorized") || errorDetail.includes("Key not found")) {
-            console.error("💡 PRO-TIP: Your Brevo V3 API key must start with 'xkeysib-'. Check Render Dashboard to ensure it was entered correctly.");
-        }
         return null;
     }
 };
