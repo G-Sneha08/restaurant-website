@@ -1,99 +1,153 @@
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 /**
  * =============================================================================
- * GMAIL SMTP INFRASTRUCTURE - ADVANCED PRODUCTION SETUP
+ * SENDINBLUE (BREVO) API INFRASTRUCTURE
  * =============================================================================
  */
-const EMAIL_USER = (process.env.EMAIL_USER || "sneha901932@gmail.com").trim();
-const EMAIL_PASS = (process.env.EMAIL_PASS || "lqfmxrkvrcakdprs").trim();
+const SENDINBLUE_API_KEY = (process.env.SENDINBLUE_API_KEY || "").trim();
+const SENDER_EMAIL = "sneha901932@gmail.com"; // Verified sender for the Brevo account
+const SENDER_NAME = "Lumina Dine";
 
-// Configuration using Pool for better persistence in cloud environments
-const transportOptions = {
-    service: "gmail", // Handles port negotiation internally (465/587)
-    pool: true,      // Keeps the connection open to avoid repeated handshake timeouts
-    maxConnections: 5,
-    maxMessages: 100,
-    auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
-    },
-    tls: {
-       rejectUnauthorized: false // Prevents SSL verification errors common on Vercel/Render
-    },
-    connectionTimeout: 20000, // Aggregate timeout (20s)
-    greetingTimeout: 10000,
-    socketTimeout: 30000,
-    debug: true,
-    logger: true // Force detailed traffic logs to Render console
-};
-
-const transporter = nodemailer.createTransport(transportOptions);
-
-// Verification Diagnostic Output
-transporter.verify((error, success) => {
-    if (error) {
-        console.error("❌ [SMTP_CRITICAL] Authentication/Network Timeout for: " + EMAIL_USER);
-        console.error("❌ [SMTP_DETAIL] Render Free Tier identifies as blocked. Error: " + error.message);
-    } else {
-        console.log("✅ [SMTP_READY] Gmail Connection Secured (Pooleed Mode): " + EMAIL_USER);
-    }
-});
 
 /**
- * Robust Wrapper to dispatch emails with tracking
+ * Robust Wrapper to dispatch emails via Brevo API with detailed tracking
  */
 const sendMailHelper = async (options) => {
     try {
-        if (!EMAIL_USER || !EMAIL_PASS) {
-            console.error("❌ [MAIL_FAILURE] Missing Credentials.");
+        if (!SENDINBLUE_API_KEY) {
+            console.error("❌ [MAIL_FAILURE] Missing SENDINBLUE_API_KEY environment variable.");
             return null;
         }
 
-        console.log(`📡 [MAIL_QUEUE] Attempting delivery to: ${options.to}`);
-        
-        const mailOptions = {
-            from: `"Lumina Dine" <${EMAIL_USER}>`,
-            bcc: EMAIL_USER, // Copy admin for confirmation
-            ...options
+        console.log(`📡 [MAIL_QUEUE] Attempting delivery to: ${options.to} via Brevo API`);
+
+        const data = {
+            sender: {
+                name: SENDER_NAME,
+                email: SENDER_EMAIL
+            },
+            to: [
+                {
+                    email: options.to,
+                    name: options.name || options.to
+                }
+            ],
+            subject: options.subject,
+            htmlContent: options.html
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ [MAIL_SUCCESS] Delivered! ID: ${info.messageId}`);
-        return info;
+        const response = await axios.post("https://api.brevo.com/v3/smtp/email", data, {
+            headers: {
+                "api-key": SENDINBLUE_API_KEY,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        });
+
+        if (response.status === 201 || response.status === 200) {
+            console.log(`✅ [MAIL_SUCCESS] Delivered! MessageID: ${response.data.messageId}`);
+            return response.data;
+        } else {
+            console.error(`❌ [MAIL_FAILURE] Brevo API responded with status ${response.status}:`, response.data);
+            return null;
+        }
     } catch (err) {
-        console.error(`❌ [MAIL_FAILURE] Transmission error: ${err.message}`);
+        const errorDetail = err.response ? JSON.stringify(err.response.data) : err.message;
+        console.error(`❌ [MAIL_FAILURE] Transmission error: ${errorDetail}`);
         return null;
     }
 };
 
 /**
- * EMAIL TEMPLATES
+ * EMAIL TEMPLATES - PREMIUM DESIGNS
  */
+
+// Shared Header & Footer Logic
+const getBaseTemplate = (content) => `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa; }
+        .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .header { background: #111; padding: 40px 20px; text-align: center; color: #fff; }
+        .header h1 { margin: 0; font-size: 28px; letter-spacing: 2px; text-transform: uppercase; color: #e67e22; }
+        .content { padding: 40px; }
+        .footer { background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #777; }
+        .btn { display: inline-block; padding: 12px 30px; background: #e67e22; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px; font-weight: bold; }
+        .info-box { background: #fff9f4; border-left: 4px solid #e67e22; padding: 15px; margin: 20px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>Lumina Dine</h1></div>
+        <div class="content">${content}</div>
+        <div class="footer">
+            <p>© 2026 Lumina Dine. All rights reserved.</p>
+            <p>123 Culinary Avenue, Gourmet City</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
 const sendWelcomeEmail = async (email, name) => {
     if (!email) return;
+    const content = `
+        <h2>Welcome to Lumina Dine, ${name}!</h2>
+        <p>We're thrilled to have you as part of our culinary family. Prepare yourself for an exquisite dining experience that blends tradition with modern artistry.</p>
+        <div class="info-box">
+            <p><strong>Your Account:</strong> ${email}</p>
+        </div>
+        <p>Unlock gourmet rewards, manage your reservations, and track your orders all in one place.</p>
+        <a href="https://restaurant-website-sneha.vercel.app" class="btn">Explore the Menu</a>
+    `;
     return await sendMailHelper({
         to: email,
+        name: name,
         subject: "Welcome to Lumina Dine 🍽️",
-        html: `<h2>Hello ${name}!</h2><p>Your exquisite journey with us has begun.</p>`
+        html: getBaseTemplate(content)
     });
 };
 
 const sendBookingEmail = async (email, name, date, time, guests) => {
     if (!email) return;
+    const content = `
+        <h2>Reservation Confirmed! 📅</h2>
+        <p>Dear ${name || 'Valued Guest'}, your table awaits. We've locked in your spot for a memorable evening.</p>
+        <div class="info-box">
+            <p><strong>📅 Date:</strong> ${date}</p>
+            <p><strong>🕒 Time:</strong> ${time}</p>
+            <p><strong>👥 Guests:</strong> ${guests}</p>
+        </div>
+        <p>If you need to change your reservation or have special dietary requirements, please feel free to reach out to us.</p>
+    `;
     return await sendMailHelper({
         to: email,
-        subject: "Reservation Confirmed 📅",
-        html: `<h2>Table Confirmed</h2><p>${date} at ${time} for ${guests} guests.</p>`
+        name: name,
+        subject: "Your Table is Confirmed at Lumina Dine 📅",
+        html: getBaseTemplate(content)
     });
 };
 
 const sendOrderEmail = async (email, name, orderId, totalPrice) => {
     if (!email) return;
+    const content = `
+        <h2>Order Received! 🍔</h2>
+        <p>Hello ${name}, we've received your order and our chefs are already working their magic.</p>
+        <div class="info-box">
+            <p><strong>🧾 Order ID:</strong> #${orderId}</p>
+            <p><strong>💰 Total Amount:</strong> ₹${totalPrice}</p>
+            <p><strong>📍 Status:</strong> Preparing with care</p>
+        </div>
+        <p>You'll receive another notification once your order is on its way. Sit back and relax!</p>
+    `;
     return await sendMailHelper({
         to: email,
-        subject: "Order Received: #${orderId} 🍔",
-        html: `<h2>Order Success</h2><p>Order #${orderId} - Total: ₹${totalPrice}</p>`
+        name: name,
+        subject: "Order Confirmation: #${orderId} - Lumina Dine 🍔",
+        html: getBaseTemplate(content)
     });
 };
 
