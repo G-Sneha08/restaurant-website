@@ -47,6 +47,16 @@ const clientPath = path.join(__dirname, '../client');
 app.use(express.static(clientPath));
 
 // Health check
+app.get('/api/debug-db', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT 1 as test');
+    res.json({ success: true, message: 'DB Connection Established', data: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'DB Error: ' + err.message, stack: err.stack });
+  }
+});
+
+// Original health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Restaurant API is running' });
 });
