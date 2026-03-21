@@ -1,109 +1,163 @@
-# 🍽️ Lumina Dine - Restaurant Management System
+# 🍽️ Lumina Dine — Restaurant Management System
 
-[![Frontend Deployment](https://img.shields.io/badge/Vercel-Frontend-black?logo=vercel)](https://restaurant-website-umber-three.vercel.app/)
-[![Backend Deployment](https://img.shields.io/badge/Render-Backend-46E3B7?logo=render)](https://restaurant-backend-cli2.onrender.com/health)
+**Streamlining dining experiences with a modern, responsive, and secure restaurant management system.**
 
-A modern, full-stack, production-ready Restaurant Management Web Application. Designed for luxury dining experiences with a deep focus on stability, security, and performance.
+---
 
-## 📌 Sections
-- [Live Demo](#-live-demo)
-- [Tech Stack](#-tech-stack)
-- [Key Features](#-key-features)
-- [Visual Highlights](#-visual-highlights)
-- [Local Installation](#-local-installation)
-- [Deployment Info](#-deployment-info)
+## 🌟 Overview
+
+Lumina Dine is a full-stack restaurant management web application designed to provide a seamless dining experience.
+
+Customers can browse menus, place orders, book tables, and submit feedback, while administrators can manage all operations efficiently through a dedicated admin panel.
 
 ---
 
 ## 🌐 Live Demo
-Experience the excellence here: [Lumina Dine Live Website](https://restaurant-website-umber-three.vercel.app/)
+
+- **Frontend (User Interface):**  
+  [https://restaurant-website-umber-three.vercel.app/](https://restaurant-website-umber-three.vercel.app/)
+
+- **Backend API (Health Check):**  
+  [https://restaurant-backend-cli2.onrender.com/health](https://restaurant-backend-cli2.onrender.com/health)
+
+- **Local Development (when running locally):**  
+  [http://localhost:5000](http://localhost:5000)
+
+⚠️ **Note:**  
+- Backend link returns API status (not a UI page)  
+- Local link works only when the project is running on your system
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **HTML5 & CSS3**: Custom vanilla design with glassmorphism and modern aesthetics.
-- **JavaScript (Vanilla)**: High-performance core logic without heavy framework overhead.
-- **Icons**: FontAwesome 6.5.1
+**Frontend**  
+- HTML5  
+- CSS3 (Modern UI with glassmorphism design)  
+- JavaScript (Vanilla)
 
-### Backend
-- **Node.js & Express.js**: Reliable server-side architecture.
-- **MySQL2**: Scalable and relational database management.
-- **JWT**: Secure session-less authentication.
+**Backend**  
+- Node.js  
+- Express.js
 
-### Infrastructure & Dev
-- **Vercel**: High-speed frontend hosting.
-- **Render**: Reliable backend compute.
-- **Railway**: Managed MySQL database.
-- **BcryptJS**: Advanced password hashing.
+**Database**  
+- MySQL (Railway – Production)  
+- MySQL (Local – Development)
+
+**Security**  
+- JWT Authentication  
+- BcryptJS (Password Hashing)
 
 ---
 
 ## ✨ Key Features
 
-### 👤 User Excellence
-- **Secure Authentication**: JWT-based login/register with hashed passwords and route protection.
-- **Dynamic Menu**: Real-time menu updates from the database with category filtering.
-- **Premium Order Flow**: Seamless cart management and order history tracking.
-- **Table Reservations**: Advanced booking system with integrated guest tracking.
-- **Aesthetic UI**: Smooth scroll reveals, responsive video empty states, and modern design.
+### 👤 User Features
+- 🔐 User Registration & Login  
+- 🍽️ Dynamic Menu Browsing  
+- 🛒 Add to Cart & Place Orders  
+- 📦 Order History Tracking  
+- 📅 Table Booking System  
+- 💬 Feedback Submission  
+- 🎨 Responsive and aesthetic UI  
 
-### 🛡️ Admin Power
-- **Intuitive Dashboard**: Real-time sales stats, active orders, and reservation metrics.
-- **Catalog Management**: Full CRUD operations on restaurant menu items.
-- **Order Control**: Complete status lifecycle management (Pending, Confirmed, Delivered, Cancelled).
-- **User Management**: Unified view of all registered patrons.
+### 🛡️ Admin Features
+- 🧑💼 Admin Panel Dashboard  
+- 🍴 Menu Management (Add / Update / Delete items)  
+- 📦 Order Status Management  
+- 🪑 Table Booking Management  
+- 💬 Feedback Monitoring  
+- 👥 User Management  
 
 ---
 
-## 📦 Local Installation
+## ⚙️ Local Setup
 
-### 1. Prerequisites
-- [Node.js](https://nodejs.org/) (v14+)
-- [MySQL](https://www.mysql.com/) server
-
-### 2. Database Initialization
+1️⃣ **Clone Repository**  
 ```bash
-# Log into MySQL and run the schema file
-mysql -u root -p < schema.sql
+git clone https://github.com/G-Sneha08/restaurant-website.git
+cd restaurant-website
 ```
 
-### 3. Environment Variables
-Create a `.env` file in the root directory (refer to `.env.example`):
+2️⃣ **Install Dependencies**  
+```bash
+npm install
+```
+
+3️⃣ **Setup Environment Variables**  
+Create a `.env` file using `.env.example`:
+
 ```env
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=restaurant_db
-JWT_SECRET=your_jwt_secret
+
+JWT_SECRET=your_secret_key
+
 PORT=5000
+NODE_ENV=development
+
+FRONTEND_URL=http://localhost:5000
 ```
 
-### 4. Setup & Start
-```bash
-# Install dependencies
-npm install
+4️⃣ **Setup Database**  
+```sql
+CREATE DATABASE restaurant_db;
+mysql -u root -p restaurant_db < schema.sql
+```
 
-# Start development server
+5️⃣ **Run the Project**  
+```bash
 npm run dev
 ```
 
 ---
 
-## 🌐 Deployment Configuration
+## 🔄 Environment Configuration
 
-This project is configured for **Unified Deployment**:
-- **Frontend**: Serves from `client/` directory.
-- **Backend Entry**: `api/index.js` for Vercel Serverless Functions.
-- **API Routing**: Configured via `vercel.json` for seamless frontend-backend communication.
+| Environment | Database |
+| :--- | :--- |
+| **Local** | `restaurant_db` |
+| **Production** | `Railway` |
+
+---
+
+## 🚀 Deployment
+
+- **Frontend** → Vercel  
+- **Backend** → Render  
+- **Database** → Railway  
+
+---
+
+## 🔐 Security
+
+- `.env` file is excluded using `.gitignore`  
+- Sensitive credentials are not exposed  
+- Passwords are securely hashed using Bcrypt  
+- JWT is used for authentication  
+
+---
+
+## 💡 Key Highlights
+
+- 💼 Full-stack real-world application  
+- 🔐 Secure authentication system  
+- ⚙️ Admin-controlled operations  
+- 🌐 Fully deployed and production-ready  
+- 🧠 Solves real-world issues (API, DB, deployment)  
 
 ---
 
 ## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
+
+This project is licensed under the MIT License.  
+You are free to use, modify, and distribute this project while including the license notice.
 
 ---
 
-*Crafted with precision & culinary inspiration. Lumina Dine — Where Technology Meets Taste.*
+### ✨ Tagline
+
+**“Lumina Dine — Where Technology Meets Taste.”**
