@@ -12,6 +12,7 @@ const pool = require("../config/db");
 // ===============================
 console.log("🚀 Auth routes loaded successfully at /api/auth");
 const { sendWelcomeEmail } = require("../utils/sendEmail");
+const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key';
 
 
 // ===============================
@@ -135,7 +136,7 @@ router.post("/login", async (req, res) => {
 
         const token = jwt.sign(
             { id: user.id, role: user.role },
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             { expiresIn: "1d" }
         );
 

@@ -1,4 +1,20 @@
 // ================= MODAL ADMIN LOGIC =================
+function openAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) {
+        modal.style.display = 'block';
+        window.loadAdminBookings();
+    }
+}
+
+function closeAdminModal() {
+    const modal = document.getElementById('adminModal');
+    if (modal) modal.style.display = 'none';
+}
+
+window.openAdminModal = openAdminModal;
+window.closeAdminModal = closeAdminModal;
+
 async function loadAdminBookings() {
     const tbody = document.getElementById('adminBookingsTable');
     if (!tbody) return;

@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(data.message || "Welcome to Lumina Dine! Your account has been created.");
+                    alert(data.message || "Welcome to Lumina Dine! Your account has been successfully created. Please login to continue.");
                     window.location.href = "login.html";
                 } else {
                     alert(data.message || "Registration failed");
