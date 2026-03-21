@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const { protect } = require("../middleware/authMiddleware");
-const { sendBookingEmail } = require("../utils/sendEmail");
 
 /* ==============================
    CREATE BOOKING
@@ -24,22 +23,14 @@ router.post("/", protect, async (req, res) => {
                 email = email || users[0].email;
             }
         }
-
         const [result] = await pool.query(
             "INSERT INTO bookings (user_id, customer_name, customer_email, customer_phone, date, time, guests, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [userId, name || null, email || null, phone || null, date, time, guests, "Pending"]
         );
 
-        // Send Email (Non-blocking but logged for speed)
-        if (email) {
-            sendBookingEmail(email, name || 'Valued Guest', date, time, guests).catch(err => {
-                console.error("📧 [BOOKING_EMAIL_ERROR]:", err.message);
-            });
-        }
-
         return res.status(201).json({
             success: true,
-            message: "Table reserved successfully! Check your email for confirmation.",
+            message: "Table reserved successfully!",
             bookingId: result.insertId
         });
 

@@ -7,24 +7,15 @@ const pool = require("../config/db");
 
 
 // FIX 1️⃣ correct import
-// ===============================
-// AUTH ROUTES LOADED
-// ===============================
-console.log("🚀 Auth routes loaded successfully at /api/auth");
-const { sendWelcomeEmail } = require("../utils/sendEmail");
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key';
-
 
 // ===============================
 // REGISTER ROUTE
 // ===============================
 router.post("/register", async (req, res) => {
-    console.log("📥 [REGISTRATION] Request received:", req.body.email);
     const { name, email, password } = req.body;
 
-    // 1. Validation
     if (!name || !email || !password) {
-        console.warn("⚠️ [REGISTRATION] Missing fields:", { name: !!name, email: !!email, hasPass: !!password });
         return res.status(400).json({ 
             success: false,
             message: "All fields (name, email, password) are mandatory." 
@@ -32,21 +23,14 @@ router.post("/register", async (req, res) => {
     }
 
     try {
-        // 2. Check existence
-        const [existingUser] = await pool.query(
-            "SELECT id FROM users WHERE email = ?",
-            [email]
-        );
-
+        const [existingUser] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
         if (existingUser.length > 0) {
-            console.warn(`⚠️ [REGISTRATION] Duplicate attempt: ${email}`);
             return res.status(409).json({ 
                 success: false,
-                message: "An account with this email already exists. Please login instead." 
+                message: "An account with this email already exists." 
             });
         }
 
-        // 3. Hash and Insert
         const hashedPassword = await bcrypt.hash(password, 10);
         const [result] = await pool.query(
             "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
@@ -55,17 +39,10 @@ router.post("/register", async (req, res) => {
 
         console.log(`✅ [REGISTRATION] User created: ${email} (ID: ${result.insertId})`);
 
-        // 4. Send Email (Non-blocking but logged)
-        // We trigger it here but don't strictly await it if it's very slow, 
-        // though the user said "received immediately" so we'll do it promptly.
-        sendWelcomeEmail(email, name).catch(err => {
-            console.error("📧 [WELCOME_EMAIL_ERROR]:", err.message);
-        });
-
         // 5. Success response
         return res.status(201).json({
             success: true,
-            message: "Registration successful! Welcome to the family. Check your email for a welcome message.",
+            message: "Registration successful! Welcome to the family.",
             userId: result.insertId
         });
 
