@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("booking-form");
 
     if (!form) return;
+    
+    // Pre-fill user data for automatic experience
+    const userData = JSON.parse(localStorage.getItem("user") || "null");
+    if (userData) {
+        if (form.querySelector("#name")) form.querySelector("#name").value = userData.name || "";
+        if (form.querySelector("#email")) form.querySelector("#email").value = userData.email || "";
+    }
 
     form.addEventListener("submit", async (e) => {
 

@@ -30,10 +30,13 @@ router.post("/", protect, async (req, res) => {
             [userId, name || null, email || null, phone || null, date, time, guests, "Pending"]
         );
 
-        // Send Email (Truly Non-blocking: Fire and Forget)
+        // Send Email (Awaited for reliability)
         if (email) {
-            sendBookingEmail(email, name || 'Valued Guest', date, time, guests)
-                .catch(err => console.error("Booking Email Background Error:", err.message));
+            try {
+                await sendBookingEmail(email, name || 'Valued Guest', date, time, guests);
+            } catch (err) {
+                console.error("Booking Email Failed:", err.message);
+            }
         }
 
         res.status(201).json({

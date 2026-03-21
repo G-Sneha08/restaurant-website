@@ -1,13 +1,19 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for 587
+    service: "gmail",
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: (process.env.EMAIL_USER || "").trim(),
+        pass: (process.env.EMAIL_PASS || "").trim()
+    },
+    tls: {
+        rejectUnauthorized: false
     }
+});
+
+transporter.verify((error, success) => {
+    if (error) console.error("📧 [SMTP_ERROR] Configuration failure:", error.message);
+    else console.log("📧 [SMTP_READY] Email system operational");
 });
 
 
@@ -16,8 +22,9 @@ const transporter = nodemailer.createTransport({
 // =========================
 const sendWelcomeEmail = async (email, name) => {
 
+    console.log(`📧 Attempting to send Welcome Email to: ${email}`);
     const mailOptions = {
-        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        from: `"Lumina Dine" <${(process.env.EMAIL_USER || "").trim()}>`,
         to: email,
         subject: "Welcome to Lumina Dine 🍽️",
         html: `
@@ -42,8 +49,9 @@ const sendWelcomeEmail = async (email, name) => {
 // =========================
 const sendBookingEmail = async (email, name, date, time, guests) => {
 
+    console.log(`📧 Attempting to send Booking Confirmation to: ${email}`);
     const mailOptions = {
-        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        from: `"Lumina Dine" <${(process.env.EMAIL_USER || "").trim()}>`,
         to: email,
         subject: "Table Booking Confirmation 🍽️",
         html: `
@@ -75,8 +83,9 @@ const sendBookingEmail = async (email, name, date, time, guests) => {
 // =========================
 const sendOrderEmail = async (email, name, orderId, totalPrice) => {
 
+    console.log(`📧 Attempting to send Order Email to: ${email}`);
     const mailOptions = {
-        from: `"Lumina Dine" <${process.env.EMAIL_USER}>`,
+        from: `"Lumina Dine" <${(process.env.EMAIL_USER || "").trim()}>`,
         to: email,
         subject: "Order Confirmation 🍔",
         html: `
