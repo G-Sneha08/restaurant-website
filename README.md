@@ -81,6 +81,7 @@ cd restaurant-website
 
 2️⃣ **Install Dependencies**  
 ```bash
+node server/server.js
 npm install
 ```
 
