@@ -9,6 +9,15 @@ const SENDINBLUE_API_KEY = (process.env.SENDINBLUE_API_KEY || "").trim();
 const SENDER_EMAIL = "sneha901932@gmail.com"; // Verified sender for the Brevo account
 const SENDER_NAME = "Lumina Dine";
 
+// Diagnostic: Log API Key availability and format (masking most of it)
+if (SENDINBLUE_API_KEY) {
+    const keyPreview = SENDINBLUE_API_KEY.startsWith("xkeysib") 
+        ? "V3 Key (Correct Format)" 
+        : "Format seems unusual (V3 keys normally start with xkeysib-)";
+    console.log(`📡 [MAIL_DIAGNOSTIC] Key Present: ${keyPreview}. ID Preview: ${SENDINBLUE_API_KEY.slice(0, 4)}... (Length: ${SENDINBLUE_API_KEY.length})`);
+} else {
+    console.error("❌ [MAIL_DIAGNOSTIC] SENDINBLUE_API_KEY IS MISSING IN LOGS.");
+}
 
 /**
  * Robust Wrapper to dispatch emails via Brevo API with detailed tracking
@@ -55,6 +64,9 @@ const sendMailHelper = async (options) => {
     } catch (err) {
         const errorDetail = err.response ? JSON.stringify(err.response.data) : err.message;
         console.error(`❌ [MAIL_FAILURE] Transmission error: ${errorDetail}`);
+        if (errorDetail.includes("unauthorized") || errorDetail.includes("Key not found")) {
+            console.error("💡 PRO-TIP: Your Brevo V3 API key must start with 'xkeysib-'. Check Render Dashboard to ensure it was entered correctly.");
+        }
         return null;
     }
 };
