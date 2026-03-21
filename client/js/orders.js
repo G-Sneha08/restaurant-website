@@ -25,11 +25,13 @@ async function loadOrders() {
         if (!orders || orders.length === 0) {
             list.innerHTML = `
                 <div class="empty-orders">
-                    <video class="empty-video" autoplay loop muted playsinline poster="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg">
-                        <source src="https://v1.pinimg.com/videos/mc/720p/88/47/6f/88476fd44a47341a7c3bdf0da16b50f6.mp4" type="video/mp4">
-                    </video>
+                    <div class="video-wrapper">
+                        <video class="empty-video" autoplay loop muted playsinline poster="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg">
+                            <source src="https://v1.pinimg.com/videos/mc/720p/88/47/6f/88476fd44a47341a7c3bdf0da16b50f6.mp4" type="video/mp4">
+                        </video>
+                    </div>
                     <p>No orders yet — your next delicious experience is just a click away.</p>
-                    <a href="menu.html" class="btn btn-primary" style="margin-top:10px;">Start Your Journey</a>
+                    <a href="menu.html" class="btn btn-primary" style="margin-top:5px;">Start Your Journey</a>
                 </div>`;
             if (clearBtn) clearBtn.style.display = 'none';
             return;

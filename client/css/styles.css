@@ -644,19 +644,31 @@ footer {
     text-align: center;
     color: var(--text-light);
     grid-column: 1 / -1;
-    gap: 14px;
+    gap: 16px;
+}
+
+.video-wrapper {
+    width: 160px;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: #fff;
+    margin-bottom: 10px;
 }
 
 .empty-video {
-    width: 140px;
-    border-radius: 12px;
-    opacity: 0.85;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 220px;
+    height: 220px;
+    opacity: 0.95;
+    object-fit: cover;
 }
 
 .empty-orders p {
-    max-width: 400px;
-    font-size: 1.125rem;
+    max-width: 450px;
+    font-size: 1.15rem;
     font-weight: 500;
 }
