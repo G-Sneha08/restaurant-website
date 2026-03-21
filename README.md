@@ -1,73 +1,109 @@
-# Lumina Dine - Restaurant Management System
+# 🍽️ Lumina Dine - Restaurant Management System
 
-A full-stack, production-ready Restaurant Management Web Application built with Node.js, Express, MySQL, and Vanilla JavaScript.
+[![Frontend Deployment](https://img.shields.io/badge/Vercel-Frontend-black?logo=vercel)](https://restaurant-website-umber-three.vercel.app/)
+[![Backend Deployment](https://img.shields.io/badge/Render-Backend-46E3B7?logo=render)](https://restaurant-backend-cli2.onrender.com/health)
 
-## 🚀 Features
+A modern, full-stack, production-ready Restaurant Management Web Application. Designed for luxury dining experiences with a deep focus on stability, security, and performance.
 
-- **User Authentication**: Secure JWT-based login and registration with bcrypt password hashing.
-- **Dynamic Menu**: Categorized menu items fetched from MySQL.
-- **Shopping Cart**: Real-time cart updates (Add/Remove/Update Quantity).
-- **Order Management**: Transaction-based order placement and history.
-- **Table Booking**: Reservation system with date/time selection.
-- **Feedback System**: User ratings and testimonials.
-- **Admin Dashboard**:
-    - Manage all users.
-    - View and update order statuses (Pending, Confirmed, Delivered, Cancelled).
-    - CRUD operations on Menu items.
-    - View customer feedback.
+## 📌 Sections
+- [Live Demo](#-live-demo)
+- [Tech Stack](#-tech-stack)
+- [Key Features](#-key-features)
+- [Visual Highlights](#-visual-highlights)
+- [Local Installation](#-local-installation)
+- [Deployment Info](#-deployment-info)
+
+---
+
+## 🌐 Live Demo
+Experience the excellence here: [Lumina Dine Live Website](https://restaurant-website-umber-three.vercel.app/)
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL
-- **Security**: JWT, Bcrypt, Helmet, CORS, Dotenv
+### Frontend
+- **HTML5 & CSS3**: Custom vanilla design with glassmorphism and modern aesthetics.
+- **JavaScript (Vanilla)**: High-performance core logic without heavy framework overhead.
+- **Icons**: FontAwesome 6.5.1
 
-## 📦 Setup Instructions
+### Backend
+- **Node.js & Express.js**: Reliable server-side architecture.
+- **MySQL2**: Scalable and relational database management.
+- **JWT**: Secure session-less authentication.
 
-### 1. Database Setup
-1. Open your MySQL client (e.g., MySQL Workbench or Terminal).
-2. Run the commands in `schema.sql` to create the database and tables.
+### Infrastructure & Dev
+- **Vercel**: High-speed frontend hosting.
+- **Render**: Reliable backend compute.
+- **Railway**: Managed MySQL database.
+- **BcryptJS**: Advanced password hashing.
 
-### 2. Environment Variables
-Create a `.env` file in the root directory and add the following:
+---
+
+## ✨ Key Features
+
+### 👤 User Excellence
+- **Secure Authentication**: JWT-based login/register with hashed passwords and route protection.
+- **Dynamic Menu**: Real-time menu updates from the database with category filtering.
+- **Premium Order Flow**: Seamless cart management and order history tracking.
+- **Table Reservations**: Advanced booking system with integrated guest tracking.
+- **Aesthetic UI**: Smooth scroll reveals, responsive video empty states, and modern design.
+
+### 🛡️ Admin Power
+- **Intuitive Dashboard**: Real-time sales stats, active orders, and reservation metrics.
+- **Catalog Management**: Full CRUD operations on restaurant menu items.
+- **Order Control**: Complete status lifecycle management (Pending, Confirmed, Delivered, Cancelled).
+- **User Management**: Unified view of all registered patrons.
+
+---
+
+## 📦 Local Installation
+
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v14+)
+- [MySQL](https://www.mysql.com/) server
+
+### 2. Database Initialization
+```bash
+# Log into MySQL and run the schema file
+mysql -u root -p < schema.sql
+```
+
+### 3. Environment Variables
+Create a `.env` file in the root directory (refer to `.env.example`):
 ```env
-DB_HOST=crossover.proxy.rlwy.net
-DB_PORT=12849
+DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=VgknVczRXKYYnbRoIVWRGwMwjOFgJfko
-DB_NAME=railway
-
-JWT_SECRET=your_super_secret_jwt_key
+DB_PASSWORD=your_password
+DB_NAME=restaurant_db
+JWT_SECRET=your_jwt_secret
 PORT=5000
-NODE_ENV=development
-PEXELS_API_KEY=lREKBvDWZIUvJBQjCJpvC46YG9n2XH7M6KPjGhaN2YWiHiKOK0L8lWdk
 ```
 
-### 3. Installation
+### 4. Setup & Start
 ```bash
+# Install dependencies
 npm install
-```
 
-### 4. Running the App
-```bash
-# Production mode
-npm start
-
-# Development mode (requires nodemon)
+# Start development server
 npm run dev
 ```
 
-The application will be available at `http://localhost:5000`.
+---
 
-## 🌐 Deployment Guide (Render/Railway)
+## 🌐 Deployment Configuration
 
-1. Push your code to a GitHub repository.
-2. Connect your repository to Render/Railway.
-3. Add the environment variables in the platform's dashboard.
-4. Set the Build Command to `npm install`.
-5. Set the Start Command to `npm start`.
-6. Ensure your MySQL database is accessible from the deployment environment (use a managed DB like PlanetScale or Aiven for production).
+This project is configured for **Unified Deployment**:
+- **Frontend**: Serves from `client/` directory.
+- **Backend Entry**: `api/index.js` for Vercel Serverless Functions.
+- **API Routing**: Configured via `vercel.json` for seamless frontend-backend communication.
+
+---
 
 ## 📄 License
-MIT License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+*Crafted with precision & culinary inspiration. Lumina Dine — Where Technology Meets Taste.*
