@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
             query += ' WHERE user_id IS NULL';
         }
         
-        query += ' ORDER BY created_at DESC';
+        query += ' ORDER BY id DESC';
         const [rows] = await pool.query(query, params);
 
         const totalPrice = rows.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
