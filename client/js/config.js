@@ -1,29 +1,18 @@
-const isLocal = window.location.hostname === 'localhost' || 
-                 window.location.hostname === '127.0.0.1' || 
-                 window.location.hostname.endsWith('.github.dev');
+// client/js/config.js
 
-// Determine API URL based on environment
-let API_BASE_URL;
+// Determine if we are running in a local environment
+const isLocalhost = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1';
 
-if (window.location.hostname.endsWith('.github.dev')) {
-    // GitHub Codespaces dynamic port mapping
-    API_BASE_URL = `${window.location.protocol}//${window.location.hostname.replace('-3000.', '-5000.')}/api`;
-} else if (isLocal) {
-    // Standard local dev usually has backend on 5000
-    API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:5000/api`;
-} else {
-    // Production Render URL (Confirmed stable)
-    API_BASE_URL = "https://restaurant-backend-cli2.onrender.com/api";
-}
+// Set the global API Base URL
+window.API_BASE_URL = isLocalhost
+    ? "http://localhost:5000/api"
+    : "https://restaurant-backend-cli2.onrender.com/api";
 
-window.API_BASE_URL = API_BASE_URL;
+console.log(`[CONFIG] Environment: ${isLocalhost ? 'LOCAL' : 'PRODUCTION'}`);
+console.log(`[CONFIG] API_BASE_URL: ${window.API_BASE_URL}`);
 
-if (isLocal) {
-    console.log(`[CONFIG] Environment: ${isLocal ? 'DEVELOPMENT' : 'PRODUCTION'}`);
-    console.log(`[CONFIG] Source: ${window.location.hostname}`);
-    console.log(`[CONFIG] API_BASE_URL: ${API_BASE_URL}`);
-}
-
+// Helper function for API requests (keeps code clean and handles tokens)
 window.apiRequest = async function(endpoint, options = {}) {
     const token = localStorage.getItem("token");
     const headers = {
@@ -32,7 +21,7 @@ window.apiRequest = async function(endpoint, options = {}) {
         ...(options.headers || {})
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(`${window.API_BASE_URL}${endpoint}`, {
         ...options,
         headers
     });
