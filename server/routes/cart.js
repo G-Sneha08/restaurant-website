@@ -11,7 +11,8 @@ const getUserId = (req) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key';
+            const decoded = jwt.verify(token, JWT_SECRET);
             return decoded.id;
         } catch (e) {
             return null;
