@@ -48,8 +48,8 @@ function renderCategory(items, sectionId) {
                 <p class="card-desc">${item.description}</p>
                 <div class="card-footer">
                     <span class="card-price">₹${item.price}</span>
-                    <button onclick="addToCart(${item.id}, '${item.name}', ${item.price}, '${item.image_url}')"
-                        class="btn btn-primary btn-sm">Add to Cart</button>
+                    <button onclick="addToCart(${item.id}, this)"
+                        class="btn btn-primary btn-sm add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
         </div>

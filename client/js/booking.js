@@ -57,28 +57,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Redirect to login if token is expired or invalid
             if (response.status === 401) {
-                alert("Session expired. Please login again.");
+                showToast("Session expired. Please login again.", 'error');
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                window.location.href = "login.html";
+                setTimeout(() => window.location.href = "login.html", 1500);
                 return;
             }
 
             if (response.ok && data.success) {
-
-                alert(data.message || "Table reserved successfully!");
+                showToast(data.message || "Table reserved successfully!");
                 form.reset();
                 loadBookings();
             } else {
-
-                alert(data.message || "Booking failed. Please try again.");
-
+                showToast(data.message || "Booking failed. Please try again.", 'error');
             }
 
         } catch (error) {
 
             console.error("Booking error:", error);
-            alert("An error occurred. Please try again later.");
+            showToast("An error occurred. Please try again later.", 'error');
 
         } finally {
             submitBtn.disabled = false;
@@ -179,14 +176,10 @@ window.cancelBooking = async function (id) {
         });
 
         if (response.ok) {
-
-            alert("Booking cancelled successfully");
+            showToast("Booking cancelled successfully");
             loadBookings();
-
         } else {
-
-            alert("Failed to cancel booking");
-
+            showToast("Failed to cancel booking", 'error');
         }
 
     } catch (error) {
@@ -215,17 +208,17 @@ window.clearBookings = async function () {
         const data = await response.json();
 
         if (response.status === 401) {
-            alert("Session expired. Please login again.");
+            showToast("Session expired. Please login again.", 'error');
             localStorage.clear();
-            window.location.href = "login.html";
+            setTimeout(() => window.location.href = "login.html", 1500);
             return;
         }
 
         if (response.ok && data.success) {
-            alert(data.message || "Reservation history cleared successfully.");
+            showToast(data.message || "Reservation history cleared successfully.");
             loadBookings();
         } else {
-            alert(data.message || "Operation failed: The server refused the purge request.");
+            showToast(data.message || "Operation failed: The server refused the purge request.", 'error');
         }
     } catch (err) {
         console.error("Clear error:", err);

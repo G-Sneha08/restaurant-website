@@ -1,34 +1,4 @@
-// ================= ADD TO CART =================
-async function addToCart(id) {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${window.API_BASE_URL}/cart`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": token ? `Bearer ${token}` : ""
-      },
-      body: JSON.stringify({
-        menu_item_id: id,
-        quantity: 1
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("Item added to cart");
-      if (typeof updateNavbar === "function") {
-        updateNavbar();
-      }
-    } else {
-      alert(data.message || "Failed to add item");
-    }
-  } catch (err) {
-    console.error("Add cart error:", err);
-    alert("Error adding item to cart");
-  }
-}
+// addToCart is now centrally managed in main.js to support toasts and dynamic button states.
 
 // ================= LOAD CART =================
 async function loadCart() {
@@ -182,8 +152,8 @@ async function checkoutCart() {
     
     // Robust token check to handle "null" or "undefined" strings
     if (!token || token === 'null' || token === 'undefined') {
-        alert("Please login to proceed with your order!");
-        window.location.href = "login.html";
+        showToast("Please login to proceed with your order!", 'error');
+        setTimeout(() => window.location.href = "login.html", 1500);
         return;
     }
 
@@ -195,19 +165,19 @@ async function checkoutCart() {
         });
 
         if (data.success) {
-            alert(data.message || "Your order has been placed successfully!");
-            window.location.href = "orders.html";
+            showToast(data.message || "Your order has been placed successfully!");
+            setTimeout(() => window.location.href = "orders.html", 2000);
         } else {
-            alert(data.message || "Indulgence failed. Please try again.");
+            showToast(data.message || "Indulgence failed. Please try again.", 'error');
         }
     } catch (err) {
         console.error("Checkout error:", err);
         // If 401 alert specifically
         if (err.message.includes("401") || err.message.includes("authorized")) {
-            alert("Your session has expired. Please log in again.");
-            logout();
+            showToast("Your session has expired. Please log in again.", 'error');
+            setTimeout(() => logout(), 1500);
         } else {
-            alert("Checkout failed: " + err.message);
+            showToast("Checkout failed: " + err.message, 'error');
         }
     }
 }

@@ -83,27 +83,76 @@ async function loadMenuImages() {
     }
 }
 
+// ================= SHOW TOAST =================
+function showToast(message, type = 'success') {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span class="toast-message">${message}</span>
+    `;
+
+    container.appendChild(toast);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+}
+
+window.showToast = showToast;
+
 // ================= ADD TO CART =================
-function addToCart(menu_item_id, quantity = 1) {
+async function addToCart(menu_item_id, btn = null) {
     const token = localStorage.getItem('token');
-    fetch(`${window.API_BASE_URL}/cart`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : ""
-        },
-        body: JSON.stringify({ menu_item_id, quantity })
-    })
-    .then(res => res.json())
-    .then(data => {
+    
+    // Check if item is already being added
+    if (btn && btn.classList.contains('adding')) return;
+    
+    if (btn) btn.classList.add('adding');
+
+    try {
+        const res = await fetch(`${window.API_BASE_URL}/cart`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token ? `Bearer ${token}` : ""
+            },
+            body: JSON.stringify({ menu_item_id, quantity: 1 })
+        });
+
+        const data = await res.json();
         if (data.success) {
-            alert(data.message || "Item added to cart!");
+            showToast(data.message || "Item added to your cart!");
             updateNavbar();
+
+            // Dynamic Button Change
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> View Cart';
+                btn.classList.remove('btn-primary', 'adding');
+                btn.classList.add('btn-view-cart');
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.location.href = "cart.html";
+                };
+            }
         } else {
-            alert(data.message || "Failed to add item to cart.");
+            showToast(data.message || "Failed to add item to cart.", 'error');
+            if (btn) btn.classList.remove('adding');
         }
-    })
-    .catch(err => console.error("Add to cart error:", err));
+    } catch (err) {
+        console.error("Add to cart error:", err);
+        showToast("Error connecting to server.", 'error');
+        if (btn) btn.classList.remove('adding');
+    }
 }
 
 window.addToCart = addToCart;

@@ -43,25 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
 
-                    alert("Login Successful!");
+                    showToast("Login Successful!");
                     
                     if (data.user && data.user.role === 'admin') {
-                        window.location.href = "admin.html";
+                        setTimeout(() => window.location.href = "admin.html", 1000);
                     } else {
-                        window.location.href = "index.html";
+                        setTimeout(() => window.location.href = "index.html", 1000);
                     }
 
                 } else {
-
-                    alert(data.message || "Login failed");
-
+                    showToast(data.message || "Login failed", 'error');
                 }
 
             } catch (error) {
-
                 console.error("Login Error:", error);
-                alert("Server error during login");
-
+                showToast("Server error during login", 'error');
             }
 
         });
@@ -106,10 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert(data.message || "Welcome to Lumina Dine! Your account has been successfully created. Please login to continue.");
-                    window.location.href = "login.html";
+                    showToast(data.message || "Welcome to Lumina Dine! Account created.");
+                    setTimeout(() => window.location.href = "login.html", 2000);
                 } else {
-                    alert(data.message || "Registration failed");
+                    showToast(data.message || "Registration failed", 'error');
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerText = "Register";

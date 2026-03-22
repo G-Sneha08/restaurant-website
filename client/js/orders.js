@@ -74,13 +74,12 @@ async function clearOrders() {
     try {
         const data = await apiRequest('/orders', { method: 'DELETE' });
         if (data.success) {
-            alert(data.message || "Your history has been cleared.");
+            showToast(data.message || "Your history has been cleared.");
             loadOrders(); // Refresh UI
         }
     } catch (err) {
         console.error("Clear orders frontend error:", err);
-        // User requested throw new Error(await res.text()) logic which is inside apiRequest now
-        alert(`Failed to clear orders: ${err.message}`);
+        showToast(`Failed to clear orders: ${err.message}`, 'error');
     }
 }
 
