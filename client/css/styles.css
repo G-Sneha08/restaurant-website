@@ -701,10 +701,13 @@ footer {
     transform: translateX(100px);
 }
 
-.toast i {
-    color: var(--primary);
-    font-size: 1.2rem;
-}
+.toast-success { border-left: 4px solid #27ae60; }
+.toast-error { border-left: 4px solid #ff4d4d; }
+.toast-warning { border-left: 4px solid #ffa502; }
+
+.toast-success i { color: #27ae60; }
+.toast-error i { color: #ff4d4d; }
+.toast-warning i { color: #ffa502; }
 
 .toast-message {
     font-weight: 500;

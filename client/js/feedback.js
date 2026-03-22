@@ -7,8 +7,8 @@ async function submitFeedback(event) {
 
     const token = localStorage.getItem('token');
     if (!token) {
-        alert("Please login to submit feedback!");
-        window.location.href = "login.html";
+        showToast("Please login to submit feedback!", 'warning');
+        setTimeout(() => window.location.href = "login.html", 1500);
         return;
     }
 
@@ -16,7 +16,7 @@ async function submitFeedback(event) {
     const rating = document.getElementById('rating').value;
 
     if (!message || !rating) {
-        alert("Please fill in all fields");
+        showToast("Please fill in all fields", 'warning');
         return;
     }
 
@@ -32,15 +32,15 @@ async function submitFeedback(event) {
 
         const data = await res.json();
         if (res.ok) {
-            alert("Thank you for your feedback!");
+            showToast("✅ Feedback submitted successfully!");
             document.getElementById('feedback-form').reset();
             loadFeedback(); // Refresh feedback list
         } else {
-            alert(data.message || "Failed to submit feedback");
+            showToast(data.message || "⚠️ Something went wrong. Try again!", 'error');
         }
     } catch (err) {
         console.error(err);
-        alert("Server error");
+        showToast("⚠️ Something went wrong. Try again!", 'error');
     }
 }
 

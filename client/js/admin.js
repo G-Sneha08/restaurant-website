@@ -78,12 +78,13 @@ async function updateBookingStatus(id, status) {
         });
         const data = await res.json();
         if (data.success) {
+            showToast("Status updated successfully!");
             loadAdminBookings(); // Refresh UI
         } else {
-            alert(data.message || "Failed to update status");
+            showToast(data.message || "Failed to update status", 'error');
         }
     } catch (err) {
-        alert("Server error updating status");
+        showToast("Server error updating status", 'error');
     }
 }
 
@@ -100,8 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem('token');
 
     if (!user || user.role !== 'admin' || !token) {
-        alert("Access Denied! Admin only.");
-        window.location.href = "login.html";
+        showToast("Access Denied! Admin only.", 'error');
+        setTimeout(() => window.location.href = "login.html", 1500);
         return;
     }
 
@@ -235,11 +236,11 @@ async function updateOrderStatus(id, status) {
             body: JSON.stringify({ status })
         });
         if (data.success) {
-            // alert("Status updated!");
+            showToast("Order status updated!");
             loadOrders(); // Refresh table
         }
     } catch (err) {
-        alert("Failed to update status");
+        showToast("Failed to update status", 'error');
     }
 }
 
@@ -292,10 +293,11 @@ async function updateBookingStatus(id, status) {
             body: JSON.stringify({ status })
         });
         if (data.success) {
+            showToast("Booking status updated!");
             loadBookings();
         }
     } catch (err) {
-        alert("Failed to update status");
+        showToast("Failed to update status", 'error');
     }
 }
 

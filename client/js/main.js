@@ -93,9 +93,14 @@ function showToast(message, type = 'success') {
     }
 
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast toast-${type}`;
+    
+    let icon = 'fa-check-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+
     toast.innerHTML = `
-        <i class="fas fa-check-circle"></i>
+        <i class="fas ${icon}"></i>
         <span class="toast-message">${message}</span>
     `;
 
