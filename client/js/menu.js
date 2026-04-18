@@ -4,12 +4,13 @@
 
 async function loadMenu() {
     try {
-        const response = await fetch(`${API_BASE_URL}/menu`);
-        const menuItems = await response.json();
-
-        // RESILIENCE: Ensure menuItems is an array
-        const items = Array.isArray(menuItems) ? menuItems : (menuItems.menu || []);
-        console.log("Menu items loaded:", items.length);
+        console.log("Starting menu load...");
+        // Use the global apiRequest helper for consistent logging/error handling
+        const data = await window.apiRequest('/menu');
+        
+        // Items are in data.menu based on backend response structure
+        const items = data.menu || [];
+        console.log("Menu items loaded successfully:", items.length);
 
         // Categorize items
         const starters = items.filter(item => item.category === 'Starters');
@@ -24,7 +25,12 @@ async function loadMenu() {
         renderCategory(desserts, 'desserts');
 
     } catch (error) {
-        console.error("Error loading menu:", error);
+        console.error("Error loading menu:", error.message);
+        // Show an error message to the user UI
+        const grids = document.querySelectorAll('.grid');
+        grids.forEach(grid => {
+            grid.innerHTML = `<p class="error-msg">Failed to load menu: ${error.message}. Please try again later.</p>`;
+        });
     }
 }
 
@@ -49,7 +55,7 @@ function renderCategory(items, sectionId) {
                 <div class="card-footer">
                     <span class="card-price">₹${item.price}</span>
                     <button onclick="addToCart(${item.id}, this)"
-                        class="btn btn-primary btn-sm add-to-cart-btn">Add to Cart</button>
+                        class="btn btn-primary btn-sm add-to-cart">Add to Cart</button>
                 </div>
             </div>
         </div>

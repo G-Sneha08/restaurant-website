@@ -34,9 +34,21 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? allowedOrigins
-    : true, // Allow all in dev
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const isAllowed = allowedOrigins.includes(origin) || 
+                     origin.endsWith(".vercel.app") || 
+                     process.env.NODE_ENV !== 'production';
+                     
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ [CORS_REJECTED]: ${origin}. Origin not in allowed list.`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -46,9 +58,24 @@ app.use(cors({
 const clientPath = path.join(__dirname, '../client');
 app.use(express.static(clientPath));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Restaurant API is running' });
+// Health check with DB status
+app.get('/health', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    connection.release();
+    res.json({ 
+      status: 'ok', 
+      database: 'connected',
+      message: 'Restaurant API and Database are operational' 
+    });
+  } catch (err) {
+    res.status(503).json({ 
+      status: 'error', 
+      database: 'disconnected', 
+      message: 'API is running but Database connection failed',
+      error: err.message
+    });
+  }
 });
 
 // ===================== API Routes =====================
@@ -65,6 +92,8 @@ app.get('/api/images', (req, res) => {
   const imageMap = {
     "Paneer Tikka": "/images/panner-tikka.jpg",
     "Paneer Butter Masala": "/images/panner-butter-masala.jpg",
+    "Chicken Biryani": "https://images.pexels.com/photos/4439740/pexels-photo-4439740.jpeg",
+    "Margherita Pizza": "https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg",
     "Cold Coffee": "/images/cold-coffee.jpg",
     "Crispy Corn": "/images/crispy-corn.jpg",
     "Rasmalai": "/images/rasmalai.jpg"

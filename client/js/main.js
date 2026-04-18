@@ -70,6 +70,8 @@ async function loadMenuImages() {
                 "Paneer Tikka": "paneerTikkaImg",
                 "Crispy Corn": "crispyCornImg",
                 "Paneer Butter Masala": "paneerButterMasalaImg",
+                "Chicken Biryani": "chickenBiryaniImg",
+                "Margherita Pizza": "margheritaPizzaImg",
                 "Cold Coffee": "coldCoffeeImg",
                 "Rasmalai": "rasmalaiImg"
             };

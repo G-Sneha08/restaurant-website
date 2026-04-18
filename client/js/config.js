@@ -20,24 +20,34 @@ window.apiRequest = async function(endpoint, options = {}) {
         ...(options.headers || {})
     };
 
-    const response = await fetch(`${window.API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers
-    });
+    console.log(`[API_REQUEST] Calling: ${endpoint}`);
 
-    let data = {};
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-    } else {
-        const text = await response.text();
-        data = { message: text || `Error ${response.status}` };
-    }
+    try {
+        const response = await fetch(`${window.API_BASE_URL}${endpoint}`, {
+            ...options,
+            headers
+        });
 
-    if (!response.ok) {
-        const err = new Error(data.message || `API error ${response.status}`);
-        err.status = response.status;
+        console.log(`[API_RESPONSE] Status: ${response.status} for ${endpoint}`);
+
+        let data = {};
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            data = { message: text || `Error ${response.status}` };
+        }
+
+        if (!response.ok) {
+            console.error(`[API_ERROR] ${endpoint}:`, data.message);
+            const err = new Error(data.message || `API error ${response.status}`);
+            err.status = response.status;
+            throw err;
+        }
+        return data;
+    } catch (err) {
+        console.error(`[NETWORK_ERROR] ${endpoint}:`, err.message);
         throw err;
     }
-    return data;
 };

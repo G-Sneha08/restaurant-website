@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
         res.json({ success: true, cart: rows, totalPrice });
     } catch (err) {
         console.error("GET_CART_ERROR:", err.message);
-        res.status(500).json({ success: false, message: 'Something went wrong while retrieving your cart. Please try again later.' });
+        res.status(503).json({ success: false, message: 'Our culinary storage is currently unreachable. Please try again soon.' });
     }
 });
 
@@ -88,7 +88,7 @@ router.post('/', async (req, res) => {
         }
     } catch (err) {
         console.error("ADD_TO_CART_ERROR:", err.message);
-        res.status(500).json({ success: false, message: 'Server encountered a problem adding this item to your cart.' });
+        res.status(503).json({ success: false, message: 'Our kitchen is experiencing technical difficulties. Could not add item to cart.' });
     }
 });
 

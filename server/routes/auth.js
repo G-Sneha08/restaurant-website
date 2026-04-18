@@ -57,9 +57,10 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        return res.status(500).json({
+        return res.status(503).json({
             success: false,
-            message: "Registration failed due to a server-side error. Please verify your connection.",
+            message: "Our database is currently resting. Please try again in 5 minutes.",
+            tip: "If this persists, the Railway database service might be paused or expired.",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
@@ -138,9 +139,10 @@ router.post("/login", async (req, res) => {
 
         console.error("❌ [LOGIN_ERROR]:", error.message);
 
-        res.status(500).json({
+        res.status(503).json({
             success: false,
-            message: "Login failed due to a server error. Please try again later.",
+            message: "Authentication service unavailable: Database connection lost.",
+            tip: "Check Railway DB status.",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
 
